@@ -1,14 +1,1 @@
-﻿  stdafx.cpp
-  TextConvert.cpp
-  Tokenizer.cpp
-  DialogResizer.cpp
-  DittoUtil.cpp
-  Exports.cpp
-  PasteAnyAsText.cpp
-  PasteImageAsHtmlImage.cpp
-  ReadOnlyFlag.cpp
-  RemoveLineFeeds.cpp
-  SelectPasteFormat.cpp
-  正在生成代码...
-    正在创建库 E:\PubCode\Ditto\Release64\Addins\DittoUtil.lib 和对象 E:\PubCode\Ditto\Release64\Addins\DittoUtil.exp
-  DittoUtil.vcxproj -> E:\PubCode\Ditto\Release64\Addins\DittoUtil.dll
+﻿d:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Microsoft\VC\v180\Microsoft.CppBuild.targets(473,5): error MSB8020: 无法找到 Visual Studio 2022 的生成工具(平台工具集 =“v143”)。若要使用 v143 生成工具进行生成，请安装 Visual Studio 2022 生成工具。或者，可以升级到当前 Visual Studio 工具，方式是通过选择“项目”菜单或右键单击该解决方案，然后选择“重定解决方案目标”。

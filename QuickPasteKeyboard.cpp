@@ -4,6 +4,8 @@
 #include "ActionEnums.h"
 #include "HotKeys.h"
 
+BOOL bDummy = FALSE;
+
 CQuickPasteKeyboard::CQuickPasteKeyboard()
 {
 	m_csTitle = theApp.m_Language.GetString("QuickPasteKeyboardTitle", "Quick Paste Keyboard");
@@ -644,180 +646,7 @@ void CQuickPasteKeyboard::LoadHotKey(KeyboardAB ab)
 		CheckDlgButton(IDC_RADIO_KEYBOARD_2, BST_CHECKED);
 	}
 
-	OnBnClickedRadioMouse1(0, 0, 0, (BOOL&)bDummy);
-}
-
-BOOL bDummy = FALSE;
-
-void CQuickPasteKeyboard::SelectMouseTypeCombo(CComboBox& combo, int value)
-{
-	int count = combo.GetCount();
-	for (int i = 0; i < count; i++)
-	{
-		int itemData = (int)combo.GetItemData(i);
-		if (itemData == value)
-		{
-			combo.SetCurSel(i);
-			break;
-		}
-	}
-}
-
-LRESULT CQuickPasteKeyboard::OnCbnKillfocusComboEnterModifier(WORD, WORD, HWND, BOOL&)
-{
-	return 0;
-}
-
-LRESULT CQuickPasteKeyboard::OnEnKillfocusEdit1(WORD, WORD, HWND, BOOL&)
-{
-	return 0;
-}
-
-LRESULT CQuickPasteKeyboard::OnKillFocus(UINT, WPARAM, LPARAM, BOOL&)
-{
-	return 0;
-}
-
-BOOL CQuickPasteKeyboard::PreTranslateMessage(MSG* pMsg)
-{
-	switch (pMsg->message)
-	{
-	case WM_KILLFOCUS:
-		break;
-	case WM_KEYDOWN:
-		if (pMsg->wParam == VK_ESCAPE)
-		{
-			if (pMsg->hwnd == m_hotKey1.m_hWnd)
-			{
-				m_hotKey1.SetHotKey(VK_ESCAPE, CAccels::GetKeyStateModifiers());
-				return TRUE;
-			}
-			if (pMsg->hwnd == m_hotKey2.m_hWnd)
-			{
-				m_hotKey2.SetHotKey(VK_ESCAPE, CAccels::GetKeyStateModifiers());
-				return TRUE;
-			}
-		}
-		break;
-	}
-
-	return FALSE;
-}
-
-BOOL CQuickPasteKeyboard::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
-{
-	NMHDR* pNMHDR = (NMHDR*)lParam;
-	if (pNMHDR && pNMHDR->code == WM_KILLFOCUS)
-	{
-		CWnd* pFocus = CWnd::GetFocus();
-		if (pFocus && (pFocus->GetParent() == this))
-		{
-			if (pFocus->GetDlgCtrlID() != IDCANCEL)
-			{
-				if (pNMHDR->idFrom)
-				{
-					int k = 0;
-				}
-			}
-		}
-	}
-
-	return FALSE;
-}
-
-BOOL CQuickPasteKeyboard::OnCommand(WPARAM wParam, LPARAM lParam)
-{
-	UINT notificationCode = (UINT)HIWORD(wParam);
-
-	if ((notificationCode == EN_KILLFOCUS) ||
-		(notificationCode == LBN_KILLFOCUS) ||
-		(notificationCode == CBN_KILLFOCUS) ||
-		(notificationCode == NM_KILLFOCUS) ||
-		(notificationCode == WM_KILLFOCUS)) {
-
-		CWnd* pFocus = CWnd::GetFocus();
-
-		if (pFocus && (pFocus->GetParent() == this))
-		{
-			if (pFocus->GetDlgCtrlID() != IDCANCEL)
-			{
-				int k = 9;
-			}
-		}
-	}
-
-	return FALSE;
-}
-
-LRESULT CQuickPasteKeyboard::OnBnClickedButtonEnter(WORD, WORD, HWND, BOOL&)
-{
-	DWORD hk = m_hotKey1.GetHotKey();
-	BYTE currentModifiers = CAccels::GetKeyStateModifiers();
-	m_hotKey1.SetHotKey(VK_RETURN, currentModifiers);
-
-	return 0;
-}
-
-LRESULT CQuickPasteKeyboard::OnBnClickedButtonEnter2(WORD, WORD, HWND, BOOL&)
-{
-	DWORD hk = m_hotKey2.GetHotKey();
-	BYTE currentModifiers = CAccels::GetKeyStateModifiers();
-	m_hotKey2.SetHotKey(VK_RETURN, currentModifiers);
-
-	return 0;
-}
-
-LRESULT CQuickPasteKeyboard::OnKeyUp(UINT, WPARAM, LPARAM, BOOL&)
-{
-	return 0;
-}
-
-LRESULT CQuickPasteKeyboard::OnBnClickedButtonReset(WORD, WORD, HWND, BOOL&)
-{
-	for (std::map<DWORD, KeyboardArray>::iterator it = m_map.begin(); it != m_map.end(); ++it)
-	{
-		for (int i = 0; i < 10; i++)
-		{
-			int newA = ActionEnums::GetDefaultShortCutKeyA((ActionEnums::ActionEnumValues)it->first, i);
-			int newB = ActionEnums::GetDefaultShortCutKeyB((ActionEnums::ActionEnumValues)it->first, i);
-			if (it->second.Array[i].A != newA ||
-				it->second.Array[i].B != newB)
-			{
-				it->second.Array[i].A = newA;
-				it->second.Array[i].B = newB;
-				it->second.Array[i].Dirty = true;
-
-				CString sh = GetShortCutText(it->second);
-			}
-		}
-	}
-
-	int count = m_list.GetItemCount();
-	for (int row = 0; row < count; row++)
-	{
-		int actionId = (int)m_list.GetItemData(row);
-
-		CString sh = GetShortCutText(m_map[actionId]);
-
-		LVITEM lvi;
-		lvi.mask = LVIF_TEXT;
-		lvi.iItem = (int)row;
-		lvi.iSubItem = 0;
-		lvi.pszText = (LPTSTR)(LPCTSTR)(sh);
-		m_list.SetItem(&lvi);
-	}
-
-	SelectedRow(0);
-
-	return 0;
-}
-
-void CQuickPasteKeyboard::SelectedRow(int row)
-{
-	m_list.SetItemState(row, LVIS_FOCUSED, LVIS_FOCUSED);
-	m_list.SetItemState(row, LVIS_SELECTED, LVIS_SELECTED);
-	m_list.SetSelectionMark(row);
-	m_list.EnsureVisible(row, FALSE);
+	OnBnClickedRadioMouse1(0, 0, 0, bDummy);
 }
 
 LRESULT CQuickPasteKeyboard::OnBnClickedRadioKeyboard1(WORD, WORD, HWND, BOOL&)
@@ -878,13 +707,13 @@ LRESULT CQuickPasteKeyboard::OnBnClickedRadioMouse1(WORD, WORD, HWND, BOOL&)
 
 LRESULT CQuickPasteKeyboard::OnBnClickedRadioKeyboard2(WORD, WORD, HWND, BOOL&)
 {
-	OnBnClickedRadioMouse1(0, 0, 0, (BOOL&)bDummy);
+	OnBnClickedRadioMouse1(0, 0, 0, bDummy);
 	return 0;
 }
 
 LRESULT CQuickPasteKeyboard::OnBnClickedRadioMouse2(WORD, WORD, HWND, BOOL&)
 {
-	OnBnClickedRadioMouse1(0, 0, 0, (BOOL&)bDummy);
+	OnBnClickedRadioMouse1(0, 0, 0, bDummy);
 	return 0;
 }
 

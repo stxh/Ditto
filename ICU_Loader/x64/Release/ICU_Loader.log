@@ -1,8 +1,1 @@
-﻿  pch.cpp
-  icu.cpp
-    正在创建库 E:\PubCode\Ditto\Release64\ICU_Loader.lib 和对象 E:\PubCode\Ditto\Release64\ICU_Loader.exp
-  正在生成代码
-  Previous IPDB not found, fall back to full compilation.
-  All 14 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
-  已完成代码的生成
-  ICU_Loader.vcxproj -> E:\PubCode\Ditto\Release64\ICU_Loader.dll
+﻿d:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Microsoft\VC\v180\Microsoft.CppBuild.targets(473,5): error MSB8020: 无法找到 Visual Studio 2022 的生成工具(平台工具集 =“v143”)。若要使用 v143 生成工具进行生成，请安装 Visual Studio 2022 生成工具。或者，可以升级到当前 Visual Studio 工具，方式是通过选择“项目”菜单或右键单击该解决方案，然后选择“重定解决方案目标”。
