@@ -1113,7 +1113,7 @@ CCopyConfig
 CCopyThread
 \*----------------------------------------------------------------------------*/
 
-IMPLEMENT_DYNCREATE(CCopyThread, CWinThread)
+IMPLEMENT_DYNCREATE(CCopyThread, WTL::CWinThread)
 
 CCopyThread::CCopyThread()
 {
@@ -1152,7 +1152,7 @@ int CCopyThread::ExitInstance()
 {
 	ASSERT( m_bQuit );  // make sure we intended to quit
 	m_pClipboardViewer->Disconnect();
-	return CWinThread::ExitInstance();
+	return WTL::CWinThread::ExitInstance();
 }
 
 // Called within Copy Thread:
@@ -1327,7 +1327,7 @@ bool CCopyThread::Quit()
 {
 	m_bQuit = true;
 	m_pClipboardViewer->PostMessage( WM_QUIT );
-	return CWinThread::PostThreadMessage( WM_QUIT, NULL, NULL ) != FALSE;
+	return WTL::CWinThread::PostThreadMessage( WM_QUIT, NULL, NULL ) != FALSE;
 }
 
 

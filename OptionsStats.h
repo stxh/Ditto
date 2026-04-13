@@ -7,19 +7,17 @@
 // OptionsStats.h : header file
 //
 
+
+
 /////////////////////////////////////////////////////////////////////////////
 // COptionsStats dialog
 
-class COptionsStats : public CPropertyPage
+class COptionsStats : public CPropertyPageImpl<COptionsStats>
 {
-	DECLARE_DYNCREATE(COptionsStats)
-
 // Construction
 public:
 	COptionsStats();   // standard constructor
 
-// Dialog Data
-	//{{AFX_DATA(COptionsStats)
 	enum { IDD = IDD_OPTIONS_STATS };
 	CString	m_eAllCopies;
 	CString	m_eAllPastes;
@@ -33,28 +31,19 @@ public:
 	CString	m_eClipsSent;
 	CString	m_eClipsRecieved;
 	CString	m_eLastStarted;
-	//}}AFX_DATA
-
-
-// Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(COptionsStats)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
-protected:
 
 	CString m_csTitle;
 
-	// Generated message map functions
-	//{{AFX_MSG(COptionsStats)
-	virtual BOOL OnInitDialog();
-	afx_msg void OnResetCounts();
-	afx_msg void OnRemoveAll();
-	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP()
+	BOOL OnInitDialog();
+	LRESULT OnResetCounts(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnRemoveAll(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+
+	BEGIN_MSG_MAP(COptionsStats)
+		MSG_WM_INITDIALOG(OnInitDialog)
+		COMMAND_ID_HANDLER(IDC_RESET_COUNTS, OnResetCounts)
+		COMMAND_ID_HANDLER(IDC_REMOVE_ALL, OnRemoveAll)
+	END_MSG_MAP()
+
 };
 
 //{{AFX_INSERT_LOCATION}}

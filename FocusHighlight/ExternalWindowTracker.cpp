@@ -1,6 +1,12 @@
 #include "stdafx.h"
 #include "externalwindowtracker.h"
 
+#include <atlbase.h>
+#include <atlstr.h>  // WTL CString的主要头文件
+#include <atlmisc.h> // 包含其他WTL工具类
+
+
+
 ExternalWindowTracker::ExternalWindowTracker(void)
 {
 	m_activeWnd = NULL;

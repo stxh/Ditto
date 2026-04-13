@@ -4,13 +4,6 @@
 
 #include "stdafx.h"
 #include "DialogResizer.h"
-
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
-#define new DEBUG_NEW
-#endif
-
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -30,12 +23,11 @@ void CDialogResizer::SetParent(HWND hWndParent)
 {
 	m_hWndParent = hWndParent;
 	CRect cr;
-	GetClientRect(m_hWndParent, cr);
+	GetClientRect(m_hWndParent, &cr);
 
 	m_DlgSize.cx = cr.Width();
 	m_DlgSize.cy = cr.Height();
 }
-
 void CDialogResizer::AddControl(int nControlID, int nFlags)
 {
 	HWND hWnd = GetDlgItem(m_hWndParent, nControlID);
@@ -49,10 +41,8 @@ void CDialogResizer::AddControl(HWND hWnd, int nFlags)
 	data.m_hWnd = hWnd;
 	data.m_nFlags = nFlags;
 
-
-	m_Controls.Add(data);
+	m_Controls.push_back(data);
 }
-
 void CDialogResizer::MoveControls(CSize csNewSize)
 {
 	int nDeltaX = csNewSize.cx - m_DlgSize.cx;
@@ -63,17 +53,16 @@ void CDialogResizer::MoveControls(CSize csNewSize)
 
 	m_DlgSize = csNewSize;
 
-	int nCount = (int)m_Controls.GetSize();
+int nCount = (int)m_Controls.size();
 	CRect rc;
 	CRect rcParent;
-
-	GetClientRect(m_hWndParent, rcParent);
+	GetClientRect(m_hWndParent, &rcParent);
 
 	for(int i = 0; i < nCount; i++)
 	{
 		CDR_Data data = m_Controls[i];
 
-		GetWindowRect(data.m_hWnd, rc);
+		GetWindowRect(data.m_hWnd, &rc);
 		MapWindowPoints(GetDesktopWindow(),  m_hWndParent, (LPPOINT)&rc, 2 );
 		
 		//

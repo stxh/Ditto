@@ -1,12 +1,23 @@
 #pragma once
-class CDimWnd : public CFrameWnd
+
+#include <atlbase.h>
+#include <atlwin.h>
+
+class CDimWnd : public CFrameWindowImpl<CDimWnd>
 {
 public:
-	CDimWnd(CWnd *pParent);
-	BOOL OnEraseBkgnd(CDC* pDC);
+	DECLARE_FRAME_WND_CLASS(NULL, 0)
+
+	CDimWnd(CWnd* pParent);
+
+	BEGIN_MSG_MAP(CDimWnd)
+		MESSAGE_HANDLER(WM_ERASEBKGND, OnEraseBkgnd)
+	END_MSG_MAP()
+
+	LRESULT OnEraseBkgnd(UINT, WPARAM, LPARAM, BOOL&);
 
 	~CDimWnd();
 
-protected:
-	DECLARE_MESSAGE_MAP()
+private:
+	HWND m_ParentWnd;
 };

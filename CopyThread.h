@@ -1,7 +1,8 @@
 #pragma once
 
 #include "ClipboardViewer.h"
-#include <afxmt.h>
+
+#include "wtl_thread.h"
 
 struct CCopyConfig
 {
@@ -38,7 +39,7 @@ public:
 	}
 };
 
-class CCopyThread : public CWinThread
+class CCopyThread : public WTL::CWinThread
 {
 	DECLARE_DYNCREATE(CCopyThread)
 public:

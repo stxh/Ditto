@@ -8,55 +8,27 @@
 #include "About.h"
 #include "InternetUpdate.h"
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
 /////////////////////////////////////////////////////////////////////////////
 // CAbout property page
-
-IMPLEMENT_DYNCREATE(CAbout, CPropertyPage)
-
-CAbout::CAbout() : CPropertyPage(CAbout::IDD)
+CAbout::CAbout() : CPropertyPageImpl<CAbout>(CAbout::IDD)
 {
 	m_csTitle = theApp.m_Language.GetString("AboutTitle", "About");
 	m_psp.pszTitle = m_csTitle;
 	m_psp.dwFlags |= PSP_USETITLE;
-
-	//{{AFX_DATA_INIT(CAbout)
-		// NOTE: the ClassWizard will add member initialization here
-	//}}AFX_DATA_INIT
 }
-
 CAbout::~CAbout()
 {
 }
 
-void CAbout::DoDataExchange(CDataExchange* pDX)
-{
-	CPropertyPage::DoDataExchange(pDX);
-	//{{AFX_DATA_MAP(CAbout)
-	DDX_Control(pDX, IDC_STATIC_LINK, m_Link);
-	DDX_Control(pDX, IDC_HYPER_LINK, m_HyperLink);
-	DDX_Control(pDX, IDC_LIST, m_List);
-	//}}AFX_DATA_MAP
-}
-
-
-BEGIN_MESSAGE_MAP(CAbout, CPropertyPage)
-	//{{AFX_MSG_MAP(CAbout)
-	//}}AFX_MSG_MAP
-END_MESSAGE_MAP()
-
+BEGIN_MSG_MAP(CAbout)
+	MSG_WM_INITDIALOG(OnInitDialog)
+END_MSG_MAP()
 /////////////////////////////////////////////////////////////////////////////
 // CAbout message handlers
 
-BOOL CAbout::OnInitDialog() 
+BOOL CAbout::OnInitDialog(HWND hWnd, LPARAM lParam)
 {
-	CPropertyPage::OnInitDialog();
-
+	CPropertyPageImpl<CAbout>::OnInitDialog(hWnd, lParam);
 	m_List.AddString(_T("Ditto"));
 
 	CInternetUpdate update;
@@ -108,9 +80,8 @@ BOOL CAbout::OnInitDialog()
 		m_List.AddString(_T("    ") + arr[i]);
 	}
 
-	CRect rect;
-	GetClientRect(rect);
-	
+RECT rect;
+	GetClientRect(&rect);	
 	rect.bottom -= 30;
 	
 	m_List.MoveWindow(rect);

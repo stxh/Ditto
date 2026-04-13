@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ClipboardSaveRestore.h"
-#include "afxmt.h"
+
 
 class CClipboardSaveRestoreCopyBuffer : public CClipboardSaveRestore
 {

@@ -19,23 +19,26 @@ bool CReadOnlyFlag::ResetReadOnlyFlag(const CDittoInfo &DittoInfo, IClip *pClip,
 	IClipFormats *pFormats = pClip->Clips();
 	if(pFormats)
 	{
-		CStringArray lines;
+		CStringVector lines;
 
 		LoadHDropFiles(lines, pFormats);
 
-		if(lines.GetSize() <= 0)
+		if(lines.empty())
 		{
 			LoadUnicodeFiles(lines, pFormats);
 		}
 
-		if(lines.GetSize() <= 0)
+		if(lines.empty())
 		{
 			LoadTextFiles(lines, pFormats);
 		}
 
-		for(int i = 0; i < lines.GetSize(); i++)
+		for(size_t i = 0; i < lines.size(); i++)
 		{
-			CString file = lines[i].TrimLeft(' ').TrimRight(' ').MakeLower();
+			CString file = lines[i];
+			file.TrimLeft(_T(' '));
+			file.TrimRight(_T(' '));
+			file.MakeLower();
 
 			//Find the first occurance of a file // or \\ for a network file or a->z:\\ for a local files
 			int pos = file.Find(_T("//"));
@@ -77,14 +80,13 @@ bool CReadOnlyFlag::ResetReadOnlyFlag(const CDittoInfo &DittoInfo, IClip *pClip,
 				}
 			}
 
-			BOOL success = FALSE;
 			if(resetFlag)
 			{
-				success = ::SetFileAttributes(file, FILE_ATTRIBUTE_NORMAL);
+				::SetFileAttributes(file, FILE_ATTRIBUTE_NORMAL);
 			}
 			else
 			{
-				success = ::SetFileAttributes(file, FILE_ATTRIBUTE_READONLY);
+				::SetFileAttributes(file, FILE_ATTRIBUTE_READONLY);
 			}
 		}
 	}
@@ -92,7 +94,7 @@ bool CReadOnlyFlag::ResetReadOnlyFlag(const CDittoInfo &DittoInfo, IClip *pClip,
 	return true;
 }
 
-bool CReadOnlyFlag::LoadUnicodeFiles(CStringArray &lines, IClipFormats *pFormats)
+bool CReadOnlyFlag::LoadUnicodeFiles(CStringVector &lines, IClipFormats *pFormats)
 {		
 	IClipFormat *pFormat = pFormats->FindFormatEx(CF_UNICODETEXT);
 	if(pFormat != NULL)
@@ -107,17 +109,17 @@ bool CReadOnlyFlag::LoadUnicodeFiles(CStringArray &lines, IClipFormats *pFormats
 			CString line;
 			while(token.Next(line))
 			{
-				lines.Add(line);
+				lines.push_back(line);
 			}
 
 			GlobalUnlock(pFormat->Data());
 		}
 	}
 
-	return lines.GetSize() > 0;
+	return !lines.empty();
 }
 
-bool CReadOnlyFlag::LoadTextFiles(CStringArray &lines, IClipFormats *pFormats)
+bool CReadOnlyFlag::LoadTextFiles(CStringVector &lines, IClipFormats *pFormats)
 {		
 	IClipFormat *pFormat = pFormats->FindFormatEx(CF_TEXT);
 	if(pFormat != NULL)
@@ -133,17 +135,17 @@ bool CReadOnlyFlag::LoadTextFiles(CStringArray &lines, IClipFormats *pFormats)
 			CString line;
 			while(token.Next(line))
 			{
-				lines.Add(line);
+				lines.push_back(line);
 			}
 
 			GlobalUnlock(pFormat->Data());
 		}
 	}
 
-	return lines.GetSize() > 0;
+	return !lines.empty();
 }
 
-bool CReadOnlyFlag::LoadHDropFiles(CStringArray &lines, IClipFormats *pFormats)
+bool CReadOnlyFlag::LoadHDropFiles(CStringVector &lines, IClipFormats *pFormats)
 {
 	IClipFormat *pFormat = pFormats->FindFormatEx(CF_HDROP);
 	if(pFormat != NULL)
@@ -158,7 +160,7 @@ bool CReadOnlyFlag::LoadHDropFiles(CStringArray &lines, IClipFormats *pFormats)
 			{
 				if(DragQueryFile(drop, nFile, file, sizeof(file)) > 0)
 				{
-					lines.Add(file);
+					lines.push_back(file);
 				}
 			}
 
@@ -166,5 +168,5 @@ bool CReadOnlyFlag::LoadHDropFiles(CStringArray &lines, IClipFormats *pFormats)
 		}
 	}
 
-	return lines.GetSize() > 0;
+	return !lines.empty();
 }

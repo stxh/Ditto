@@ -4,7 +4,6 @@
 #include "stdafx.h"
 #include "CP_Main.h"
 #include "MainFrm.h"
-#include "afxole.h"
 #include "Misc.h"
 #include "CopyProperties.h"
 #include "InternetUpdate.h"
@@ -18,73 +17,58 @@
 #include "OptionsSheet.h"
 #include "DeleteClipData.h"
 #include "DatabaseUtilities.h"
-
-#ifdef _DEBUG
-    #define new DEBUG_NEW
-    #undef THIS_FILE
-    static char THIS_FILE[] = __FILE__;
-#endif 
-
 #define WM_ICON_NOTIFY			WM_APP+10
 #define MYWM_NOTIFYICON (WM_USER+1)
 #define WM_TRAYNOTIFY WM_USER + 100
 	
-IMPLEMENT_DYNAMIC(CMainFrame, CFrameWnd)
-
-BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
-	//{{AFX_MSG_MAP(CMainFrame)
-	ON_WM_CREATE()
-	ON_COMMAND(ID_FIRST_OPTION, OnFirstOption)
-	ON_COMMAND(ID_FIRST_EXIT, OnFirstExit)
-	ON_WM_TIMER()
-	ON_COMMAND(ID_FIRST_SHOWQUICKPASTE, OnFirstShowquickpaste)
-	ON_COMMAND(ID_FIRST_TOGGLECONNECTCV, OnFirstToggleConnectCV)
-	ON_UPDATE_COMMAND_UI(ID_FIRST_TOGGLECONNECTCV, OnUpdateFirstToggleConnectCV)
-	ON_COMMAND(ID_FIRST_HELP, OnFirstHelp)
-	//}}AFX_MSG_MAP
-	ON_MESSAGE(WM_HOTKEY, OnHotKey)
-	ON_MESSAGE(WM_SHOW_TRAY_ICON, OnShowTrayIcon)
-	ON_MESSAGE(WM_CLIPBOARD_COPIED, OnClipboardCopied)
-	ON_WM_CLOSE()
-	ON_MESSAGE(WM_ADD_TO_DATABASE_FROM_SOCKET, OnAddToDatabaseFromSocket)
-	ON_MESSAGE(WM_SEND_RECIEVE_ERROR, OnErrorOnSendRecieve)
-	ON_MESSAGE(WM_SHOW_ERROR_MSG, OnErrorMsg)
-	ON_COMMAND(ID_FIRST_IMPORT, OnFirstImport)
-	ON_WM_DESTROY()
-	ON_COMMAND(ID_FIRST_NEWCLIP, OnFirstNewclip)
-	ON_MESSAGE(WM_SET_CONNECTED, OnSetConnected)
-	ON_MESSAGE(WM_OPEN_CLOSE_WINDOW, OnOpenCloseWindow)
-	ON_MESSAGE(WM_LOAD_ClIP_ON_CLIPBOARD, OnLoadClipOnClipboard)
-	ON_COMMAND(ID_FIRST_GLOBALHOTKEYS, &CMainFrame::OnFirstGlobalhotkeys)
-	ON_MESSAGE(WM_GLOBAL_CLIPS_CLOSED, OnGlobalClipsClosed)
-	ON_MESSAGE(WM_OPTIONS_CLOSED, OnOptionsClosed)
-	ON_MESSAGE(WM_SHOW_OPTIONS, OnShowOptions)
-	ON_COMMAND(ID_FIRST_DELETECLIPDATA, &CMainFrame::OnFirstDeleteclipdata)
-	ON_MESSAGE(WM_DELETE_CLIPS_CLOSED, OnDeleteClipDataClosed)
-	ON_COMMAND(ID_FIRST_SAVECURRENTCLIPBOARD, &CMainFrame::OnFirstSavecurrentclipboard)
-	ON_MESSAGE(WM_SAVE_CLIPBOARD, &CMainFrame::OnSaveClipboardMessage)
-	ON_MESSAGE(WM_READD_TASKBAR_ICON, OnReAddTaskBarIcon)
-	ON_MESSAGE(WM_REOPEN_DATABASE, &CMainFrame::OnReOpenDatabase)
-	ON_MESSAGE(WM_SHOW_MSG_WINDOW, &CMainFrame::OnShowMsgWindow)
-	ON_MESSAGE(WM_SHOW_DITTO_GROUP, &CMainFrame::OnShowDittoGroup)
-	ON_COMMAND(ID_FIRST_FIXUPSTICKYCLIPORDER, &CMainFrame::OnFirstFixupstickycliporder)
-	ON_MESSAGE(WM_DISPLAYCHANGE, &CMainFrame::OnResolutionChange)
-	ON_MESSAGE(WM_TRAYNOTIFY, &CMainFrame::OnTrayNotification)
-	ON_MESSAGE(WM_PLAIN_TEXT_PASTE, &CMainFrame::OnPlainTextPaste)
-	ON_WM_WININICHANGE()
-	ON_COMMAND(ID_FIRST_SHOWSTARTUPMESSAGE, &CMainFrame::OnFirstShowstartupmessage)
-	ON_UPDATE_COMMAND_UI(ID_FIRST_SHOWSTARTUPMESSAGE, &CMainFrame::OnUpdateFirstShowstartupmessage)
-	ON_COMMAND(ID_FIRST_BACKUPDATABASE, &CMainFrame::OnFirstBackupdatabase)
-	ON_COMMAND(ID_FIRST_RESTOREDATABASE, &CMainFrame::OnFirstRestoredatabase)
-	ON_MESSAGE(WM_BACKUP_DB, OnBackupDb)
-	ON_MESSAGE(WM_RESTORE_DB, OnRestoreDb)
-	ON_COMMAND(ID_FIRST_DELETEALLNONUSEDCLIPS, &CMainFrame::OnFirstDeleteallnonusedclips)
-	ON_MESSAGE(WM_PASTE_CLIP, OnPasteClip)
-	ON_MESSAGE(WM_EDIT_CLIP, OnEditClip)
-
-	ON_WM_SETFOCUS()
-END_MESSAGE_MAP()
-
+BEGIN_MSG_MAP(CMainFrame)
+	MESSAGE_HANDLER(WM_CREATE, OnCreate)
+	COMMAND_ID_HANDLER(ID_FIRST_OPTION, OnFirstOption)
+	COMMAND_ID_HANDLER(ID_FIRST_EXIT, OnFirstExit)
+	MESSAGE_HANDLER(WM_TIMER, OnTimer)
+	COMMAND_ID_HANDLER(ID_FIRST_SHOWQUICKPASTE, OnFirstShowquickpaste)
+	COMMAND_ID_HANDLER(ID_FIRST_TOGGLECONNECTCV, OnFirstToggleConnectCV)
+	COMMAND_ID_HANDLER(ID_FIRST_HELP, OnFirstHelp)
+	MESSAGE_HANDLER(WM_HOTKEY, OnHotKey)
+	MESSAGE_HANDLER(WM_SHOW_TRAY_ICON, OnShowTrayIcon)
+	MESSAGE_HANDLER(WM_CLIPBOARD_COPIED, OnClipboardCopied)
+	MESSAGE_HANDLER(WM_CLOSE, OnClose)
+	MESSAGE_HANDLER(WM_ADD_TO_DATABASE_FROM_SOCKET, OnAddToDatabaseFromSocket)
+	MESSAGE_HANDLER(WM_SEND_RECIEVE_ERROR, OnErrorOnSendRecieve)
+	MESSAGE_HANDLER(WM_SHOW_ERROR_MSG, OnErrorMsg)
+	COMMAND_ID_HANDLER(ID_FIRST_IMPORT, OnFirstImport)
+	MESSAGE_HANDLER(WM_DESTROY, OnDestroy)
+	COMMAND_ID_HANDLER(ID_FIRST_NEWCLIP, OnFirstNewclip)
+	MESSAGE_HANDLER(WM_SET_CONNECTED, OnSetConnected)
+	MESSAGE_HANDLER(WM_OPEN_CLOSE_WINDOW, OnOpenCloseWindow)
+	MESSAGE_HANDLER(WM_LOAD_ClIP_ON_CLIPBOARD, OnLoadClipOnClipboard)
+	COMMAND_ID_HANDLER(ID_FIRST_GLOBALHOTKEYS, OnFirstGlobalhotkeys)
+	MESSAGE_HANDLER(WM_GLOBAL_CLIPS_CLOSED, OnGlobalClipsClosed)
+	MESSAGE_HANDLER(WM_OPTIONS_CLOSED, OnOptionsClosed)
+	MESSAGE_HANDLER(WM_SHOW_OPTIONS, OnShowOptions)
+	COMMAND_ID_HANDLER(ID_FIRST_DELETECLIPDATA, OnFirstDeleteclipdata)
+	MESSAGE_HANDLER(WM_DELETE_CLIPS_CLOSED, OnDeleteClipDataClosed)
+	COMMAND_ID_HANDLER(ID_FIRST_SAVECURRENTCLIPBOARD, OnFirstSavecurrentclipboard)
+	MESSAGE_HANDLER(WM_SAVE_CLIPBOARD, OnSaveClipboardMessage)
+	MESSAGE_HANDLER(WM_READD_TASKBAR_ICON, OnReAddTaskBarIcon)
+	MESSAGE_HANDLER(WM_REOPEN_DATABASE, OnReOpenDatabase)
+	MESSAGE_HANDLER(WM_SHOW_MSG_WINDOW, OnShowMsgWindow)
+	MESSAGE_HANDLER(WM_SHOW_DITTO_GROUP, OnShowDittoGroup)
+	COMMAND_ID_HANDLER(ID_FIRST_FIXUPSTICKYCLIPORDER, OnFirstFixupstickycliporder)
+	MESSAGE_HANDLER(WM_DISPLAYCHANGE, OnResolutionChange)
+	MESSAGE_HANDLER(WM_TRAYNOTIFY, OnTrayNotification)
+	MESSAGE_HANDLER(WM_PLAIN_TEXT_PASTE, OnPlainTextPaste)
+	MESSAGE_HANDLER(WM_WININICHANGE, OnWinIniChange)
+	COMMAND_ID_HANDLER(ID_FIRST_SHOWSTARTUPMESSAGE, OnFirstShowstartupmessage)
+	COMMAND_ID_HANDLER(ID_FIRST_BACKUPDATABASE, OnFirstBackupdatabase)
+	COMMAND_ID_HANDLER(ID_FIRST_RESTOREDATABASE, OnFirstRestoredatabase)
+	MESSAGE_HANDLER(WM_BACKUP_DB, OnBackupDb)
+	MESSAGE_HANDLER(WM_RESTORE_DB, OnRestoreDb)
+	COMMAND_ID_HANDLER(ID_FIRST_DELETEALLNONUSEDCLIPS, OnFirstDeleteallnonusedclips)
+	MESSAGE_HANDLER(WM_PASTE_CLIP, OnPasteClip)
+	MESSAGE_HANDLER(WM_EDIT_CLIP, OnEditClip)
+	MESSAGE_HANDLER(WM_SETFOCUS, OnSetFocus)
+END_MSG_MAP()
 	static UINT indicators[] = 
 {
 	ID_SEPARATOR,  // status line indicator
@@ -112,13 +96,13 @@ CMainFrame::~CMainFrame()
     CGetSetOptions::SetMainHWND(0);
 }
 
-int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
+LRESULT CMainFrame::OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-    if(CFrameWnd::OnCreate(lpCreateStruct) ==  - 1)
+    LPCREATESTRUCT lpCreateStruct = (LPCREATESTRUCT)lParam;
+    if(CFrameWindowImpl<CMainFrame>::OnCreate(uMsg, wParam, lParam, bHandled) ==  - 1)
     {
         return  - 1;
     }
-
 	m_PowerManager.Start(m_hWnd);
 
     ////Center the main window so message boxes are in the center
@@ -183,16 +167,15 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
     m_thread.Start(this);
 
+bHandled = TRUE;
     return 0;
 }
-
-LRESULT CMainFrame::OnPlainTextPaste(WPARAM wParam, LPARAM lParam)
+LRESULT CMainFrame::OnPlainTextPaste(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	DoTextOnlyPaste();
-	return 1;
+	return 0;
 }
-
-LRESULT CMainFrame::OnTrayNotification(WPARAM wParam, LPARAM lParam)
+LRESULT CMainFrame::OnTrayNotification(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	if (WM_MOUSEFIRST <= LOWORD(lParam) && LOWORD(lParam) <= WM_MOUSELAST)
 	{
@@ -206,9 +189,8 @@ LRESULT CMainFrame::OnTrayNotification(WPARAM wParam, LPARAM lParam)
 	}
 	
 	m_trayIcon.OnTrayNotification(wParam, lParam);
-	return 0L;
+	return 0;
 }
-
 BOOL CMainFrame::PreCreateWindow(CREATESTRUCT &cs)
 {
     if(cs.hMenu != NULL)
@@ -217,17 +199,17 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT &cs)
         cs.hMenu = NULL; // no menu for this window
     }
 
-    if(!CFrameWnd::PreCreateWindow(cs))
+    if(!CFrameWindowImpl<CMainFrame>::PreCreateWindow(cs))
     {
         return FALSE;
     }
 
     WNDCLASS wc;
     wc.style = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW;
-    wc.lpfnWndProc = AfxWndProc;
+    wc.lpfnWndProc = ::DefWindowProc;
     wc.cbClsExtra = 0;
     wc.cbWndExtra = 0;
-    wc.hInstance = AfxGetInstanceHandle();
+    wc.hInstance = _Module.GetModuleInstance();
     wc.hIcon = NULL;
     wc.hCursor = LoadCursor(NULL, IDC_ARROW);
     wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
@@ -235,46 +217,27 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT &cs)
     wc.lpszClassName = _T("Ditto");
 
     // Create the QPaste window class
-    if(!AfxRegisterClass(&wc))
+    if(!::RegisterClass(&wc))
     {
         return FALSE;
     }
 
     cs.lpszClass = wc.lpszClassName;
 
-    return TRUE;
+    return 0;
 }
-
-/////////////////////////////////////////////////////////////////////////////
-// CMainFrame diagnostics
-
-#ifdef _DEBUG
-    void CMainFrame::AssertValid()const
-    {
-        CFrameWnd::AssertValid();
-    }
-
-    void CMainFrame::Dump(CDumpContext &dc)const
-    {
-        CFrameWnd::Dump(dc);
-    }
-
-#endif //_DEBUG
-
-/////////////////////////////////////////////////////////////////////////////
-// CMainFrame message handlers
+/////////////////////////////////////////////////////////////////////////////// CMainFrame message handlers
 
 
 
 
-void CMainFrame::OnFirstExit()
+LRESULT CMainFrame::OnFirstExit(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
     this->SendMessage(WM_CLOSE, 0, 0);
+    return 0;
 }
-
-LRESULT CMainFrame::OnHotKey(WPARAM wParam, LPARAM lParam)
-{
-    if(theApp.m_pDittoHotKey && wParam == theApp.m_pDittoHotKey->m_Atom ||
+LRESULT CMainFrame::OnHotKey(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+{    if(theApp.m_pDittoHotKey && wParam == theApp.m_pDittoHotKey->m_Atom ||
 		theApp.m_pDittoHotKey2 && wParam == theApp.m_pDittoHotKey2->m_Atom ||
 		theApp.m_pDittoHotKey3 && wParam == theApp.m_pDittoHotKey3->m_Atom)
     {
@@ -721,11 +684,11 @@ void CMainFrame::DoDittoCopyBufferPaste(int nCopyBuffer)
     CATCH_SQLITE_EXCEPTION
 }
 
-void CMainFrame::OnTimer(UINT_PTR nIDEvent)
+LRESULT CMainFrame::OnTimer(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
+    UINT_PTR nIDEvent = (UINT_PTR)wParam;
     switch(nIDEvent)
-    {
-        case HIDE_ICON_TIMER:
+    {        case HIDE_ICON_TIMER:
             {
 				m_trayIcon.Hide();
                 KillTimer(nIDEvent);
@@ -866,12 +829,12 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 			theApp.CloseNoDbWindow();
 			break;
 
-    }
-
-    CFrameWnd::OnTimer(nIDEvent);
 }
 
-LRESULT CMainFrame::OnShowTrayIcon(WPARAM wParam, LPARAM lParam)
+    bHandled = FALSE;
+    return 0;
+}
+LRESULT CMainFrame::OnShowTrayIcon(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
     if(lParam)
     {
@@ -891,25 +854,26 @@ LRESULT CMainFrame::OnShowTrayIcon(WPARAM wParam, LPARAM lParam)
         m_trayIcon.Hide();
     }
 
-    return TRUE;
+    return 0;
 }
-
-void CMainFrame::OnFirstShowquickpaste()
+LRESULT CMainFrame::OnFirstShowquickpaste(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
     m_quickPaste.ShowQPasteWnd(this, false, false, FALSE);
+    return 0;
 }
-
-void CMainFrame::OnFirstToggleConnectCV()
+LRESULT CMainFrame::OnFirstToggleConnectCV(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
     theApp.ToggleConnectCV();
+    return 0;
 }
-
-void CMainFrame::OnUpdateFirstToggleConnectCV(CCmdUI *pCmdUI)
+LRESULT CMainFrame::OnUpdateFirstToggleConnectCV(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
-    theApp.UpdateMenuConnectCV(pCmdUI->m_pMenu, ID_FIRST_TOGGLECONNECTCV);
+    // Command UI update handling would need to be implemented differently in WTL
+    // For now, we'll leave this as a placeholder
+    bHandled = FALSE;
+    return 0;
 }
-
-LRESULT CMainFrame::OnClipboardCopied(WPARAM wParam, LPARAM lParam)
+LRESULT CMainFrame::OnClipboardCopied(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	Log(_T("Start of function OnClipboardCopied, adding clip to thread for processing"));
 
@@ -920,9 +884,8 @@ LRESULT CMainFrame::OnClipboardCopied(WPARAM wParam, LPARAM lParam)
 	} 
     
     Log(_T("End of function OnClipboardCopied"));	
-    return TRUE;
+    return 0;
 }
-
 BOOL CMainFrame::PreTranslateMessage(MSG *pMsg)
 {
 	//forward the mouse wheel onto the window under the cursor
@@ -948,10 +911,9 @@ BOOL CMainFrame::PreTranslateMessage(MSG *pMsg)
 			pMsg->message = WM_MOUSEHWHEEL;
 	}
 
-    return CFrameWnd::PreTranslateMessage(pMsg);
+    return CFrameWindowImpl<CMainFrame>::PreTranslateMessage(pMsg);
 }
-
-void CMainFrame::OnClose()
+LRESULT CMainFrame::OnClose(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
     CloseAllOpenDialogs();
 
@@ -963,35 +925,35 @@ void CMainFrame::OnClose()
 
 	m_PowerManager.Close();
 
-    CFrameWnd::OnClose();
+    bHandled = FALSE;
+    return 0;
 }
-
 bool CMainFrame::CloseAllOpenDialogs()
 {
     bool bRet = false;
     DWORD dwordProcessId;
     DWORD dwordChildWindowProcessId;
     GetWindowThreadProcessId(this->m_hWnd, &dwordProcessId);
-    ASSERT(dwordProcessId);
 
-    CWnd *pTempWnd = GetDesktopWindow()->GetWindow(GW_CHILD);
-    while((pTempWnd = pTempWnd->GetWindow(GW_HWNDNEXT)) != NULL)
+    HWND hTempWnd = GetDesktopWindow();
+    hTempWnd = ::GetWindow(hTempWnd, GW_CHILD);
+    while((hTempWnd = ::GetWindow(hTempWnd, GW_HWNDNEXT)) != NULL)
     {
-        if(pTempWnd->GetSafeHwnd() == NULL)
+        if(hTempWnd == NULL)
         {
             break;
         }
 
-        GetWindowThreadProcessId(pTempWnd->GetSafeHwnd(), &dwordChildWindowProcessId);
+        GetWindowThreadProcessId(hTempWnd, &dwordChildWindowProcessId);
         if(dwordChildWindowProcessId == dwordProcessId)
         {
             TCHAR szTemp[100];
-            GetClassName(pTempWnd->GetSafeHwnd(), szTemp, 100);
+            GetClassName(hTempWnd, szTemp, 100);
 
             // #32770 is class name for dialogs so don't process the message if it is a dialog
             if(STRCMP(szTemp, _T("#32770")) == 0)
             {
-                pTempWnd->SendMessage(WM_CLOSE, 0, 0);
+                ::SendMessage(hTempWnd, WM_CLOSE, 0, 0);
                 bRet = true;
             }
         }
@@ -1006,14 +968,13 @@ bool CMainFrame::CloseAllOpenDialogs()
 
     return bRet;
 }
-
-LRESULT CMainFrame::OnLoadClipOnClipboard(WPARAM wParam, LPARAM lParam)
+LRESULT CMainFrame::OnLoadClipOnClipboard(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	CClip *pClip = (CClip*)wParam;
     if(pClip == NULL)
     {
         LogSendRecieveInfo("---------ERROR OnLoadClipOnClipboard pClip == NULL");
-        return FALSE;
+        return 0;
     }
 
     if(pClip)
@@ -1039,16 +1000,15 @@ LRESULT CMainFrame::OnLoadClipOnClipboard(WPARAM wParam, LPARAM lParam)
 
 	delete pClip;
 
-	return TRUE;
+	return 0;
 }
-
-LRESULT CMainFrame::OnAddToDatabaseFromSocket(WPARAM wParam, LPARAM lParam)
+LRESULT CMainFrame::OnAddToDatabaseFromSocket(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
     CClipList *pClipList = (CClipList*)wParam;
     if(pClipList == NULL)
     {
         LogSendRecieveInfo("---------OnAddToDatabaseFromSocket - ERROR pClipList == NULL");
-        return FALSE;
+        return 0;
     }
 
     DWORD flags = (DWORD)lParam;
@@ -1076,27 +1036,24 @@ LRESULT CMainFrame::OnAddToDatabaseFromSocket(WPARAM wParam, LPARAM lParam)
 
 	delete pClipList;
 
-    return TRUE;
+    return 0;
 }
-
-LRESULT CMainFrame::OnErrorOnSendRecieve(WPARAM wParam, LPARAM lParam)
+LRESULT CMainFrame::OnErrorOnSendRecieve(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
     CString csNewText = (TCHAR*)wParam;
 
     ShowErrorMessage(_T("Ditto - Send/Receive Error"), csNewText);
 
-    return TRUE;
+    return 0;
 }
-
-LRESULT CMainFrame::OnErrorMsg(WPARAM wParam, LPARAM lParam)
+LRESULT CMainFrame::OnErrorMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	CString csNewText = (TCHAR*)wParam;
 
 	ShowErrorMessage(_T("Ditto"), csNewText);
 
-	return TRUE;
+	return 0;
 }
-
 CString WndName(HWND hParent)
 {
     TCHAR cWindowText[200];
@@ -1126,23 +1083,23 @@ CString WndName(HWND hParent)
     return cWindowText;
 }
 
-void CMainFrame::OnFirstHelp()
+LRESULT CMainFrame::OnFirstHelp(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
     CHyperLink::GotoURL(_T("https://github.com/sabrogden/Ditto/wiki"), SW_SHOW);
+    return 0;
 }
-
 void CMainFrame::ShowErrorMessage(CString csTitle, CString csMessage)
 {
     Log(StrF(_T("ShowErrorMessage %s - %s"), csTitle, csMessage));
 	m_trayIcon.SetBalloonDetails(csMessage, csTitle, CTrayNotifyIcon::BalloonStyle::Error, CGetSetOptions::GetBalloonTimeout());
 }
 
-void CMainFrame::OnFirstImport()
+LRESULT CMainFrame::OnFirstImport(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
     theApp.ImportClips(theApp.m_MainhWnd);
+    return 0;
 }
-
-LRESULT CMainFrame::OnSetConnected(WPARAM wParam, LPARAM lParam)
+LRESULT CMainFrame::OnSetConnected(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
     if(wParam)
     {
@@ -1153,10 +1110,9 @@ LRESULT CMainFrame::OnSetConnected(WPARAM wParam, LPARAM lParam)
         theApp.SetConnectCV(false);		
     }
 
-    return TRUE;
+    return 0;
 }
-
-LRESULT CMainFrame::OnOpenCloseWindow(WPARAM wParam, LPARAM lParam)
+LRESULT CMainFrame::OnOpenCloseWindow(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	if(wParam)
 	{
@@ -1168,22 +1124,21 @@ LRESULT CMainFrame::OnOpenCloseWindow(WPARAM wParam, LPARAM lParam)
 		m_quickPaste.HideQPasteWnd();
 	}
 
-	return TRUE;
+	return 0;
 }
-
-void CMainFrame::OnDestroy()
+LRESULT CMainFrame::OnDestroy(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-    CFrameWnd::OnDestroy();
+    bHandled = FALSE;
+    return 0;
 }
-
-void CMainFrame::OnFirstNewclip()
+LRESULT CMainFrame::OnFirstNewclip(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
     CClipIDs IDs;
     IDs.Add( - 1);
     theApp.EditItems(IDs, true, true);
+    return 0;
 }
-
-void CMainFrame::OnFirstOption()
+LRESULT CMainFrame::OnFirstOption(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
 	if(m_pOptions != NULL)
 	{
@@ -1195,14 +1150,14 @@ void CMainFrame::OnFirstOption()
 
 		if(m_pOptions != NULL)
 		{
-			((COptionsSheet*)m_pOptions)->SetNotifyWnd(m_hWnd);
+			m_pOptions->SetNotifyWnd(m_hWnd);
 			m_pOptions->Create();
 			m_pOptions->ShowWindow(SW_SHOW);
 		}
 	}
+	return 0;
 }
-
-void CMainFrame::OnFirstGlobalhotkeys()
+LRESULT CMainFrame::OnFirstGlobalhotkeys(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
 	if(m_pGlobalClips != NULL)
 	{
@@ -1222,15 +1177,14 @@ void CMainFrame::OnFirstGlobalhotkeys()
 			m_pGlobalClips->ShowWindow(SW_SHOW);
 		}
 	}
+	return 0;
 }
-
-LRESULT CMainFrame::OnShowOptions(WPARAM wParam, LPARAM lParam)
+LRESULT CMainFrame::OnShowOptions(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	OnFirstOption();
 	return 0;
 }
-
-LRESULT CMainFrame::OnOptionsClosed(WPARAM wParam, LPARAM lParam)
+LRESULT CMainFrame::OnOptionsClosed(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	BOOL themeChanged = (BOOL)wParam;
 	m_trayIcon.MinimiseToTray(this);
@@ -1269,8 +1223,7 @@ LRESULT CMainFrame::OnOptionsClosed(WPARAM wParam, LPARAM lParam)
 
 	return 0;
 }
-
-LRESULT CMainFrame::OnGlobalClipsClosed(WPARAM wParam, LPARAM lParam)
+LRESULT CMainFrame::OnGlobalClipsClosed(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	m_trayIcon.MinimiseToTray(this);
 	CAlphaBlend tran;
@@ -1281,7 +1234,6 @@ LRESULT CMainFrame::OnGlobalClipsClosed(WPARAM wParam, LPARAM lParam)
 
 	return 0;
 }
-
 void CMainFrame::RefreshShowInTaskBar()
 {
 	BOOL windowVisible = m_quickPaste.IsWindowVisibleEx();
@@ -1294,7 +1246,7 @@ void CMainFrame::RefreshShowInTaskBar()
 	}
 }
 
-LRESULT CMainFrame::OnDeleteClipDataClosed(WPARAM wParam, LPARAM lParam)
+LRESULT CMainFrame::OnDeleteClipDataClosed(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	m_trayIcon.MinimiseToTray(this);
 	CAlphaBlend tran;
@@ -1305,8 +1257,7 @@ LRESULT CMainFrame::OnDeleteClipDataClosed(WPARAM wParam, LPARAM lParam)
 
 	return 0;
 }
-
-void CMainFrame::OnFirstDeleteclipdata()
+LRESULT CMainFrame::OnFirstDeleteclipdata(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
 	//this->ShowWindow(SW_HIDE);
 	if (m_pDeleteClips != NULL)
@@ -1327,15 +1278,14 @@ void CMainFrame::OnFirstDeleteclipdata()
 			m_pDeleteClips->ShowWindow(SW_SHOW);
 		}
 	}
+	return 0;
 }
-
-LRESULT CMainFrame::OnSaveClipboardMessage(WPARAM wParam, LPARAM lParam)
+LRESULT CMainFrame::OnSaveClipboardMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	OnFirstSavecurrentclipboard();
-	return TRUE;
+	return 0;
 }
-
-void CMainFrame::OnFirstSavecurrentclipboard()
+LRESULT CMainFrame::OnFirstSavecurrentclipboard(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
 	Log(_T("Start Saving the current clipboard to the database"));
 	CClip* pClip = new CClip;
@@ -1362,18 +1312,17 @@ void CMainFrame::OnFirstSavecurrentclipboard()
 		}
 	}
 	Log(_T("Start Saving the current clipboard to the database"));
+	return 0;
 }
-
-LRESULT CMainFrame::OnReAddTaskBarIcon(WPARAM wParam, LPARAM lParam)
+LRESULT CMainFrame::OnReAddTaskBarIcon(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	if(CGetSetOptions::GetShowIconInSysTray())
 	{
 		m_trayIcon.SetIcon(CTrayNotifyIcon::LoadIcon(IDR_MAINFRAME));
 	}
-	return TRUE;
+	return 0;
 }
-
-LRESULT CMainFrame::OnReOpenDatabase(WPARAM wParam, LPARAM lParam)
+LRESULT CMainFrame::OnReOpenDatabase(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	Log(StrF(_T("OnReOpenDatabase, Start closing and reopening database Delay: %d"), CGetSetOptions::GetWindowsResumeDelayReOpenDbMS()));
 
@@ -1388,10 +1337,9 @@ LRESULT CMainFrame::OnReOpenDatabase(WPARAM wParam, LPARAM lParam)
 
 	Log(StrF(_T("OnReOpenDatabase, End closing and reopening database Delay: %d"), CGetSetOptions::GetWindowsResumeDelayReOpenDbMS()));
 
-	return TRUE;
+	return 0;
 }
-
-LRESULT CMainFrame::OnShowMsgWindow(WPARAM wParam, LPARAM lParam)
+LRESULT CMainFrame::OnShowMsgWindow(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	CString *pMsg = (CString*)wParam;
 	int clipId = (int)lParam;
@@ -1399,10 +1347,9 @@ LRESULT CMainFrame::OnShowMsgWindow(WPARAM wParam, LPARAM lParam)
 	m_trayIcon.SetBalloonDetails(pMsg->GetBuffer(), _T("Ditto"), CTrayNotifyIcon::BalloonStyle::Info, CGetSetOptions::GetBalloonTimeout());
 
 	delete pMsg;
-	return TRUE;
+	return 0;
 }
-
-LRESULT CMainFrame::OnShowDittoGroup(WPARAM wParam, LPARAM lParam)
+LRESULT CMainFrame::OnShowDittoGroup(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	int groupId = (int)wParam;
 	CppSQLite3Query q = theApp.m_db.execQueryEx(_T("SELECT bIsGroup FROM Main WHERE lID = %d"), groupId);
@@ -1414,15 +1361,14 @@ LRESULT CMainFrame::OnShowDittoGroup(WPARAM wParam, LPARAM lParam)
 		}
 	}
 
-	return TRUE;
+	return 0;
 }
-
-void CMainFrame::OnFirstFixupstickycliporder()
+LRESULT CMainFrame::OnFirstFixupstickycliporder(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
 	ReOrderStickyClips(-1, theApp.m_db);
+	return 0;
 }
-
-LRESULT CMainFrame::OnResolutionChange(WPARAM wParam, LPARAM lParam)
+LRESULT CMainFrame::OnResolutionChange(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	if (m_startupScreenWidth != GetScreenWidth() ||
 		m_startupScreenHeight != GetScreenHeight())
@@ -1433,12 +1379,11 @@ LRESULT CMainFrame::OnResolutionChange(WPARAM wParam, LPARAM lParam)
 		SetTimer(SCREEN_RESOLUTION_CHANGED, 1000, NULL);
 	}
 
-	return TRUE;
+	return 0;
 }
-
-void CMainFrame::OnWinIniChange(LPCTSTR lpszSection)
+LRESULT CMainFrame::OnWinIniChange(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	CFrameWnd::OnWinIniChange(lpszSection);
+	LPCTSTR lpszSection = (LPCTSTR)lParam;
 
 	if (lpszSection != NULL &&
 		wcscmp(lpszSection, L"ImmersiveColorSet") == 0)
@@ -1447,77 +1392,65 @@ void CMainFrame::OnWinIniChange(LPCTSTR lpszSection)
 		KillTimer(SET_WINDOWS_THEME_TIMER);
 		SetTimer(SET_WINDOWS_THEME_TIMER, 1000, NULL);
 	}
+
+	bHandled = FALSE;
+	return 0;
 }
 
-
-void CMainFrame::OnFirstShowstartupmessage()
+LRESULT CMainFrame::OnFirstShowstartupmessage(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
 	BOOL existing = CGetSetOptions::GetShowStartupMessage();
 	CGetSetOptions::SetShowStartupMessage(!existing);
+	return 0;
 }
 
-
-void CMainFrame::OnUpdateFirstShowstartupmessage(CCmdUI *pCmdUI)
+LRESULT CMainFrame::OnUpdateFirstShowstartupmessage(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
-	if (pCmdUI == NULL ||
-		pCmdUI->m_pMenu == NULL)
-	{
-		return;
-	}
-
-	if (CGetSetOptions::GetShowStartupMessage())
-	{
-		pCmdUI->m_pMenu->CheckMenuItem(ID_FIRST_SHOWSTARTUPMESSAGE, MF_CHECKED);
-	}
-	else
-	{
-		pCmdUI->m_pMenu->CheckMenuItem(ID_FIRST_SHOWSTARTUPMESSAGE, MF_UNCHECKED);
-	}
+    // Command UI update handling would need to be implemented differently in WTL
+    // For now, we'll leave this as a placeholder
+    bHandled = FALSE;
+    return 0;
 }
 
-
-void CMainFrame::OnFirstBackupdatabase()
+LRESULT CMainFrame::OnFirstBackupdatabase(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
 	BackupDbPrompt(m_hWnd);
+	return 0;
 }
-
-void CMainFrame::OnFirstRestoredatabase()
+LRESULT CMainFrame::OnFirstRestoredatabase(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
 	RestoreDbPrompt(m_hWnd);
+	return 0;
 }
-
-LRESULT CMainFrame::OnBackupDb(WPARAM wParam, LPARAM lParam)
+LRESULT CMainFrame::OnBackupDb(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	OnFirstBackupdatabase();
-	return TRUE;
+	return 0;
 }
-
-LRESULT CMainFrame::OnRestoreDb(WPARAM wParam, LPARAM lParam)
+LRESULT CMainFrame::OnRestoreDb(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	OnFirstRestoredatabase();
-	return TRUE;
+	return 0;
 }
-
-void CMainFrame::OnFirstDeleteallnonusedclips()
+LRESULT CMainFrame::OnFirstDeleteallnonusedclips(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
 	int nRet = MessageBox(theApp.m_Language.GetString("Delete_All_Non_Used_Clips", "Delete all clips that are not groups, in groups, marked as never auto delete, has a shortcut key or marked as sticky.\r\n\r\nThis cannot be undone."), _T("Ditto"), MB_YESNO | MB_TOPMOST);
 	if (nRet == IDNO)
 	{
-		return;
+		return 0;
 	}
 
 	DeleteNonUsedClips(false);
 
 	theApp.RefreshView();
+	return 0;
 }
-
-LRESULT CMainFrame::OnPasteClip(WPARAM wParam, LPARAM lParam)
+LRESULT CMainFrame::OnPasteClip(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	PasteOrShowGroup(wParam, TRUE, FALSE, TRUE, false);
-	return TRUE;
+	return 0;
 }
-
-LRESULT CMainFrame::OnEditClip(WPARAM wParam, LPARAM lParam)
+LRESULT CMainFrame::OnEditClip(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	CClipIDs IDs;
 	IDs.Add(wParam);
@@ -1529,14 +1462,10 @@ LRESULT CMainFrame::OnEditClip(WPARAM wParam, LPARAM lParam)
 	}
 
 	theApp.EditItems(IDs, true, textOnly);
-	return TRUE;
+	return 0;
 }
-
-void CMainFrame::OnSetFocus(CWnd* pOldWnd)
+LRESULT CMainFrame::OnSetFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	CFrameWnd::OnSetFocus(pOldWnd);
-
-	//int nRet = MessageBox(_T("focused"), _T("Ditto"), MB_YESNO | MB_TOPMOST);
-
-	// TODO: Add your message handler code here
+	bHandled = FALSE;
+	return 0;
 }

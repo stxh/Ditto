@@ -1,58 +1,15 @@
-// FileTransferProgressDlg.cpp : implementation file
-//
-
 #include "stdafx.h"
 #include "cp_main.h"
 #include "FileTransferProgressDlg.h"
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-/////////////////////////////////////////////////////////////////////////////
-// CFileTransferProgressDlg dialog
-
-
-CFileTransferProgressDlg::CFileTransferProgressDlg(CWnd* pParent /*=NULL*/)
-	: CDialog(CFileTransferProgressDlg::IDD, pParent)
+LRESULT CFileTransferProgressDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 {
-	m_bCancelled = false;
-}
-
-void CFileTransferProgressDlg::DoDataExchange(CDataExchange* pDX)
-{
-	CDialog::DoDataExchange(pDX);
-	//{{AFX_DATA_MAP(CFileTransferProgressDlg)
-	DDX_Control(pDX, IDC_FILE_COPY, m_FileCopy);
-	DDX_Control(pDX, IDCANCEL, m_m_CancelButton);
-	DDX_Control(pDX, IDC_PROGRESS_FILE, m_ProgressSingleFile);
-	DDX_Control(pDX, IDC_PROGRESS_ALL_FILES, m_ProgressAllFiles);
-	DDX_Control(pDX, IDC_STATIC_1, m_Message);
-	DDX_Control(pDX, IDC_STATIC_2, m_CopyingFile);
-	//}}AFX_DATA_MAP
-}
-
-
-BEGIN_MESSAGE_MAP(CFileTransferProgressDlg, CDialog)
-	//{{AFX_MSG_MAP(CFileTransferProgressDlg)
-	//}}AFX_MSG_MAP
-END_MESSAGE_MAP()
-
-/////////////////////////////////////////////////////////////////////////////
-// CFileTransferProgressDlg message handlers
-
-void CFileTransferProgressDlg::PostNcDestroy() 
-{
-	CDialog::PostNcDestroy();
-
-	delete this;
-}
-
-BOOL CFileTransferProgressDlg::OnInitDialog() 
-{
-	CDialog::OnInitDialog();
+	m_FileCopy.Attach(GetDlgItem(IDC_FILE_COPY));
+	m_m_CancelButton.Attach(GetDlgItem(IDCANCEL));
+	m_ProgressSingleFile.Attach(GetDlgItem(IDC_PROGRESS_FILE));
+	m_ProgressAllFiles.Attach(GetDlgItem(IDC_PROGRESS_ALL_FILES));
+	m_Message.Attach(GetDlgItem(IDC_STATIC_1));
+	m_CopyingFile.Attach(GetDlgItem(IDC_STATIC_2));
 
 	m_FileCopy.Open(IDR_FILE_COPY);
 	m_FileCopy.Play(0, -1, -1);
@@ -61,12 +18,18 @@ BOOL CFileTransferProgressDlg::OnInitDialog()
 
 	::SetWindowPos(m_hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE|SWP_NOMOVE|SWP_SHOWWINDOW);
 
-	return TRUE;
+	return 0;
 }
 
-void CFileTransferProgressDlg::OnCancel() 
+LRESULT CFileTransferProgressDlg::OnCancel(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 {
 	m_bCancelled = true;
+	return 0;
+}
+
+void CFileTransferProgressDlg::PostNcDestroy() 
+{
+	delete this;
 }
 
 void CFileTransferProgressDlg::SetMessage(CString &cs)

@@ -1,5 +1,5 @@
 #pragma once
-#include "afxpropertygridctrl.h"
+
 #include "DialogResizer.h"
 
 class CAdvGeneral : public CDialogEx

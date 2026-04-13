@@ -118,7 +118,7 @@ int count = tokens.GetSize();
 		chFirst = line.GetAt(0);
 		if( chFirst == ' ' || chFirst == '\t' )
 		{
-			text += "» "; // show indication that the line is modified
+			text += "ï¿½ "; // show indication that the line is modified
 			line.TrimLeft();
 			text += line;
 		}
@@ -199,7 +199,7 @@ BOOL CMainTable::DeleteAll()
 	}
 	catch(CDaoException* e)
 	{
-		AfxMessageBox(e->m_pErrorInfo->m_strDescription);
+		MessageBox(NULL, e->m_pErrorInfo->m_strDescription, _T("Error"), MB_OK | MB_ICONERROR);
 		e->Delete();
 	}
 

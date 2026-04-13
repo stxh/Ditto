@@ -1,10 +1,5 @@
-#include "afxwin.h"
-#if !defined(AFX_COPYPROPERTIES_H__129FE1CD_D305_487A_B88C_BB01CD9C1BB7__INCLUDED_)
-#define AFX_COPYPROPERTIES_H__129FE1CD_D305_487A_B88C_BB01CD9C1BB7__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
+
 // CopyProperties.h : header file
 //
 
@@ -15,15 +10,15 @@
 /////////////////////////////////////////////////////////////////////////////
 // CCopyProperties dialog
 
-class CCopyProperties : public CDialog
+class CCopyProperties : public CDialogImpl<CCopyProperties>
 {
-// Construction
 public:
-	CCopyProperties(long lCopyID, CWnd* pParent = NULL, CClip *pMemoryClip = NULL);   // standard constructor
+	enum { IDD = IDD_COPY_PROPERTIES };
+
+// Construction
+	CCopyProperties(long lCopyID, HWND hParent = NULL, CClip *pMemoryClip = NULL) : m_lCopyID(lCopyID), m_pMemoryClip(pMemoryClip) {} // standard constructor
 
 // Dialog Data
-	//{{AFX_DATA(CCopyProperties)
-	enum { IDD = IDD_COPY_PROPERTIES };
 	CEdit	m_QuickPasteText;
 	CEdit m_description;
 	CGroupCombo	m_GroupCombo;
@@ -35,19 +30,10 @@ public:
 	BOOL	m_bNeverAutoDelete;
 	BOOL m_hotKeyGlobal;
 	BOOL m_moveToGroupHotKeyGlobal;
-	//}}AFX_DATA
-
-
-// Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CCopyProperties)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
 
 public:
 	bool m_bChangedText;
-	long m_lGroupChangedTo;
+	long m_lGroupChangedTo;  // Changed from bool to long to match the original intention
 	void SetHideOnKillFocus(bool bVal)	{ m_bHideOnKillFocus = bVal; }
 	void SetHandleKillFocus(bool bVal)	{ m_bHandleKillFocus = bVal; }
 	void SetToTopMost(bool bVal)		{ m_bSetToTopMost = bVal; }
@@ -73,20 +59,30 @@ protected:
 	BOOL CheckGlobalHotKey(CClip &clip);
 	BOOL CheckMoveToGroupGlobalHotKey(CClip &clip);
 
-	// Generated message map functions
-	//{{AFX_MSG(CCopyProperties)
-	virtual BOOL OnInitDialog();
-	virtual void OnOK();
-	afx_msg void OnDeleteCopyData();
-	virtual void OnCancel();
-	afx_msg void OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized);
-	afx_msg void OnSize(UINT nType, int cx, int cy);
-	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP()
-public:
-	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
-	afx_msg void OnLbnSelchangeCopyData();
-	afx_msg void OnNcLButtonDown(UINT nHitTest, CPoint point);
+	// WTL Message Map
+	BEGIN_MSG_MAP(CCopyProperties)
+		MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
+		MESSAGE_HANDLER(WM_COMMAND, OnCommand)
+		MESSAGE_HANDLER(WM_ACTIVATE, OnActivate)
+		MESSAGE_HANDLER(WM_SIZE, OnSize)
+		MESSAGE_HANDLER(WM_NCLBUTTONDOWN, OnNcLButtonDown)
+		COMMAND_ID_HANDLER(IDCANCEL, OnCancel)
+		COMMAND_ID_HANDLER(IDOK, OnOK)
+		COMMAND_HANDLER(IDC_DELETE_COPY_DATA, BN_CLICKED, OnDeleteCopyData)
+		COMMAND_HANDLER(IDC_LIST1, LBN_SELCHANGE, OnLbnSelchangeCopyData)
+		MESSAGE_HANDLER(WM_CTLCOLORSTATIC, OnCtlColor)
+	END_MSG_MAP()
+
+	LRESULT OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnCommand(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnOK(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnDeleteCopyData(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnCancel(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnActivate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnCtlColor(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnLbnSelchangeCopyData(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnNcLButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 };
 
 //{{AFX_INSERT_LOCATION}}

@@ -74,7 +74,7 @@ BOOL CTypesTable::DeleteAll()
 	}
 	catch(CDaoException* e)
 	{
-		AfxMessageBox(e->m_pErrorInfo->m_strDescription);
+		MessageBox(NULL, e->m_pErrorInfo->m_strDescription, _T("Error"), MB_OK | MB_ICONERROR);
 		e->Delete();
 	}
 

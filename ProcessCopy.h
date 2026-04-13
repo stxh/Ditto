@@ -231,7 +231,7 @@ public:
 	CCopyThread
 \*----------------------------------------------------------------------------*/
 
-class CCopyThread : public CWinThread
+class CCopyThread : public WTL::CWinThread
 {
 	DECLARE_DYNCREATE(CCopyThread)
 

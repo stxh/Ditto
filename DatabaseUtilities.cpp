@@ -164,7 +164,7 @@ BOOL CheckDBExists(CString csDBPath)
 				theApp.m_Language.GetString("New_Database", "and a new database will be created"),
 				csPath);
 			
-			AfxMessageBox(cs);
+			MessageBox(NULL, cs, _T("Error"), MB_OK | MB_ICONERROR);
 			
 			CFile::Rename(csDBPath, csMarkAsBad);
 

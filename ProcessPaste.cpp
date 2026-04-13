@@ -163,7 +163,10 @@ void CProcessPaste::MarkAsPasted(bool updateClipOrder)
 	pData->updateClipOrder = updateClipOrder;
 
 	//Moved to a thread because when running from from U3 devices the write is time consuming
-	AfxBeginThread(CProcessPaste::MarkAsPastedThread, (LPVOID)pData, THREAD_PRIORITY_LOWEST);
+	// Use Windows API instead of MFC AfxBeginThread
+	HANDLE hThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)CProcessPaste::MarkAsPastedThread, (LPVOID)pData, 0, NULL);
+	if (hThread)
+		CloseHandle(hThread);
 
 	Log(_T("End of MarkAsPasted"));
 }

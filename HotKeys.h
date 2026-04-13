@@ -54,7 +54,7 @@ public:
 	CHotKeys - Manages system-wide hotkeys
 \*------------------------------------------------------------------*/
 
-class CHotKeys : public CArray<CHotKey*,CHotKey*>
+class CHotKeys : public CArrayEx<CHotKey*>
 {
 public:
 	HWND	m_hWnd;

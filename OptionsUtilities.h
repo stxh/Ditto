@@ -1,54 +1,32 @@
-#if !defined(AFX_OPTIONSUTILITIES_H__094B311D_3C47_43A8_A254_A009E3F0A75D__INCLUDED_)
-#define AFX_OPTIONSUTILITIES_H__094B311D_3C47_43A8_A254_A009E3F0A75D__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-// OptionsUtilities.h : header file
-//
 
-/////////////////////////////////////////////////////////////////////////////
-// COptionsUtilities dialog
+#include <atlbase.h>
+#include <atlwin.h>
+#include <atldlgs.h>
+#include <atlctrls.h>
 
-class COptionsUtilities : public CPropertyPage
+class COptionsUtilities : public CPropertyPageImpl<COptionsUtilities>
 {
-	DECLARE_DYNCREATE(COptionsUtilities)
-
-// Construction
 public:
-	COptionsUtilities();
-	~COptionsUtilities();
-
-// Dialog Data
-	//{{AFX_DATA(COptionsUtilities)
 	enum { IDD = IDD_OPTIONS_UTILITIES };
-	CEdit	m_ePath;
-	//}}AFX_DATA
 
+	COptionsUtilities() {}
 
-// Overrides
-	// ClassWizard generate virtual function overrides
-	//{{AFX_VIRTUAL(COptionsUtilities)
-	public:
-	virtual BOOL OnApply();
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
+	BEGIN_MSG_MAP(COptionsUtilities)
+		MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
+		COMMAND_ID_HANDLER(IDC_COMPACT_DB, OnCompactDB)
+		COMMAND_ID_HANDLER(IDC_REPAIR, OnRepair)
+		COMMAND_ID_HANDLER(IDC_GET_PATH, OnGetPath)
+		CHAIN_MSG_MAP(CPropertyPageImpl<COptionsUtilities>)
+	END_MSG_MAP()
 
-// Implementation
-protected:
-	// Generated message map functions
-	//{{AFX_MSG(COptionsUtilities)
-	afx_msg void OnCompactDB();
-	virtual BOOL OnInitDialog();
-	afx_msg void OnRepair();
-	afx_msg void OnGetPath();
-	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP()
+	LRESULT OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
+	LRESULT OnCompactDB(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnRepair(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnGetPath(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 
+	int OnApply() override;
+
+private:
+	CEdit m_ePath;
 };
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
-
-#endif // !defined(AFX_OPTIONSUTILITIES_H__094B311D_3C47_43A8_A254_A009E3F0A75D__INCLUDED_)

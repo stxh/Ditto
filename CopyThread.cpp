@@ -14,7 +14,7 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CCopyThread
 
-IMPLEMENT_DYNCREATE(CCopyThread, CWinThread)
+IMPLEMENT_DYNCREATE(CCopyThread, WTL::CWinThread)
 
 CCopyThread::CCopyThread():
 	m_bQuit(false),
@@ -47,7 +47,7 @@ int CCopyThread::ExitInstance()
 {
 	m_pClipboardViewer->Disconnect(false);
 
-	return CWinThread::ExitInstance();
+	return WTL::CWinThread::ExitInstance();
 }
 
 // Called within Copy Thread:
@@ -255,5 +255,5 @@ bool CCopyThread::Quit()
 {
 	m_bQuit = true;
 	m_pClipboardViewer->PostMessage( WM_QUIT );
-	return CWinThread::PostThreadMessage( WM_QUIT, NULL, NULL ) != FALSE;
+	return WTL::CWinThread::PostThreadMessage( WM_QUIT, NULL, NULL ) != FALSE;
 }

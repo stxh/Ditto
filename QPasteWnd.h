@@ -10,7 +10,7 @@
 #include <vector>
 #include <list>
 #include <map>
-#include <afxmt.h>
+#include <atlsync.h>
 #include "ClipFormatQListCtrl.h"
 #include "QPasteWndThread.h"
 #include "editwithbutton.h"

@@ -72,7 +72,7 @@ public:
 	static bool m_bFromIni;
 	static CString m_csIniFileName;
 	static bool m_bInConversion;
-	static CTheme m_Theme;
+	static ::CTheme m_Theme;
 	static bool m_portable;
 	static bool m_windowsApp;
 	static bool m_chocolateyApp;

@@ -12,16 +12,16 @@
 #define TIMER_OPEN_DB 1
 #define TIMER_ERROR_MSG 2
 
-BEGIN_MESSAGE_MAP(CNoDbFrameWnd, CFrameWnd)
-	ON_WM_CREATE()
-	ON_COMMAND(ID_FIRST_OPTIONS, &CNoDbFrameWnd::OnFirstOptions)
-	ON_COMMAND(ID_FIRST_EXIT_NO_DB, &CNoDbFrameWnd::OnFirstExitNoDb)
-	ON_MESSAGE(WM_TRAYNOTIFY, &CNoDbFrameWnd::OnTrayNotification)
-	ON_MESSAGE(WM_OPTIONS_CLOSED, OnOptionsClosed)
-	ON_WM_TIMER()
-	ON_WM_HOTKEY()
-END_MESSAGE_MAP()
-
+BEGIN_MSG_MAP(CNoDbFrameWnd)
+    MESSAGE_HANDLER(WM_CREATE, OnCreate)
+    COMMAND_ID_HANDLER(ID_FIRST_OPTIONS, OnFirstOptions)
+    COMMAND_ID_HANDLER(ID_FIRST_EXIT_NO_DB, OnFirstExitNoDb)
+    MESSAGE_HANDLER(WM_TRAYNOTIFY, OnTrayNotification)
+    MESSAGE_HANDLER(WM_OPTIONS_CLOSED, OnOptionsClosed)
+    MESSAGE_HANDLER(WM_TIMER, OnTimer)
+    MESSAGE_HANDLER(WM_HOTKEY, OnHotKey)
+    CHAIN_MSG_MAP(CFrameWindowImpl<CNoDbFrameWnd>)
+END_MSG_MAP()
 CNoDbFrameWnd::CNoDbFrameWnd()
 {
 	m_pOptions = NULL;
@@ -30,11 +30,8 @@ CNoDbFrameWnd::CNoDbFrameWnd()
 	m_pDittoHotKey3 = NULL;
 }
 
-int CNoDbFrameWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
+LRESULT CNoDbFrameWnd::OnCreate(UINT, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	if (CFrameWnd::OnCreate(lpCreateStruct) == -1)
-		return -1;
-
 	////Center the main window so message boxes are in the center
 	CRect rcScreen = DefaultMonitorRect();
 	CPoint cpCenter = rcScreen.CenterPoint();
@@ -57,10 +54,11 @@ int CNoDbFrameWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	g_HotKeys.RegisterAll();
 
+	bHandled = FALSE;
 	return 0;
 }
 
-void CNoDbFrameWnd::OnFirstOptions()
+LRESULT CNoDbFrameWnd::OnFirstOptions(WORD, WORD, HWND, BOOL&)
 {
 	if (m_pOptions != NULL)
 	{
@@ -72,26 +70,30 @@ void CNoDbFrameWnd::OnFirstOptions()
 
 		if (m_pOptions != NULL)
 		{
-			((COptionsSheet*)m_pOptions)->SetNotifyWnd(m_hWnd);
+			m_pOptions->SetNotifyWnd(m_hWnd);
 			m_pOptions->Create();
 			m_pOptions->ShowWindow(SW_SHOW);
 		}
 	}
+
+	return 0;
 }
 
-void CNoDbFrameWnd::OnFirstExitNoDb()
+LRESULT CNoDbFrameWnd::OnFirstExitNoDb(WORD, WORD, HWND, BOOL&)
 {
-	this->SendMessage(WM_CLOSE, 0, 0);
+	SendMessage(WM_CLOSE, 0, 0);
+	return 0;
 }
 
-LRESULT CNoDbFrameWnd::OnTrayNotification(WPARAM wParam, LPARAM lParam)
+LRESULT CNoDbFrameWnd::OnTrayNotification(UINT, WPARAM wParam, LPARAM lParam, BOOL&)
 {
 	m_trayIcon.OnTrayNotification(wParam, lParam);
 	return 0L;
 }
 
-void CNoDbFrameWnd::OnTimer(UINT_PTR nIDEvent)
+LRESULT CNoDbFrameWnd::OnTimer(UINT, WPARAM wParam, LPARAM, BOOL& bHandled)
 {
+	UINT_PTR nIDEvent = static_cast<UINT_PTR>(wParam);
 	switch (nIDEvent)
 	{
 	case TIMER_OPEN_DB:
@@ -103,7 +105,8 @@ void CNoDbFrameWnd::OnTimer(UINT_PTR nIDEvent)
 		break;
 	}
 
-	CFrameWnd::OnTimer(nIDEvent);
+	bHandled = FALSE;
+	return 0;
 }
 
 void CNoDbFrameWnd::ShowNoDbMessage()
@@ -138,7 +141,7 @@ void CNoDbFrameWnd::TryOpenDatabase()
 	}
 }
 
-LRESULT CNoDbFrameWnd::OnOptionsClosed(WPARAM wParam, LPARAM lParam)
+LRESULT CNoDbFrameWnd::OnOptionsClosed(UINT, WPARAM wParam, LPARAM lParam, BOOL&)
 {
 	delete m_pOptions;
 	m_pOptions = NULL;
@@ -148,8 +151,9 @@ LRESULT CNoDbFrameWnd::OnOptionsClosed(WPARAM wParam, LPARAM lParam)
 	return TRUE;
 }
 
-void CNoDbFrameWnd::OnHotKey(UINT nHotKeyId, UINT nKey1, UINT nKey2)
+LRESULT CNoDbFrameWnd::OnHotKey(UINT, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
+	const UINT nHotKeyId = static_cast<UINT>(wParam);
 	if (m_pDittoHotKey && nHotKeyId == m_pDittoHotKey->m_Atom ||
 		m_pDittoHotKey2 && nHotKeyId == m_pDittoHotKey2->m_Atom ||
 		m_pDittoHotKey3 && nHotKeyId == m_pDittoHotKey3->m_Atom)
@@ -157,5 +161,6 @@ void CNoDbFrameWnd::OnHotKey(UINT nHotKeyId, UINT nKey1, UINT nKey2)
 		ShowNoDbMessage();
 	}
 
-	CFrameWnd::OnHotKey(nHotKeyId, nKey1, nKey2);
+	bHandled = FALSE;
+	return 0;
 }

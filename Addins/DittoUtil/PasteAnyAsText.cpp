@@ -1,5 +1,5 @@
 #include "StdAfx.h"
-#include ".\pasteanyastext.h"
+#include "pasteanyastext.h"
 #include "SelectPasteFormat.h"
 
 PasteAnyAsText::PasteAnyAsText(void)
@@ -13,14 +13,12 @@ PasteAnyAsText::~PasteAnyAsText(void)
 bool PasteAnyAsText::SelectClipToPasteAsText(const CDittoInfo &DittoInfo, IClip *pClip)
 {
 	bool ret = false;
-	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	IClipFormats *pFormats = pClip->Clips();
 
-	CWnd* pWnd = CWnd::FromHandle(DittoInfo.m_hWndDitto);
-	CSelectPasteFormat dlg(pWnd, pFormats);
+	CSelectPasteFormat dlg(DittoInfo.m_hWndDitto, pFormats);
 
-	if(dlg.DoModal() == IDOK)
+	if(dlg.DoModal(DittoInfo.m_hWndDitto) == IDOK)
 	{
 		//Find the format that was selected, remove all then readd the data as type CF_TEXT
 		CLIPFORMAT format = dlg.SelectedFormat();

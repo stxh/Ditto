@@ -1,71 +1,31 @@
-// OptionFriends.cpp : implementation file
-//
-
 #include "stdafx.h"
 #include "cp_main.h"
 #include "OptionFriends.h"
 #include "FriendDetails.h"
 #include "DimWnd.h"
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
 #define EMPTRY_STRING "----"
 
-/////////////////////////////////////////////////////////////////////////////
-// COptionFriends property page
-
-IMPLEMENT_DYNCREATE(COptionFriends, CPropertyPage)
-
-COptionFriends::COptionFriends() : CPropertyPage(COptionFriends::IDD)
+COptionFriends::COptionFriends()
 {
 	m_csTitle = theApp.m_Language.GetString("FriendsTitle", "Friends");
 	m_psp.pszTitle = m_csTitle;
-	m_psp.dwFlags |= PSP_USETITLE; 
-
-	//{{AFX_DATA_INIT(COptionFriends)
+	m_psp.dwFlags |= PSP_USETITLE;
+	m_pParent = NULL;
 	m_PlaceOnClipboard = _T("");
 	m_csPassword = _T("");
 	m_csAdditionalPasswords = _T("");
-	//}}AFX_DATA_INIT
 }
 
 COptionFriends::~COptionFriends()
 {
 }
 
-void COptionFriends::DoDataExchange(CDataExchange* pDX)
+LRESULT COptionFriends::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) 
 {
-	CPropertyPage::DoDataExchange(pDX);
-	//{{AFX_DATA_MAP(COptionFriends)
-	DDX_Control(pDX, IDC_CHECK_DISABLE_FRIENDS, m_bDisableRecieve);
-	DDX_Control(pDX, IDC_CHECK_LOG_SEND_RECIEVE, m_SendRecieve);
-	DDX_Control(pDX, IDC_LIST, m_List);
-	DDX_Text(pDX, IDC_EDIT_PLACE_ON_CLIPBOARD, m_PlaceOnClipboard);
-	DDX_Text(pDX, IDC_EDIT_PASSWORD, m_csPassword);
-	DDX_Text(pDX, IDC_EDIT_ADDITIONAL, m_csAdditionalPasswords);
-	//}}AFX_DATA_MAP
-}
-
-
-BEGIN_MESSAGE_MAP(COptionFriends, CPropertyPage)
-	//{{AFX_MSG_MAP(COptionFriends)
-	ON_NOTIFY(NM_DBLCLK, IDC_LIST, OnDblclkList)
-	ON_NOTIFY(LVN_KEYDOWN, IDC_LIST, OnKeydownList)
-	ON_BN_CLICKED(IDC_CHECK_DISABLE_FRIENDS, OnCheckDisableFriends)
-	//}}AFX_MSG_MAP 
-END_MESSAGE_MAP()
-
-/////////////////////////////////////////////////////////////////////////////
-// COptionFriends message handlers
-
-
-BOOL COptionFriends::OnInitDialog() 
-{
-	CPropertyPage::OnInitDialog();
+	m_bDisableRecieve.Attach(GetDlgItem(IDC_CHECK_DISABLE_FRIENDS));
+	m_SendRecieve.Attach(GetDlgItem(IDC_CHECK_LOG_SEND_RECIEVE));
+	m_List.Attach(GetDlgItem(IDC_LIST));
 
 	m_pParent = (COptionsSheet *)GetParent();
 	
@@ -90,14 +50,16 @@ BOOL COptionFriends::OnInitDialog()
 		::CheckDlgButton(m_hWnd, IDC_RADIO_USE_HOST_NAME, BST_CHECKED);
 	}
 
-	UpdateData(FALSE);
+	SetDlgItemText(IDC_EDIT_PLACE_ON_CLIPBOARD, m_PlaceOnClipboard);
+	SetDlgItemText(IDC_EDIT_PASSWORD, m_csPassword);
+	SetDlgItemText(IDC_EDIT_ADDITIONAL, m_csAdditionalPasswords);
 
 	theApp.m_Language.UpdateOptionFriends(this);
 		
-	return FALSE;
+	return 0;
 }
 
-BOOL COptionFriends::OnApply() 
+int COptionFriends::OnApply() 
 {
 	CSendClients client;
 	for (int i = 0; i < MAX_SEND_CLIENTS; i++)
@@ -124,7 +86,9 @@ BOOL COptionFriends::OnApply()
 	CGetSetOptions::SetDisableRecieve(m_bDisableRecieve.GetCheck());
 	theApp.StartStopServerThread();
 
-	UpdateData();
+	GetDlgItemText(IDC_EDIT_PLACE_ON_CLIPBOARD, m_PlaceOnClipboard);
+	GetDlgItemText(IDC_EDIT_PASSWORD, m_csPassword);
+	GetDlgItemText(IDC_EDIT_ADDITIONAL, m_csAdditionalPasswords);
 
 	CGetSetOptions::SetListToPutOnClipboard(m_PlaceOnClipboard);
 	CGetSetOptions::SetNetworkPassword(m_csPassword);
@@ -143,7 +107,7 @@ BOOL COptionFriends::OnApply()
 		CGetSetOptions::SetRequestFilesUsingIP(FALSE);
 	}
 	
-	return CPropertyPage::OnApply();
+	return PSNRET_NOERROR;
 }
 
 
@@ -210,17 +174,14 @@ void COptionFriends::InsertItems()
 	}
 }
 
-void COptionFriends::OnDblclkList(NMHDR* pNMHDR, LRESULT* pResult) 
+LRESULT COptionFriends::OnDblclkList(int, LPNMHDR pnmh, BOOL&) 
 {
-	POSITION pos = m_List.GetFirstSelectedItemPosition();
-	if(pos)
+	int nItem = m_List.GetNextItem(-1, LVNI_SELECTED);
+	if(nItem >= 0)
 	{
-		int nItem = m_List.GetNextSelectedItem(pos);
-
 		EditItem(nItem);
 	}
-	
-	*pResult = 0;
+	return 0;
 }
 
 BOOL COptionFriends::EditItem(int nItem)
@@ -259,18 +220,17 @@ BOOL COptionFriends::EditItem(int nItem)
 	return FALSE;
 }
 
-void COptionFriends::OnKeydownList(NMHDR* pNMHDR, LRESULT* pResult) 
+LRESULT COptionFriends::OnKeydownList(int, LPNMHDR pnmh, BOOL&) 
 {
-	LV_KEYDOWN* pLVKeyDow = (LV_KEYDOWN*)pNMHDR;
+	LV_KEYDOWN* pLVKeyDow = (LV_KEYDOWN*)pnmh;
 
 	switch (pLVKeyDow->wVKey)
 	{
 	case VK_DELETE:
 		{
-			POSITION pos = m_List.GetFirstSelectedItemPosition();
-			if(pos)
+			int nItem = m_List.GetNextItem(-1, LVNI_SELECTED);
+			if(nItem >= 0)
 			{
-				int nItem = m_List.GetNextSelectedItem(pos);
 				m_List.SetItemText(nItem, 1, _T(EMPTRY_STRING));
 				m_List.SetItemText(nItem, 2, _T(EMPTRY_STRING));
 				m_List.SetItemText(nItem, 3, _T(EMPTRY_STRING));
@@ -279,24 +239,23 @@ void COptionFriends::OnKeydownList(NMHDR* pNMHDR, LRESULT* pResult)
 		break;
 	case VK_RETURN:
 		{
-			POSITION pos = m_List.GetFirstSelectedItemPosition();
-			if(pos)
+			int nItem = m_List.GetNextItem(-1, LVNI_SELECTED);
+			if(nItem >= 0)
 			{
-				int nItem = m_List.GetNextSelectedItem(pos);
 				EditItem(nItem);
 			}
 		}
 		break;
 	}
 	
-	
-	*pResult = 0;
+	return 0;
 }
 
-void COptionFriends::OnCheckDisableFriends() 
+LRESULT COptionFriends::OnCheckDisableFriends(WORD, WORD, HWND, BOOL&) 
 {
 	if(m_bDisableRecieve.GetCheck() == BST_CHECKED)
-		GetDlgItem(IDC_EDIT_PLACE_ON_CLIPBOARD)->EnableWindow(FALSE);
+		::EnableWindow(GetDlgItem(IDC_EDIT_PLACE_ON_CLIPBOARD), FALSE);
 	else
-		GetDlgItem(IDC_EDIT_PLACE_ON_CLIPBOARD)->EnableWindow(TRUE);
+		::EnableWindow(GetDlgItem(IDC_EDIT_PLACE_ON_CLIPBOARD), TRUE);
+	return 0;
 }

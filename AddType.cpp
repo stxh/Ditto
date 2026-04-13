@@ -6,51 +6,13 @@
 #include "Misc.h"
 #include "AddType.h"
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
 /////////////////////////////////////////////////////////////////////////////
 // CAddType dialog
 
-
-CAddType::CAddType(CWnd* pParent /*=NULL*/)
-	: CDialog(CAddType::IDD, pParent)
-{
-	//{{AFX_DATA_INIT(CAddType)
-	m_eCustomType = _T("");
-	//}}AFX_DATA_INIT
-}
-
-
-void CAddType::DoDataExchange(CDataExchange* pDX)
-{
-	CDialog::DoDataExchange(pDX);
-	//{{AFX_DATA_MAP(CAddType)
-	DDX_Control(pDX, IDC_LIST1, m_lbCandidateTypes);
-	DDX_Text(pDX, IDC_EDIT1, m_eCustomType);
-	DDV_MaxChars(pDX, m_eCustomType, 50);
-	//}}AFX_DATA_MAP
-}
-
-
-BEGIN_MESSAGE_MAP(CAddType, CDialog)
-	//{{AFX_MSG_MAP(CAddType)
-	//}}AFX_MSG_MAP
-	ON_BN_CLICKED(IDC_RADIO_PRIMARY_TYPES, &CAddType::OnBnClickedRadioPrimaryTypes)
-	ON_BN_CLICKED(IDC_RADIO_CURRENT_TYPES, &CAddType::OnBnClickedRadioCurrentTypes)
-	ON_BN_CLICKED(IDC_RADIO_CUSTOM_TYPE, &CAddType::OnBnClickedRadioCustomType)
-	ON_BN_CLICKED(IDC_ADD_3, &CAddType::OnBnClickedAdd)
-	ON_LBN_DBLCLK(IDC_LIST1, &CAddType::OnLbnDblclkList)
-END_MESSAGE_MAP()
-
 /////////////////////////////////////////////////////////////////////////////
 // CAddType message handlers
-BOOL CAddType::OnInitDialog() 
+LRESULT CAddType::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) 
 {
-	CDialog::OnInitDialog();		
 	
 	::CheckDlgButton(m_hWnd, IDC_RADIO_CURRENT_TYPES, BST_CHECKED);
 	OnBnClickedRadioCurrentTypes();
@@ -58,6 +20,7 @@ BOOL CAddType::OnInitDialog()
 	m_lbCandidateTypes.SetFocus();
 
 	theApp.m_Language.UpdateOptionSupportedTypesAdd(this);
+	bHandled = FALSE;
 	return FALSE;
 }
 
@@ -65,22 +28,20 @@ void CAddType::AddCurrentClipboardTypes()
 {
 	m_lbCandidateTypes.ResetContent();
 
-	COleDataObject oleData;
-
-	if (!oleData.AttachClipboard())
-		return;
-
-	oleData.BeginEnumFormats();
-
-	FORMATETC test;
-
-	while (oleData.GetNextFormat(&test))
+	// Open clipboard to enumerate formats
+	if (OpenClipboard())
 	{
-		BOOL b = oleData.IsDataAvailable(test.cfFormat);
-		m_lbCandidateTypes.AddString(GetFormatName(test.cfFormat));
+		UINT format = 0;
+		while ((format = EnumClipboardFormats(format)) != 0)
+		{
+			CString formatName = GetFormatName(format);
+			if (!formatName.IsEmpty())
+			{
+				m_lbCandidateTypes.AddString(formatName);
+			}
+		}
+		CloseClipboard();
 	}
-
-	oleData.Release();
 }
 
 void CAddType::AddCommonTypes()
@@ -95,7 +56,7 @@ void CAddType::AddCommonTypes()
 	m_lbCandidateTypes.AddString(GetFormatName(RegisterClipboardFormat(_T("HTML Format"))));
 }
 
-void CAddType::OnBnClickedRadioPrimaryTypes()
+LRESULT CAddType::OnBnClickedRadioPrimaryTypes(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
 	AddCommonTypes();
 	::ShowWindow(::GetDlgItem(m_hWnd, IDC_LIST1), SW_SHOW);
@@ -106,9 +67,11 @@ void CAddType::OnBnClickedRadioPrimaryTypes()
 		m_lbCandidateTypes.SetCurSel(0);
 		m_lbCandidateTypes.SetSel(0);
 	}
+	bHandled = TRUE;
+	return 0;
 }
 
-void CAddType::OnBnClickedRadioCurrentTypes()
+LRESULT CAddType::OnBnClickedRadioCurrentTypes(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
 	AddCurrentClipboardTypes();
 	::ShowWindow(::GetDlgItem(m_hWnd, IDC_LIST1), SW_SHOW);
@@ -120,21 +83,25 @@ void CAddType::OnBnClickedRadioCurrentTypes()
 		m_lbCandidateTypes.SetSel(0);
 
 	}
+	bHandled = TRUE;
+	return 0;
 }
 
-void CAddType::OnBnClickedRadioCustomType()
+LRESULT CAddType::OnBnClickedRadioCustomType(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
 	::ShowWindow(::GetDlgItem(m_hWnd, IDC_EDIT1), SW_SHOW);
 	::ShowWindow(::GetDlgItem(m_hWnd, IDC_LIST1), SW_HIDE);
 	::SetFocus(::GetDlgItem(m_hWnd, IDC_EDIT1));
+	bHandled = TRUE;
+	return 0;
 }
 
-void CAddType::OnBnClickedAdd()
+LRESULT CAddType::OnBnClickedAdd(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
 	m_csSelectedTypes.RemoveAll();
 
-	if (IsDlgButtonChecked(IDC_RADIO_PRIMARY_TYPES) == BST_CHECKED ||
-		IsDlgButtonChecked(IDC_RADIO_CURRENT_TYPES) == BST_CHECKED)
+	if (::SendDlgItemMessage(m_hWnd, IDC_RADIO_PRIMARY_TYPES, BM_GETCHECK, 0, 0) == BST_CHECKED ||
+		::SendDlgItemMessage(m_hWnd, IDC_RADIO_CURRENT_TYPES, BM_GETCHECK, 0, 0) == BST_CHECKED)
 	{
 		int nCount = m_lbCandidateTypes.GetSelCount();
 		if (nCount)
@@ -151,17 +118,23 @@ void CAddType::OnBnClickedAdd()
 			}
 		}
 	}
-	else if (IsDlgButtonChecked(IDC_RADIO_CUSTOM_TYPE) == BST_CHECKED)
+	else if (::SendDlgItemMessage(m_hWnd, IDC_RADIO_CUSTOM_TYPE, BM_GETCHECK, 0, 0) == BST_CHECKED)
 	{
-		UpdateData();
+		// Get text from edit control
+		::GetDlgItemText(m_hWnd, IDC_EDIT1, m_eCustomType.GetBuffer(50), 50);
+		m_eCustomType.ReleaseBuffer();
 		m_csSelectedTypes.Add(m_eCustomType);
 	}
 
 	EndDialog(IDOK);
+	bHandled = TRUE;
+	return 0;
 }
 
 
-void CAddType::OnLbnDblclkList()
+LRESULT CAddType::OnLbnDblclkList(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
 	OnBnClickedAdd();
+	bHandled = TRUE;
+	return 0;
 }

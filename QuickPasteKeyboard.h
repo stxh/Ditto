@@ -1,17 +1,15 @@
 #pragma once
-#include "afxcmn.h"
-#include "afxwin.h"
 
+#include <atlbase.h>
+#include <atlwin.h>
+#include <atldlgs.h>
+#include <atlctrls.h>
+#include <atlctrlx.h>
 
-// CQuickPasteKeyboard dialog
-
-class CQuickPasteKeyboard : public CPropertyPage
+class CQuickPasteKeyboard : public CPropertyPageImpl<CQuickPasteKeyboard>
 {
-	DECLARE_DYNAMIC(CQuickPasteKeyboard)
-
 public:
-	CQuickPasteKeyboard();
-	virtual ~CQuickPasteKeyboard();
+	enum { IDD = IDD_OPTIONS_QUICK_PASTE_KEYBOARD };
 
 	class KeyboardAB
 	{
@@ -40,18 +38,53 @@ public:
 		KeyboardAB Array[10];
 	};
 
-// Dialog Data
-	enum { IDD = IDD_OPTIONS_QUICK_PASTE_KEYBOARD };
+	BEGIN_MSG_MAP(CQuickPasteKeyboard)
+		MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
+		MESSAGE_HANDLER(WM_KEYUP, OnKeyUp)
+		MESSAGE_HANDLER(WM_KILLFOCUS, OnKillFocus)
+		NOTIFY_HANDLER(IDC_LIST1, LVN_ITEMACTIVATE, OnLvnItemActivateList1)
+		NOTIFY_HANDLER(IDC_LIST1, LVN_ITEMCHANGED, OnLvnItemchangedList1)
+		COMMAND_ID_HANDLER(IDC_ASSIGN, OnBnClickedAssign)
+		COMMAND_ID_HANDLER(IDC_BUTTON_REMOVE, OnBnClickedButtonRemove)
+		COMMAND_ID_HANDLER(IDC_BUTTON_ADD, OnBnClickedButtonAdd)
+		COMMAND_ID_HANDLER(IDC_COMBO_ENTER_MODIFIER, OnCbnKillfocusComboEnterModifier)
+		COMMAND_HANDLER(IDC_HOTKEY1, EN_KILLFOCUS, OnEnKillfocusEdit1)
+		COMMAND_ID_HANDLER(IDC_BUTTON_ENTER, OnBnClickedButtonEnter)
+		COMMAND_ID_HANDLER(IDC_BUTTON_ENTER2, OnBnClickedButtonEnter2)
+		COMMAND_ID_HANDLER(IDC_BUTTON_RESET, OnBnClickedButtonReset)
+		COMMAND_ID_HANDLER(IDC_RADIO_KEYBOARD_1, OnBnClickedRadioKeyboard1)
+		COMMAND_ID_HANDLER(IDC_RADIO_MOUSE_1, OnBnClickedRadioMouse1)
+		COMMAND_ID_HANDLER(IDC_RADIO_KEYBOARD_2, OnBnClickedRadioKeyboard2)
+		COMMAND_ID_HANDLER(IDC_RADIO_MOUSE_2, OnBnClickedRadioMouse2)
+		COMMAND_ID_HANDLER(IDC_CHECK_ENABLE_SECOND_PRESS, OnBnClickedCheckEnableSecondPress)
+		CHAIN_MSG_MAP(CPropertyPageImpl<CQuickPasteKeyboard>)
+	END_MSG_MAP()
 
-protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	LRESULT OnInitDialog(UINT, WPARAM, LPARAM, BOOL&);
+	LRESULT OnKeyUp(UINT, WPARAM, LPARAM, BOOL&);
+	LRESULT OnKillFocus(UINT, WPARAM, LPARAM, BOOL&);
+	LRESULT OnLvnItemActivateList1(int, LPNMHDR, BOOL&);
+	LRESULT OnLvnItemchangedList1(int, LPNMHDR, BOOL&);
+	LRESULT OnBnClickedAssign(WORD, WORD, HWND, BOOL&);
+	LRESULT OnBnClickedButtonRemove(WORD, WORD, HWND, BOOL&);
+	LRESULT OnBnClickedButtonAdd(WORD, WORD, HWND, BOOL&);
+	LRESULT OnCbnKillfocusComboEnterModifier(WORD, WORD, HWND, BOOL&);
+	LRESULT OnEnKillfocusEdit1(WORD, WORD, HWND, BOOL&);
+	LRESULT OnBnClickedButtonEnter(WORD, WORD, HWND, BOOL&);
+	LRESULT OnBnClickedButtonEnter2(WORD, WORD, HWND, BOOL&);
+	LRESULT OnBnClickedButtonReset(WORD, WORD, HWND, BOOL&);
+	LRESULT OnBnClickedRadioKeyboard1(WORD, WORD, HWND, BOOL&);
+	LRESULT OnBnClickedRadioMouse1(WORD, WORD, HWND, BOOL&);
+	LRESULT OnBnClickedRadioKeyboard2(WORD, WORD, HWND, BOOL&);
+	LRESULT OnBnClickedRadioMouse2(WORD, WORD, HWND, BOOL&);
+	LRESULT OnBnClickedCheckEnableSecondPress(WORD, WORD, HWND, BOOL&);
 
-	DECLARE_MESSAGE_MAP()
-public:
-	CListCtrl m_list;
-	virtual BOOL OnInitDialog();
+	int OnApply() override;
+	BOOL PreTranslateMessage(MSG* pMsg);
+	BOOL OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult);
+	BOOL OnCommand(WPARAM wParam, LPARAM lParam);
 
-protected:
+private:
 	void InitListCtrlCols();
 	void LoadItems();
 	CString GetShortCutText(KeyboardArray ab);
@@ -62,36 +95,14 @@ protected:
 	int SelectedCommandId();
 	int SelectedCommandShortCutId();
 	int SelectedCommandRow();
-	void SelectMouseTypeCombo(CComboBox &combo, int value);
+	void SelectMouseTypeCombo(CComboBox& combo, int value);
 	void SelectedRow(int row);
+	void OnCbnSelchangeComboAllAssigned(WORD, WORD, HWND, BOOL&);
 
-public:
-	afx_msg void OnLvnItemActivateList1(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnLvnItemchangedList1(NMHDR *pNMHDR, LRESULT *pResult);
+	CListCtrl m_list;
 	CHotKeyCtrl m_hotKey1;
-	afx_msg void OnBnClickedAssign();
 	CHotKeyCtrl m_hotKey2;
-	virtual BOOL OnApply();
 	CComboBox m_assignedCombo;
-	afx_msg void OnCbnSelchangeComboAllAssigned();
-	afx_msg void OnBnClickedButtonRemove();
-	afx_msg void OnBnClickedButtonAdd();
-	afx_msg void OnCbnKillfocusComboEnterModifier();
-	afx_msg void OnEnKillfocusEdit1();
-	afx_msg void OnKillFocus(CWnd* pNewWnd);
-	virtual BOOL PreTranslateMessage(MSG* pMsg);
-	virtual BOOL OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult);
-	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
-	afx_msg void OnBnClickedButtonEnter();
-	afx_msg void OnBnClickedButtonEnter2();
-
-	afx_msg void OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
 	CComboBox m_mouseType1;
 	CComboBox m_mouseType2;
-	afx_msg void OnBnClickedButtonReset();
-	afx_msg void OnBnClickedRadioKeyboard1();
-	afx_msg void OnBnClickedRadioMouse1();
-	afx_msg void OnBnClickedRadioKeyboard2();
-	afx_msg void OnBnClickedRadioMouse2();
-	afx_msg void OnBnClickedCheckEnableSecondPress();
 };

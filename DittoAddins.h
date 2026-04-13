@@ -2,7 +2,7 @@
 
 #include "DittoAddin.h"
 #include <vector>
-#include <afxtempl.h>
+
 
 class CDittoAddins
 {

@@ -20,11 +20,8 @@
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
 #endif
-
-class DittoCommandLineInfo : public CCommandLineInfo
+class DittoCommandLineInfo
 {
 public:
 	DittoCommandLineInfo()
@@ -42,13 +39,12 @@ public:
 		m_restartFromRestartManager = FALSE;
 	}
 
- 	virtual void ParseParam(const TCHAR* pszParam, BOOL bFlag, BOOL bLast)
- 	{
+	void ParseParam(const TCHAR* pszParam, BOOL bFlag, BOOL bLast)
+  	{
   		if(bFlag)
   		{
   			if(STRICMP(pszParam, _T("Connect")) == 0)
-  			{
-  				m_bConnect = TRUE;
+  			{  				m_bConnect = TRUE;
   			}
   			else if(STRICMP(pszParam, _T("Disconnect")) == 0)
   			{
@@ -108,9 +104,8 @@ public:
 			}
   		}
  
-		CCommandLineInfo::ParseParam(pszParam, bFlag, bLast);
- 	}
-
+// Base class ParseParam removed - we handle all parameters here
+  	}
 	BOOL m_bDisconnect;
 	BOOL m_bConnect;
 	BOOL m_pasteClip;
@@ -126,13 +121,12 @@ public:
 
 CCP_MainApp theApp;
 
-BEGIN_MESSAGE_MAP(CCP_MainApp, CWinApp)
-	//{{AFX_MSG_MAP(CCP_MainApp)
-		// NOTE - the ClassWizard will add and remove mapping macros here.
-		//    DO NOT EDIT what you see in these blocks of generated code!
-	//}}AFX_MSG_MAP
-END_MESSAGE_MAP()
-
+// WTL message map for application
+BOOL CCP_MainApp::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
+{
+	// Handle application-level messages here
+	return FALSE;
+}
 CCP_MainApp::CCP_MainApp()
 {
 	m_copyReason = CopyReasonEnum::COPY_TO_UNKOWN;
@@ -160,7 +154,7 @@ CCP_MainApp::CCP_MainApp()
 	m_bAsynchronousRefreshView = true;
 	m_lClipsSent = 0;
 	m_lClipsRecieved = 0;
-	m_oldtStartUp = COleDateTime::GetCurrentTime();
+	GetSystemTime(&m_oldtStartUp); // Initialize with current system time
 
 	m_bExitServerThread = false;
 
@@ -178,7 +172,7 @@ CCP_MainApp::CCP_MainApp()
 	m_pNoDbMainFrame = NULL;
 	m_databaseOnNetworkShare = false;
 
-	m_dwRestartManagerSupportFlags = AFX_RESTART_MANAGER_SUPPORT_RESTART;
+	
 }
 
 CCP_MainApp::~CCP_MainApp()
@@ -186,7 +180,7 @@ CCP_MainApp::~CCP_MainApp()
 	
 }
 
-BOOL CCP_MainApp::InitInstance()
+BOOL CCP_MainApp::InitInstance(HINSTANCE hInstance, int nCmdShow)
 {	
 	INITCOMMONCONTROLSEX InitCtrls;
 	InitCtrls.dwSize = sizeof(InitCtrls);
@@ -195,15 +189,19 @@ BOOL CCP_MainApp::InitInstance()
 	InitCtrls.dwICC = ICC_WIN95_CLASSES;
 	InitCommonControlsEx(&InitCtrls);
 
-	AfxEnableControlContainer();
-	AfxOleInit();
-	AfxInitRichEditEx();	
+	// Initialize WTL application module
+	CAppModule::Init(hInstance);
 
-	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
-	Gdiplus::GdiplusStartup(&m_gdiplusToken, &gdiplusStartupInput, NULL);
+	// Initialize OLE (replaces AfxOleInit)
+	OleInitialize(NULL);
 
+	// Initialize RichEdit (replaces AfxInitRichEditEx)
+	LoadLibrary(TEXT("RICHED20.DLL"));
 	LoadLibrary(TEXT("MSFTEDIT.DLL"));
 
+	// Initialize GDI+
+	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
+	Gdiplus::GdiplusStartup(&m_gdiplusToken, &gdiplusStartupInput, NULL);
 	setlocale(LC_TIME, ".OCP"); // defines the date/time formatting
 
 	//MessageBox(NULL, _T("ditto starting"), _T("d"), MB_OK);
@@ -374,7 +372,7 @@ BOOL CCP_MainApp::InitInstance()
 		csMutex += CGetSetOptions::GetExeFileName();
 	}
 
-	CWinApp::RegisterWithRestartManager(false, csMutex);
+	
 
 	//create mutex doesn't like slashes, remove them, it always returns NULL with them in
 	csMutex.Replace(_T("\\"), _T("_"));
@@ -410,16 +408,31 @@ BOOL CCP_MainApp::InitInstance()
 	if(nRet == FALSE)
 	{
 		m_pNoDbMainFrame = new CNoDbFrameWnd();
-		m_pMainWnd = m_pNoDbMainFrame;
-				
-		m_pNoDbMainFrame->LoadFrame(IDR_MAINFRAME, WS_OVERLAPPEDWINDOW | FWS_ADDTOTITLE, NULL, NULL);
+		if(m_pNoDbMainFrame == NULL)
+		{
+			Log(_T("Failed to allocate CNoDbFrameWnd"));
+			return FALSE;
+		}
+
+		HWND hFrame = m_pNoDbMainFrame->CreateEx(NULL, _T("Ditto"), WS_OVERLAPPEDWINDOW);
+		if(hFrame == NULL)
+		{
+			Log(_T("Failed to create no-db frame window"));
+			delete m_pNoDbMainFrame;
+			m_pNoDbMainFrame = NULL;
+			return FALSE;
+		}
+
 		m_pNoDbMainFrame->ShowWindow(SW_SHOW);
 		m_pNoDbMainFrame->UpdateWindow();
 	}
 	else
 	{
-		//Sleep(1000);
 		CreateMainWnd();
+		if(m_pMainFrame == NULL)
+		{
+			return FALSE;
+		}
 	}
 
 	return TRUE;
@@ -428,9 +441,22 @@ BOOL CCP_MainApp::InitInstance()
 void CCP_MainApp::CreateMainWnd()
 {
 	CMainFrame* pFrame = new CMainFrame;
-	m_pMainWnd = m_pMainFrame = pFrame;
+	if(pFrame == NULL)
+	{
+		Log(_T("Failed to allocate main frame"));
+		return;
+	}
 
-	pFrame->LoadFrame(IDR_MAINFRAME, WS_OVERLAPPEDWINDOW | FWS_ADDTOTITLE, NULL, NULL);
+	m_pMainFrame = pFrame;
+
+	HWND hFrame = pFrame->CreateEx(NULL, _T("Ditto"), WS_OVERLAPPEDWINDOW);
+	if(hFrame == NULL)
+	{
+		Log(_T("Failed to create main frame window"));
+		delete pFrame;
+		m_pMainFrame = NULL;
+		return;
+	}
 
 	//removed to keep ditto from taking focus on startup
 	//pFrame->ShowWindow(SW_SHOW);
@@ -442,7 +468,10 @@ void CCP_MainApp::CloseNoDbWindow()
 {
 	if (m_pNoDbMainFrame != NULL)
 	{
-		m_pNoDbMainFrame->CloseWindow();
+		if(::IsWindow(m_pNoDbMainFrame->m_hWnd))
+		{
+			m_pNoDbMainFrame->DestroyWindow();
+		}
 		delete m_pNoDbMainFrame;
 		m_pNoDbMainFrame = NULL;
 	}
@@ -564,7 +593,10 @@ void CCP_MainApp::StartStopServerThread()
 {
 	if(CGetSetOptions::GetDisableRecieve() == FALSE && CGetSetOptions::GetAllowFriends())
 	{
-		AfxBeginThread(MTServerThread, m_MainhWnd);
+		// Use Windows API instead of MFC AfxBeginThread
+		HANDLE hThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)MTServerThread, (LPVOID)m_MainhWnd, 0, NULL);
+		if (hThread)
+			CloseHandle(hThread);
 	}
 	else
 	{
@@ -926,15 +958,30 @@ int CCP_MainApp::ExitInstance()
 
 	Gdiplus::GdiplusShutdown(m_gdiplusToken);
 
-	return CWinApp::ExitInstance();
+	// Clean up OLE
+	OleUninitialize();
+
+	// Clean up GDI+
+	Gdiplus::GdiplusShutdown(m_gdiplusToken);
+
+	// Clean up database
+	if (m_db.isOpen())
+		m_db.close();
+
+	// Clean up mutexes
+	if (m_hMutex)
+		CloseHandle(m_hMutex);
+	if (m_adminPasteMutex)
+		CloseHandle(m_adminPasteMutex);
+
+	return CAppModule::ExitInstance();
 }
 
 // return TRUE if there is more idle processing to do
 BOOL CCP_MainApp::OnIdle(LONG lCount)
 {
 	// let winapp handle its idle processing
-	if(CWinApp::OnIdle(lCount))
-		return TRUE;
+	
 
 	return FALSE;
 }
@@ -1325,9 +1372,50 @@ int CCP_MainApp::GetActiveGroupId()
 	m_activeGroupId = -1;
 	m_activeGroupStartTime = 0;
 
-	return ret;
+return ret;
 }
 
+// WTL WinMain function (replaces MFC's WinMain)
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+{
+	// Parse command line
+	DittoCommandLineInfo cmdInfo;
+	int argc = 0;
+	LPWSTR* argv = CommandLineToArgvW(GetCommandLineW(), &argc);
+	
+	for(int i = 1; i < argc; i++)
+	{
+		BOOL bFlag = FALSE;
+		if(argv[i][0] == '-' || argv[i][0] == '/')
+		{
+			bFlag = TRUE;
+			cmdInfo.ParseParam(argv[i] + 1, bFlag, (i == argc - 1));
+		}
+		else
+		{
+			cmdInfo.ParseParam(argv[i], bFlag, (i == argc - 1));
+		}
+	}
+	
+	LocalFree(argv);
+
+	// Initialize and run the application
+	CCP_MainApp app;
+	if(!app.InitInstance(hInstance, nCmdShow))
+	{
+		return FALSE;
+	}
+
+	// Main message loop
+	MSG msg;
+	while(GetMessage(&msg, NULL, 0, 0))
+	{
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+
+	return app.ExitInstance();
+}
 void CCP_MainApp::SetCopyReason(CopyReasonEnum::CopyReason copyReason)
 {
 	m_copyReason = copyReason;

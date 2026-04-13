@@ -4,29 +4,19 @@
 #if _MSC_VER > 1000
 #pragma once
 #endif // _MSC_VER > 1000
-// FileTransferProgressDlg.h : header file
-//
+
 #include "Resource.h"
+#include <atlbase.h>
+#include <atlwin.h>
+#include <atldlgs.h>
+#include <atlctrls.h>
 
-/////////////////////////////////////////////////////////////////////////////
-// CFileTransferProgressDlg dialog
-
-class CFileTransferProgressDlg : public CDialog
+class CFileTransferProgressDlg : public CDialogImpl<CFileTransferProgressDlg>
 {
-// Construction
 public:
-	CFileTransferProgressDlg(CWnd* pParent = NULL);   // standard constructor
-
-// Dialog Data
-	//{{AFX_DATA(CFileTransferProgressDlg)
 	enum { IDD = IDD_DIALOG_REMOTE_FILE };
-	CAnimateCtrl	m_FileCopy;
-	CButton	m_m_CancelButton;
-	CProgressCtrl	m_ProgressSingleFile;
-	CProgressCtrl	m_ProgressAllFiles;
-	CStatic	m_Message;
-	CStatic	m_CopyingFile;
-	//}}AFX_DATA
+
+	CFileTransferProgressDlg() : m_bCancelled(false) {}
 
 	void SetMessage(CString &cs);
 	CString GetMessage();
@@ -37,34 +27,28 @@ public:
 	void SetSingleFilePos(int nPos);
 	void ResetSingleFileProgress();
 
-	bool Cancelled()	{ return m_bCancelled; }
+	bool Cancelled() { return m_bCancelled; }
 
 	void PumpMessages();
 
+	BEGIN_MSG_MAP(CFileTransferProgressDlg)
+		MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
+		COMMAND_ID_HANDLER(IDCANCEL, OnCancel)
+	END_MSG_MAP()
 
+	LRESULT OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
+	LRESULT OnCancel(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 
+	void PostNcDestroy();
 
-// Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CFileTransferProgressDlg)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	virtual void PostNcDestroy();
-	//}}AFX_VIRTUAL
-
-// Implementation
-protected:
+private:
 	bool m_bCancelled;
-
-	// Generated message map functions
-	//{{AFX_MSG(CFileTransferProgressDlg)
-	virtual BOOL OnInitDialog();
-	virtual void OnCancel();
-	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP()
+	CAnimateCtrl m_FileCopy;
+	CButton m_m_CancelButton;
+	CProgressBarCtrl m_ProgressSingleFile;
+	CProgressBarCtrl m_ProgressAllFiles;
+	CStatic m_Message;
+	CStatic m_CopyingFile;
 };
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 
 #endif // !defined(AFX_FILETRANSFERPROGRESSDLG_H__B7CD7263_7AA2_44C1_BF85_31021FB23D85__INCLUDED_)

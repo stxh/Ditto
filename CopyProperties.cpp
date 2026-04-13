@@ -18,66 +18,31 @@ static char THIS_FILE[] = __FILE__;
 // CCopyProperties dialog
 
 
-CCopyProperties::CCopyProperties(long lCopyID, CWnd* pParent, CClip *pMemoryClip)
-	: CDialog(CCopyProperties::IDD, pParent)
+CCopyProperties::CCopyProperties(long lCopyID, HWND hParent, CClip *pMemoryClip) : m_lCopyID(lCopyID), m_pMemoryClip(pMemoryClip)
 {
-	m_lCopyID = lCopyID;
 	m_bDeletedData = false;
 	m_bChangedText = false;
 	m_bHandleKillFocus = false;
 	m_bHideOnKillFocus = false;
 	m_lGroupChangedTo = -1;
-	m_pMemoryClip = pMemoryClip;
 	m_bSetToTopMost = true;
 
-	//{{AFX_DATA_INIT(CCopyProperties)
 	m_eDate = _T("");
 	m_lastPasteDate = _T("");
 	m_bNeverAutoDelete = FALSE;
-	//}}AFX_DATA_INIT
 }
 
 
-void CCopyProperties::DoDataExchange(CDataExchange* pDX)
-{
-	CDialog::DoDataExchange(pDX);
-	//{{AFX_DATA_MAP(CCopyProperties)
-	DDX_Control(pDX, IDC_EDIT_QUICK_PASTE, m_QuickPasteText);
-	DDX_Control(pDX, IDC_EDIT_PROPERTIES, m_description);
-	DDX_Control(pDX, IDC_COMBO1, m_GroupCombo);
-	DDX_Control(pDX, IDC_HOTKEY, m_HotKey);
-	DDX_Control(pDX, IDC_COPY_DATA, m_lCopyData);
-	DDX_Text(pDX, IDC_DATE, m_eDate);
-	DDX_Text(pDX, IDC_DATE_LAST_USED, m_lastPasteDate);
-	DDX_Check(pDX, IDC_NEVER_AUTO_DELETE, m_bNeverAutoDelete);
-	DDX_Check(pDX, IDC_HOT_KEY_GLOBAL, m_hotKeyGlobal);
-	DDX_Control(pDX, IDC_HOTKEY_MOVE_TO_GROUP, m_MoveToGrouHotKey);
-	DDX_Check(pDX, IDC_HOT_KEY_GLOBAL_MOVE_TO_GROUP, m_moveToGroupHotKeyGlobal);
-	//}}AFX_DATA_MAP
-}
 
-
-BEGIN_MESSAGE_MAP(CCopyProperties, CDialog)
-	//{{AFX_MSG_MAP(CCopyProperties)
-	ON_BN_CLICKED(IDC_DELETE_COPY_DATA, OnDeleteCopyData)
-	ON_WM_ACTIVATE()
-	ON_WM_SIZE()
-	//}}AFX_MSG_MAP
-	ON_WM_CTLCOLOR()
-	ON_LBN_SELCHANGE(IDC_COPY_DATA, &CCopyProperties::OnLbnSelchangeCopyData)
-	ON_WM_NCLBUTTONDOWN()
-END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 // CCopyProperties message handlers
 
-BOOL CCopyProperties::OnInitDialog() 
+LRESULT CCopyProperties::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) 
 {
-	CDialog::OnInitDialog();
-
 	//remove the default icon in top left of window
-	int extendedStyle = GetWindowLong(m_hWnd, GWL_EXSTYLE);
-	SetWindowLong(m_hWnd, GWL_EXSTYLE, extendedStyle | WS_EX_DLGMODALFRAME);
+	int extendedStyle = GetWindowLong(GWL_EXSTYLE);
+	SetWindowLong(GWL_EXSTYLE, extendedStyle | WS_EX_DLGMODALFRAME);
 	SetWindowPos(NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 
 	m_GroupCombo.FillCombo();
@@ -99,18 +64,23 @@ BOOL CCopyProperties::OnInitDialog()
 	}
 	CATCH_SQLITE_EXCEPTION
 
-	UpdateData(FALSE);
+	// Set the values to the controls directly instead of UpdateData
+	SetDlgItemText(IDC_DATE, m_eDate);
+	SetDlgItemText(IDC_DATE_LAST_USED, m_lastPasteDate);
+	CheckDlgButton(IDC_NEVER_AUTO_DELETE, m_bNeverAutoDelete);
+	CheckDlgButton(IDC_HOT_KEY_GLOBAL, m_hotKeyGlobal);
+	CheckDlgButton(IDC_HOT_KEY_GLOBAL_MOVE_TO_GROUP, m_moveToGroupHotKeyGlobal);
 
 	if(m_bSetToTopMost)
-		SetWindowPos(&CWnd::wndTopMost, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE);
+		SetWindowPos(HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE);
 
 	if(m_lCopyID == -1 && m_pMemoryClip != NULL)
 	{
-		GetDlgItem(IDOK)->SetFocus();
+		::SetFocus(GetDlgItem(IDOK));
 	}
 	else
 	{
-		m_description.SetFocus();
+		::SetFocus(m_description.m_hWnd);
 	}
 	
 	m_Resize.SetParent(m_hWnd);
@@ -141,11 +111,37 @@ BOOL CCopyProperties::OnInitDialog()
 
 void CCopyProperties::LoadDataFromCClip(CClip &Clip)
 {
-	COleDateTime dtTime(Clip.m_Time.GetTime());
-	m_eDate = dtTime.Format();
+	// Convert time_t to SYSTEMTIME for display
+	time_t clipTime = Clip.m_Time.GetTime();
+	SYSTEMTIME stTime;
+	if (clipTime != 0) {
+		FILETIME ftTime;
+		LONGLONG llTime = Int32x32To64(clipTime, 10000000) + 116444736000000000; // Convert to FILETIME
+		ftTime.dwLowDateTime = (DWORD)llTime;
+		ftTime.dwHighDateTime = llTime >> 32;
+		FileTimeToSystemTime(&ftTime, &stTime);
+		m_eDate.Format(_T("%02d/%02d/%04d %02d:%02d:%02d"), 
+			stTime.wMonth, stTime.wDay, stTime.wYear,
+			stTime.wHour, stTime.wMinute, stTime.wSecond);
+	} else {
+		m_eDate = _T("");
+	}
 	
-	COleDateTime lastPasteDate(Clip.m_lastPasteDate.GetTime());
-	m_lastPasteDate = lastPasteDate.Format();
+	// Convert last paste time
+	time_t lastPasteTime = Clip.m_lastPasteDate.GetTime();
+	SYSTEMTIME stLastPaste;
+	if (lastPasteTime != 0) {
+		FILETIME ftLastPaste;
+		LONGLONG llLastPaste = Int32x32To64(lastPasteTime, 10000000) + 116444736000000000; // Convert to FILETIME
+		ftLastPaste.dwLowDateTime = (DWORD)llLastPaste;
+		ftLastPaste.dwHighDateTime = llLastPaste >> 32;
+		FileTimeToSystemTime(&ftLastPaste, &stLastPaste);
+		m_lastPasteDate.Format(_T("%02d/%02d/%04d %02d:%02d:%02d"), 
+			stLastPaste.wMonth, stLastPaste.wDay, stLastPaste.wYear,
+			stLastPaste.wHour, stLastPaste.wMinute, stLastPaste.wSecond);
+	} else {
+		m_lastPasteDate = _T("");
+	}
 
 	m_description.SetWindowText(Clip.m_Desc);
 	
@@ -239,24 +235,24 @@ void CCopyProperties::LoadDataFromCClip(CClip &Clip)
 		::ShowWindow(::GetDlgItem(m_hWnd, IDC_CHECK_WIN_MOVE_TO_GROUP), SW_HIDE);
 		::ShowWindow(::GetDlgItem(m_hWnd, IDC_HOT_KEY_GLOBAL_MOVE_TO_GROUP), SW_HIDE);
 
-		CRect anchorRect;
+		RECT anchorRect;
 		::GetWindowRect(::GetDlgItem(m_hWnd, IDC_STATIC_HOT_KEY_MOVE_TO_GROUP), &anchorRect);
 		ScreenToClient(&anchorRect);
 		
 
-		HWND hwnd = ::GetTopWindow(this->GetSafeHwnd());
+		HWND hwnd = ::GetTopWindow(this->m_hWnd);
 		// while we have a valid hwnd, 
 		// loop through all child windows
 		while (hwnd)
 		{
-			CRect rect;
+			RECT rect;
 			::GetWindowRect(hwnd, &rect);
 			ScreenToClient(&rect);
 
 			if(rect.top > anchorRect.bottom)
 			{
 				::MoveWindow(hwnd, rect.left, 
-					rect.top - (anchorRect.Height()+4), rect.Width(), 
+					rect.top - (anchorRect.bottom - anchorRect.top + 4), rect.Width(), 
 					rect.Height(), TRUE);
 			}
 
@@ -265,18 +261,20 @@ void CCopyProperties::LoadDataFromCClip(CClip &Clip)
 			hwnd = ::GetNextWindow(hwnd, GW_HWNDNEXT);
 		}
 
-		CRect rect2;
+		RECT rect2;
 		::GetWindowRect(m_hWnd, &rect2);
 
 		::MoveWindow(m_hWnd, rect2.left, 
 				rect2.top, rect2.Width(), 
-				rect2.Height() - (anchorRect.Height()+4), TRUE);
+				rect2.Height() - (anchorRect.bottom - anchorRect.top + 4), TRUE);
 	}
 }
 
-void CCopyProperties::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized) 
+LRESULT CCopyProperties::OnActivate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) 
 {
-	CDialog::OnActivate(nState, pWndOther, bMinimized);
+	UINT nState = (UINT)wParam;
+	// CWnd* pWndOther = (CWnd*)lParam; // lParam doesn't contain the window pointer in WM_ACTIVATE
+	BOOL bMinimized = (BOOL)HIWORD(lParam);
 
 	if (nState == WA_INACTIVE)
 	{
@@ -291,14 +289,20 @@ void CCopyProperties::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized)
 	}
 	else if (nState == WA_ACTIVE)
 	{
-		SetFocus();
+		::SetFocus(m_hWnd);
 		::SetForegroundWindow(m_hWnd);
 	}
 
+	return 0;
 }
-void CCopyProperties::OnOK() 
+LRESULT CCopyProperties::OnOK(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled) 
 {
-	UpdateData();
+	// Get the values from the controls directly instead of UpdateData
+	GetDlgItemText(IDC_DATE, m_eDate);
+	GetDlgItemText(IDC_DATE_LAST_USED, m_lastPasteDate);
+	m_bNeverAutoDelete = (BOOL)IsDlgButtonChecked(IDC_NEVER_AUTO_DELETE);
+	m_hotKeyGlobal = (BOOL)IsDlgButtonChecked(IDC_HOT_KEY_GLOBAL);
+	m_moveToGroupHotKeyGlobal = (BOOL)IsDlgButtonChecked(IDC_HOT_KEY_GLOBAL_MOVE_TO_GROUP);
 
 	try
 	{
@@ -324,7 +328,7 @@ void CCopyProperties::OnOK()
 				{
 					if(MessageBox(_T("Error registering global hot key\n\nContinue?"), _T(""), MB_YESNO|MB_ICONWARNING) == IDNO)
 					{
-						return;
+						return 0;
 					}
 				}
 
@@ -332,7 +336,7 @@ void CCopyProperties::OnOK()
 				{
 					if(MessageBox(_T("Error registering global move to group hot key\n\nContinue?"), _T(""), MB_YESNO|MB_ICONWARNING) == IDNO)
 					{
-						return;
+						return 0;
 					}
 				}
 
@@ -350,7 +354,8 @@ void CCopyProperties::OnOK()
 	}
 	CATCH_SQLITE_EXCEPTION
 
-	CDialog::OnOK();
+	EndDialog(wID);
+	return 0;
 }
 
 BOOL CCopyProperties::CheckGlobalHotKey(CClip &clip)
@@ -434,7 +439,7 @@ void CCopyProperties::LoadDataIntoCClip(CClip &Clip)
 	//don't auto delete check box is checked
 	if(m_bNeverAutoDelete)
 	{
-		Clip.m_dontAutoDelete = (int)CTime::GetCurrentTime().GetTime();
+		Clip.m_dontAutoDelete = (int)time(NULL);
 	}
 	else if(m_bNeverAutoDelete == FALSE)
 	{
@@ -446,7 +451,7 @@ void CCopyProperties::LoadDataIntoCClip(CClip &Clip)
 	Clip.m_globalMoveToGroupShortCut = m_moveToGroupHotKeyGlobal;
 }
 
-void CCopyProperties::OnDeleteCopyData() 
+LRESULT CCopyProperties::OnDeleteCopyData(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled) 
 {
 	int nCount = m_lCopyData.GetSelCount();
 	if(nCount)
@@ -482,18 +487,23 @@ void CCopyProperties::OnDeleteCopyData()
 			}
 		}		
 	}
+	
+	return 0;
 }
 
-void CCopyProperties::OnCancel() 
+LRESULT CCopyProperties::OnCancel(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled) 
 {
 	m_bHandleKillFocus = true;
 		
-	CDialog::OnCancel();
+	EndDialog(wID);
+	return 0;
 }
 
-void CCopyProperties::OnSize(UINT nType, int cx, int cy) 
+LRESULT CCopyProperties::OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) 
 {
-	CDialog::OnSize(nType, cx, cy);
+	UINT nType = (UINT)wParam;
+	int cx = LOWORD(lParam);
+	int cy = HIWORD(lParam);
 	
 	if (((GetKeyState(VK_LBUTTON) & 0x100) != 0) &&
 		m_mouseDownOnCaption == false)
@@ -504,20 +514,31 @@ void CCopyProperties::OnSize(UINT nType, int cx, int cy)
 	{
 		m_Resize.SetParent(m_hWnd);
 	}
+	
+	return 0;
 }
 
-HBRUSH CCopyProperties::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
+LRESULT CCopyProperties::OnCtlColor(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	HBRUSH hbr = CDialog::OnCtlColor(pDC, pWnd, nCtlColor);
+	// Get DC and handle
+	HDC hdc = (HDC)wParam;
+	HWND hwndChild = (HWND)lParam;
 
-	// TODO:  Change any attributes of the DC here
+	// Return default brush for now - this should be modified based on your specific requirements
+	// For now, let's use system color for static text
+	if (GetDlgCtrlID(hwndChild) == IDC_DATE || 
+		GetDlgCtrlID(hwndChild) == IDC_DATE_LAST_USED)
+	{
+		SetBkColor(hdc, GetSysColor(COLOR_WINDOW));
+		return (LRESULT)GetSysColorBrush(COLOR_WINDOW);
+	}
 
-	// TODO:  Return a different brush if the default is not desired
-	return hbr;
+	// For other controls, return default
+	return (LRESULT)::GetSysColorBrush(COLOR_BTNFACE);
 }
 
 
-void CCopyProperties::OnLbnSelchangeCopyData()
+LRESULT CCopyProperties::OnLbnSelchangeCopyData(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
 	int selCount = m_lCopyData.GetSelCount();
 	if (selCount > 0)
@@ -527,7 +548,7 @@ void CCopyProperties::OnLbnSelchangeCopyData()
 		//Get the selected indexes
 		ARRAY items;
 		items.SetSize(selCount);
-		m_lCopyData.GetSelItems(selCount, items.GetData());
+		m_lCopyData.GetSelItems(selCount, items.GetData()); 
 
 		items.SortDescending();
 
@@ -580,11 +601,17 @@ void CCopyProperties::OnLbnSelchangeCopyData()
 			break;
 		}
 	}
+	
+	return 0;
 }
 
 
-void CCopyProperties::OnNcLButtonDown(UINT nHitTest, CPoint point)
+LRESULT CCopyProperties::OnNcLButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
+	UINT nHitTest = (UINT)wParam;
+	POINTS pts = MAKEPOINTS(lParam);
+	POINT point = {pts.x, pts.y};
+
 	m_mouseDownOnCaption = false;
 
 	if (nHitTest == HTCAPTION)
@@ -592,5 +619,5 @@ void CCopyProperties::OnNcLButtonDown(UINT nHitTest, CPoint point)
 		m_mouseDownOnCaption = true;
 	}
 
-	CDialog::OnNcLButtonDown(nHitTest, point);
+	return 0;
 }

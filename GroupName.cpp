@@ -5,56 +5,31 @@
 #include "cp_main.h"
 #include "GroupName.h"
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-/////////////////////////////////////////////////////////////////////////////
-// CGroupName dialog
-
-
-CGroupName::CGroupName(CWnd* pParent /*=NULL*/)
-	: CDialog(CGroupName::IDD, pParent)
+LRESULT CGroupName::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 {
-	//{{AFX_DATA_INIT(CGroupName)
-	m_csName = _T("");
-	//}}AFX_DATA_INIT
+	CWindow nameEdit = GetDlgItem(IDC_NAME);
+	if (nameEdit.IsWindow())
+	{
+		nameEdit.SetWindowText(m_csName);
+		nameEdit.SetFocus();
+		return FALSE;
+	}
+	return TRUE;
 }
 
-
-void CGroupName::DoDataExchange(CDataExchange* pDX)
+LRESULT CGroupName::OnOk(WORD, WORD, HWND, BOOL&)
 {
-	CDialog::DoDataExchange(pDX);
-	//{{AFX_DATA_MAP(CGroupName)
-	DDX_Text(pDX, IDC_NAME, m_csName);
-	//}}AFX_DATA_MAP
+	CWindow nameEdit = GetDlgItem(IDC_NAME);
+	if (nameEdit.IsWindow())
+	{
+		nameEdit.GetWindowText(m_csName);
+	}
+	EndDialog(IDOK);
+	return 0;
 }
 
-
-BEGIN_MESSAGE_MAP(CGroupName, CDialog)
-	//{{AFX_MSG_MAP(CGroupName)
-	//}}AFX_MSG_MAP
-END_MESSAGE_MAP()
-
-/////////////////////////////////////////////////////////////////////////////
-// CGroupName message handlers
-
-void CGroupName::OnOK() 
+LRESULT CGroupName::OnCancel(WORD, WORD, HWND, BOOL&)
 {
-	UpdateData(TRUE);
-	
-	CDialog::OnOK();
-}
-
-BOOL CGroupName::OnInitDialog() 
-{
-	CDialog::OnInitDialog();
-
-	CWnd *pWnd = GetDlgItem(IDC_NAME);
-	if(pWnd)
-		pWnd->SetFocus();
-		
-	return FALSE;
+	EndDialog(IDCANCEL);
+	return 0;
 }

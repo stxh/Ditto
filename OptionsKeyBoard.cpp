@@ -1,75 +1,39 @@
-// OptionsKeyBoard.cpp : implementation file
-//
-
 #include "stdafx.h"
 #include "CP_Main.h"
 #include "OptionsKeyBoard.h"
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-/////////////////////////////////////////////////////////////////////////////
-// COptionsKeyBoard property page
-
-IMPLEMENT_DYNCREATE(COptionsKeyBoard, CPropertyPage)
-
-COptionsKeyBoard::COptionsKeyBoard() : CPropertyPage(COptionsKeyBoard::IDD)
+COptionsKeyBoard::COptionsKeyBoard()
 {
 	m_csTitle = theApp.m_Language.GetString("KeyboardShortcutsTitle", "Keyboard Shortcuts");
 	m_psp.pszTitle = m_csTitle;
 	m_psp.dwFlags |= PSP_USETITLE;
-	
-	//{{AFX_DATA_INIT(COptionsKeyBoard)
-	//}}AFX_DATA_INIT
+	m_pParent = NULL;
 }
 
-COptionsKeyBoard::~COptionsKeyBoard()
+LRESULT COptionsKeyBoard::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) 
 {
-}
+	m_btSendPaste.Attach(GetDlgItem(IDC_CHECK_SEND_PASTE));
+	m_UseUiGroupForLastTen.Attach(GetDlgItem(IDC_CHECK_USE_UI_GROUP_LAST_10));
+	m_btMoveClipOnGlobal10.Attach(GetDlgItem(IDC_CHECK_MOVE_CLIPS_ON_PASTE));
+	m_Nine.Attach(GetDlgItem(IDC_HOTKEY9));
+	m_Eight.Attach(GetDlgItem(IDC_HOTKEY8));
+	m_Seven.Attach(GetDlgItem(IDC_HOTKEY7));
+	m_Six.Attach(GetDlgItem(IDC_HOTKEY6));
+	m_Five.Attach(GetDlgItem(IDC_HOTKEY5));
+	m_Four.Attach(GetDlgItem(IDC_HOTKEY4));
+	m_Three.Attach(GetDlgItem(IDC_HOTKEY3));
+	m_Two.Attach(GetDlgItem(IDC_HOTKEY2));
+	m_Ten.Attach(GetDlgItem(IDC_HOTKEY10));
+	m_One.Attach(GetDlgItem(IDC_HOTKEY1));
+	m_HotKey.Attach(GetDlgItem(IDC_HOTKEY));
+	m_HotKey2.Attach(GetDlgItem(IDC_HOTKEY_ACTIVATE_2));
+	m_HotKey3.Attach(GetDlgItem(IDC_HOTKEY_ACTIVATE_3));
+	m_TextOnlyKey.Attach(GetDlgItem(IDC_HOTKEY_TEXT_ONLY));
+	m_saveClipboardHotKey.Attach(GetDlgItem(IDC_HOTKEY_SAVE_CLIPBOARD));
+	m_copyAndSaveClipboardCtrl.Attach(GetDlgItem(IDC_HOTKEY_COPYSAVECLIPBOARD));
 
-void COptionsKeyBoard::DoDataExchange(CDataExchange* pDX)
-{
-	CPropertyPage::DoDataExchange(pDX);
-	//{{AFX_DATA_MAP(COptionsKeyBoard)
-	DDX_Control(pDX, IDC_CHECK_SEND_PASTE, m_btSendPaste);
-	DDX_Control(pDX, IDC_CHECK_USE_UI_GROUP_LAST_10, m_UseUiGroupForLastTen);
-	DDX_Control(pDX, IDC_HOTKEY9, m_Nine);
-	DDX_Control(pDX, IDC_HOTKEY8, m_Eight);
-	DDX_Control(pDX, IDC_HOTKEY7, m_Seven);
-	DDX_Control(pDX, IDC_HOTKEY6, m_Six);
-	DDX_Control(pDX, IDC_HOTKEY5, m_Five);
-	DDX_Control(pDX, IDC_HOTKEY4, m_Four);
-	DDX_Control(pDX, IDC_HOTKEY3, m_Three);
-	DDX_Control(pDX, IDC_HOTKEY2, m_Two);
-	DDX_Control(pDX, IDC_HOTKEY10, m_Ten);
-	DDX_Control(pDX, IDC_HOTKEY1, m_One);
-	DDX_Control(pDX, IDC_HOTKEY, m_HotKey);
-	DDX_Control(pDX, IDC_HOTKEY_ACTIVATE_2, m_HotKey2);
-	DDX_Control(pDX, IDC_HOTKEY_ACTIVATE_3, m_HotKey3);
-	DDX_Control(pDX, IDC_HOTKEY_TEXT_ONLY, m_TextOnlyKey);
-	//}}AFX_DATA_MAP
-	DDX_Control(pDX, IDC_STATIC_CUSTOM_KEYS, m_CustomeKeysHelp);
-	DDX_Control(pDX, IDC_CHECK_MOVE_CLIPS_ON_PASTE, m_btMoveClipOnGlobal10);
-	DDX_Control(pDX, IDC_HOTKEY_SAVE_CLIPBOARD, m_saveClipboardHotKey);
-	DDX_Control(pDX, IDC_HOTKEY_COPYSAVECLIPBOARD, m_copyAndSaveClipboardCtrl);
-}
-
-BEGIN_MESSAGE_MAP(COptionsKeyBoard, CPropertyPage)
-	//{{AFX_MSG_MAP(COptionsKeyBoard)
-	//}}AFX_MSG_MAP
-END_MESSAGE_MAP()
-
-/////////////////////////////////////////////////////////////////////////////
-// COptionsKeyBoard message handlers
-
-BOOL COptionsKeyBoard::OnInitDialog() 
-{
-	CPropertyPage::OnInitDialog();
-
-	m_CustomeKeysHelp.SetURL(_T("https://github.com/sabrogden/Ditto/wiki/Custom-Key-Strokes"));
+	m_CustomeKeysHelp.SubclassWindow(GetDlgItem(IDC_STATIC_CUSTOM_KEYS));
+	m_CustomeKeysHelp.SetHyperLink(_T("https://github.com/sabrogden/Ditto/wiki/Custom-Key-Strokes"));
 
 	m_pParent = (COptionsSheet *)GetParent();
 
@@ -104,20 +68,20 @@ BOOL COptionsKeyBoard::OnInitDialog()
 
 	theApp.m_Language.UpdateOptionShortcuts(this);	
 		
-	return FALSE;
+	return 0;
 }
 
-LRESULT COptionsKeyBoard::OnWizardNext() 
+int COptionsKeyBoard::OnWizardNext() 
 {
-	return CPropertyPage::OnWizardNext();
+	return 0;
 }
 
 BOOL COptionsKeyBoard::OnWizardFinish() 
 {
-	return CPropertyPage::OnWizardFinish();
+	return TRUE;
 }
 
-BOOL COptionsKeyBoard::OnApply()
+int COptionsKeyBoard::OnApply()
 {
 	CGetSetOptions::SetSendPasteOnFirstTenHotKeys(m_btSendPaste.GetCheck());
 	CGetSetOptions::SetMoveClipsOnGlobal10(m_btMoveClipOnGlobal10.GetCheck());
@@ -164,11 +128,10 @@ BOOL COptionsKeyBoard::OnApply()
 	g_HotKeys.SaveAllKeys();
 	g_HotKeys.RegisterAll(true);
 	
-	return CPropertyPage::OnApply();
+	return PSNRET_NOERROR;
 }
 
-void COptionsKeyBoard::OnCancel() 
+void COptionsKeyBoard::OnReset() 
 {
-	g_HotKeys.RegisterAll( true );
-	CPropertyPage::OnCancel();
+	g_HotKeys.RegisterAll(true);
 }

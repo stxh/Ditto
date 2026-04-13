@@ -1,0 +1,483 @@
+﻿  64 bit Processing .\CP_Main.idl
+  CP_Main.idl
+  64 bit Processing C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\oaidl.idl
+  oaidl.idl
+  64 bit Processing C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\objidl.idl
+  objidl.idl
+  64 bit Processing C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\unknwn.idl
+  unknwn.idl
+  64 bit Processing C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\wtypes.idl
+  wtypes.idl
+  64 bit Processing C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\wtypesbase.idl
+  wtypesbase.idl
+  64 bit Processing C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\basetsd.h
+  basetsd.h
+  64 bit Processing C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\guiddef.h
+  guiddef.h
+  64 bit Processing C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\ocidl.idl
+  ocidl.idl
+  64 bit Processing C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\oleidl.idl
+  oleidl.idl
+  64 bit Processing C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\servprov.idl
+  servprov.idl
+  64 bit Processing C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\urlmon.idl
+  urlmon.idl
+  64 bit Processing C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\msxml.idl
+  msxml.idl
+  64 bit Processing C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\oaidl.acf
+  oaidl.acf
+  64 bit Processing C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\ocidl.acf
+  ocidl.acf
+  StdAfx.cpp
+E:\PubCode\Ditto\stdafx.h(41,9): warning C4278: 'FindText': identifier in type library 'riched20.dll' is already a macro; use the 'rename' qualifier
+  (compiling source file 'StdAfx.cpp')
+  
+E:\PubCode\Ditto\stdafx.h(41,9): warning C4192: automatically excluding 'wireHWND' while importing type library 'riched20.dll'
+  (compiling source file 'StdAfx.cpp')
+  
+E:\PubCode\Ditto\stdafx.h(41,9): warning C4192: automatically excluding '_RemotableHandle' while importing type library 'riched20.dll'
+  (compiling source file 'StdAfx.cpp')
+  
+E:\PubCode\Ditto\stdafx.h(41,9): warning C4192: automatically excluding '__MIDL_IWinTypes_0009' while importing type library 'riched20.dll'
+  (compiling source file 'StdAfx.cpp')
+  
+  About.cpp
+  Accels.cpp
+E:\PubCode\Ditto\Accels.cpp(99,37): warning C4018: '<': signed/unsigned mismatch
+  (compiling source file '/Accels.cpp')
+  
+  ActionEnums.cpp
+E:\PubCode\Ditto\ActionEnums.cpp(517,3): warning C4060: switch statement contains no 'case' or 'default' labels
+  (compiling source file '/ActionEnums.cpp')
+  
+  AddType.cpp
+  AdvGeneral.cpp
+  AutoSendToClientThread.cpp
+  BitmapHelper.cpp
+E:\PubCode\Ditto\BitmapHelper.cpp(107,12): warning C4244: 'initializing': conversion from 'INT_PTR' to 'int', possible loss of data
+  (compiling source file '/BitmapHelper.cpp')
+  
+  ClipEditThread.cpp
+  CF_HDropAggregator.cpp
+  CF_TextAggregator.cpp
+  CF_UnicodeTextAggregator.cpp
+  ChaiScriptOnCopy.cpp
+E:\PubCode\Ditto\ChaiScriptOnCopy.cpp(22,9): warning C4927: illegal conversion; more than one user-defined conversion has been implicitly applied
+  (compiling source file '/ChaiScriptOnCopy.cpp')
+      E:\PubCode\Ditto\ChaiScriptOnCopy.cpp(22,9):
+      while calling the constructor 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>::basic_string(const _Elem *const )'
+          with
+          [
+              _Elem=char
+          ]
+      C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\xstring(749,5):
+      see declaration of 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>::basic_string'
+  
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\xutility(4709,18): warning C4244: '=': conversion from 'const wchar_t' to 'char', possible loss of data
+  (compiling source file '/ChaiScriptOnCopy.cpp')
+      C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\xutility(4709,18):
+      the template instantiation context (the oldest one first) is
+          E:\PubCode\Ditto\chaiscript\language\chaiscript_windows.hpp(78,16):
+          see reference to function template instantiation 'std::string chaiscript::detail::Loadable_Module::to_string<std::wstring>(const T &)' being compiled
+          with
+          [
+              T=std::wstring
+          ]
+          E:\PubCode\Ditto\chaiscript\language\chaiscript_windows.hpp(36,29):
+          see reference to function template instantiation 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>::basic_string<std::_String_const_iterator<std::_String_val<std::_Simple_types<_Elem>>>,0>(_Iter,_Iter,const _Alloc &)' being compiled
+          with
+          [
+              _Elem=wchar_t,
+              _Iter=std::_String_const_iterator<std::_String_val<std::_Simple_types<wchar_t>>>,
+              _Alloc=std::allocator<char>
+          ]
+          C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\xstring(793,17):
+          see reference to function template instantiation 'void std::basic_string<char,std::char_traits<char>,std::allocator<char>>::_Construct_from_iter<const wchar_t*,const wchar_t*,_Size_type>(_Iter,const _Sent,_Size)' being compiled
+          with
+          [
+              _Size_type=unsigned __int64,
+              _Iter=const wchar_t *,
+              _Sent=const wchar_t *,
+              _Size=unsigned __int64
+          ]
+          C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\xstring(949,18):
+          see reference to function template instantiation '_OutIt *std::_Copy_n_unchecked4<const wchar_t*,_Size,char*>(_InIt,_SizeTy,_OutIt)' being compiled
+          with
+          [
+              _OutIt=char *,
+              _Size=unsigned __int64,
+              _InIt=const wchar_t *,
+              _SizeTy=unsigned __int64
+          ]
+  
+  ChaiScriptXml.cpp
+  ConvertRTFToText.cpp
+  ImageFormatAggregator.cpp
+E:\PubCode\Ditto\ImageFormatAggregator.cpp(38,12): warning C4244: 'initializing': conversion from 'INT_PTR' to 'int', possible loss of data
+  (compiling source file '/ImageFormatAggregator.cpp')
+  
+  Clip.cpp
+E:\PubCode\Ditto\Clip.cpp(652,32): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+  (compiling source file '/Clip.cpp')
+  
+E:\PubCode\Ditto\Clip.cpp(660,26): warning C4244: 'argument': conversion from 'INT_PTR' to 'int', possible loss of data
+  (compiling source file '/Clip.cpp')
+  
+E:\PubCode\Ditto\Clip.cpp(788,57): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+  (compiling source file '/Clip.cpp')
+  
+  ClipCompare.cpp
+  ClipFormatQListCtrl.cpp
+  Clip_ImportExport.cpp
+  ClipboardSaveRestore.cpp
+  Generating Code...
+E:\PubCode\Ditto\Clip.cpp(2025,1): warning C4715: 'CClip::CreateGdiplusBitmap': not all control paths return a value
+  Compiling...
+  ClipboardViewer.cpp
+  ClipIds.cpp
+  ICU_String.cpp
+E:\PubCode\Ditto\ICU_String.cpp(90,46): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+  (compiling source file '/ICU_String.cpp')
+  
+E:\PubCode\Ditto\ICU_String.cpp(90,60): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+  (compiling source file '/ICU_String.cpp')
+  
+E:\PubCode\Ditto\ICU_String.cpp(109,45): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+  (compiling source file '/ICU_String.cpp')
+  
+E:\PubCode\Ditto\ICU_String.cpp(109,58): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+  (compiling source file '/ICU_String.cpp')
+  
+  ImageHelper.cpp
+  NoDbFrameWnd.cpp
+  CopyProperties.cpp
+  CopyThread.cpp
+  CP_Main.cpp
+E:\PubCode\Ditto\CP_Main.cpp(83,13): warning C4996: 'wcsnicmp': The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name: _wcsnicmp. See online help for details.
+  (compiling source file '/CP_Main.cpp')
+  
+E:\PubCode\Ditto\CP_Main.cpp(94,13): warning C4996: 'wcsnicmp': The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name: _wcsnicmp. See online help for details.
+  (compiling source file '/CP_Main.cpp')
+  
+E:\PubCode\Ditto\CP_Main.cpp(105,13): warning C4996: 'wcsnicmp': The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name: _wcsnicmp. See online help for details.
+  (compiling source file '/CP_Main.cpp')
+  
+  CustomFriendsHelper.cpp
+  DeleteClipData.cpp
+  DimWnd.cpp
+  DittoChaiScript.cpp
+  DittoPopupWindow.cpp
+  DPI.cpp
+  EditWithButton.cpp
+E:\PubCode\Ditto\EditWithButton.cpp(317,45): warning C4302: 'type cast': truncation from 'LPWSTR' to 'WORD'
+  (compiling source file '/EditWithButton.cpp')
+  
+  EventThread.cpp
+E:\PubCode\Ditto\EventThread.cpp(245,52): warning C4267: 'argument': conversion from 'size_t' to 'DWORD', possible loss of data
+  (compiling source file '/EventThread.cpp')
+  
+E:\PubCode\Ditto\EventThread.cpp(253,35): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+  (compiling source file '/EventThread.cpp')
+  
+  FriendPromptDlg.cpp
+  GdiImageDrawer.cpp
+  GdipButton.cpp
+  GlobalClips.cpp
+  Generating Code...
+  Compiling...
+  HotKeys.cpp
+  ImageViewer.cpp
+E:\PubCode\Ditto\ImageViewer.cpp(151,62): warning C4244: 'argument': conversion from 'double' to 'INT', possible loss of data
+  (compiling source file '/ImageViewer.cpp')
+  
+E:\PubCode\Ditto\ImageViewer.cpp(151,58): warning C4244: 'argument': conversion from 'double' to 'INT', possible loss of data
+  (compiling source file '/ImageViewer.cpp')
+  
+E:\PubCode\Ditto\ImageViewer.cpp(198,19): warning C4244: '=': conversion from 'double' to 'LONG', possible loss of data
+  (compiling source file '/ImageViewer.cpp')
+  
+E:\PubCode\Ditto\ImageViewer.cpp(199,19): warning C4244: '=': conversion from 'double' to 'LONG', possible loss of data
+  (compiling source file '/ImageViewer.cpp')
+  
+  MainFrmThread.cpp
+  Md5.cpp
+E:\PubCode\Ditto\Md5.cpp(240,2): warning C5033: 'register' is no longer a supported storage class
+  (compiling source file '/Md5.cpp')
+  
+  MessagePumpThread.cpp
+  MyDropTarget.cpp
+  NTray.cpp
+  Popup.cpp
+  PowerManager.cpp
+  QPasteWndThread.cpp
+E:\PubCode\Ditto\QPasteWndThread.cpp(114,42): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+  (compiling source file '/QPasteWndThread.cpp')
+  
+  QRCodeViewer.cpp
+  QuickPasteKeyboard.cpp
+  RegExFilterHelper.cpp
+  ScriptEditor.cpp
+  ScrollHelper.cpp
+E:\PubCode\Ditto\ScrollHelper.cpp(71,26): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+  (compiling source file '/ScrollHelper.cpp')
+  
+E:\PubCode\Ditto\ScrollHelper.cpp(71,19): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+  (compiling source file '/ScrollHelper.cpp')
+  
+E:\PubCode\Ditto\ScrollHelper.cpp(461,36): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+  (compiling source file '/ScrollHelper.cpp')
+  
+E:\PubCode\Ditto\ScrollHelper.cpp(461,22): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+  (compiling source file '/ScrollHelper.cpp')
+  
+  SendMail.cpp
+  TextConvert.cpp
+  Tokenizer.cpp
+  ShowTaskBarIcon.cpp
+  SimpleBrowser.cpp
+  Generating Code...
+  Compiling...
+  SnapWindow.cpp
+  SpecialPasteOptions.cpp
+  CppSQLite3.cpp
+  Crc32Dynamic.cpp
+  DatabaseUtilities.cpp
+E:\PubCode\Ditto\DatabaseUtilities.cpp(979,19): warning C4244: 'initializing': conversion from 'INT_PTR' to 'int', possible loss of data
+  (compiling source file '/DatabaseUtilities.cpp')
+  
+  DittoAddin.cpp
+  DittoAddins.cpp
+  DittoWindow.cpp
+  ExternalWindowTracker.cpp
+  FileTransferProgressDlg.cpp
+  FormatSQL.cpp
+  FriendDetails.cpp
+  GroupCombo.cpp
+  GroupName.cpp
+  GroupTree.cpp
+  HListBox.cpp
+  HTMLFormatAggregator.cpp
+  InternetUpdate.cpp
+E:\PubCode\Ditto\InternetUpdate.cpp(137,7): warning C4101: 'ver': unreferenced local variable
+  (compiling source file '/InternetUpdate.cpp')
+  
+  MainFrm.cpp
+E:\PubCode\Ditto\MainFrm.cpp(1516,19): warning C4244: 'argument': conversion from 'WPARAM' to 'int', possible loss of data
+  (compiling source file '/MainFrm.cpp')
+  
+E:\PubCode\Ditto\MainFrm.cpp(1523,10): warning C4244: 'argument': conversion from 'WPARAM' to 'ARG_TYPE', possible loss of data
+E:\PubCode\Ditto\MainFrm.cpp(1523,10): warning C4244:         with
+E:\PubCode\Ditto\MainFrm.cpp(1523,10): warning C4244:         [
+E:\PubCode\Ditto\MainFrm.cpp(1523,10): warning C4244:             ARG_TYPE=int
+E:\PubCode\Ditto\MainFrm.cpp(1523,10): warning C4244:         ]
+  (compiling source file '/MainFrm.cpp')
+  
+  MainTableFunctions.cpp
+  Generating Code...
+  Compiling...
+  Misc.cpp
+E:\PubCode\Ditto\Misc.cpp(28,17): warning C4996: 'gethostbyname': Use getaddrinfo() or GetAddrInfoW() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+  (compiling source file '/Misc.cpp')
+  
+E:\PubCode\Ditto\Misc.cpp(30,10): warning C4996: 'inet_ntoa': Use inet_ntop() or InetNtop() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+  (compiling source file '/Misc.cpp')
+  
+E:\PubCode\Ditto\Misc.cpp(221,27): warning C4302: 'type cast': truncation from 'TCHAR *' to 'BYTE'
+  (compiling source file '/Misc.cpp')
+  
+E:\PubCode\Ditto\Misc.cpp(618,5): warning C4996: 'GetVersionExW': was declared deprecated
+  (compiling source file '/Misc.cpp')
+  
+E:\PubCode\Ditto\Misc.cpp(667,5): warning C4996: 'GetVersionExW': was declared deprecated
+  (compiling source file '/Misc.cpp')
+  
+E:\PubCode\Ditto\Misc.cpp(1076,8): warning C4996: 'GetVersionExW': was declared deprecated
+  (compiling source file '/Misc.cpp')
+  
+E:\PubCode\Ditto\Misc.cpp(1545,23): warning C4244: 'initializing': conversion from 'INT_PTR' to 'int', possible loss of data
+  (compiling source file '/Misc.cpp')
+  
+E:\PubCode\Ditto\Misc.cpp(1705,10): warning C4005: 'OUT': macro redefinition
+  (compiling source file '/Misc.cpp')
+      C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(83,9):
+      see previous definition of 'OUT'
+  
+E:\PubCode\Ditto\Misc.cpp(1706,10): warning C4005: 'IN': macro redefinition
+  (compiling source file '/Misc.cpp')
+      C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(79,9):
+      see previous definition of 'IN'
+  
+  MoveToGroupDlg.cpp
+  MultiLanguage.cpp
+  OleClipSource.cpp
+  OptionFriends.cpp
+  Options.cpp
+E:\PubCode\Ditto\Options.cpp(622,32): warning C4018: '<': signed/unsigned mismatch
+  (compiling source file '/Options.cpp')
+  
+E:\PubCode\Ditto\Options.cpp(668,32): warning C4018: '<': signed/unsigned mismatch
+  (compiling source file '/Options.cpp')
+  
+E:\PubCode\Ditto\Options.cpp(1572,11): warning C4996: 'wcstok': wcstok has been changed to conform with the ISO C standard, adding an extra context parameter. To use the legacy Microsoft wcstok, define _CRT_NON_CONFORMING_WCSTOK.
+  (compiling source file '/Options.cpp')
+  
+E:\PubCode\Ditto\Options.cpp(1582,12): warning C4996: 'wcstok': wcstok has been changed to conform with the ISO C standard, adding an extra context parameter. To use the legacy Microsoft wcstok, define _CRT_NON_CONFORMING_WCSTOK.
+  (compiling source file '/Options.cpp')
+  
+E:\PubCode\Ditto\Options.cpp(1601,9): warning C4927: illegal conversion; more than one user-defined conversion has been implicitly applied
+  (compiling source file '/Options.cpp')
+      E:\PubCode\Ditto\Options.cpp(1601,9):
+      while calling the constructor 'ATL::CStringT<char,StrTraitMFC_DLL<char,ATL::ChTraitsCRT<_CharType>>>::CStringT(const wchar_t *)'
+          with
+          [
+              _CharType=char
+          ]
+      C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\atlmfc\include\cstringt.h(1068,19):
+      see declaration of 'ATL::CStringT<char,StrTraitMFC_DLL<char,ATL::ChTraitsCRT<_CharType>>>::CStringT'
+          with
+          [
+              _CharType=char
+          ]
+  
+E:\PubCode\Ditto\Options.cpp(3039,2): warning C4102: 'std': unreferenced label
+  (compiling source file '/Options.cpp')
+  
+  OptionsCopyBuffers.cpp
+  OptionsGeneral.cpp
+  OptionsKeyBoard.cpp
+  OptionsQuickPaste.cpp
+  OptionsSheet.cpp
+  OptionsStats.cpp
+  OptionsTypes.cpp
+  Path.cpp
+  PerfTimer.cpp
+  ProcessPaste.cpp
+  ProgressWnd.cpp
+  QPasteWnd.cpp
+  QuickPaste.cpp
+  RichTextAggregator.cpp
+  Generating Code...
+  Compiling...
+  SaveAnimation.cpp
+  SendKeys.cpp
+E:\PubCode\Ditto\SendKeys.cpp(256,25): warning C4996: 'GetVersion': was declared deprecated
+  (compiling source file '/SendKeys.cpp')
+  
+E:\PubCode\Ditto\SendKeys.cpp(591,25): warning C4244: 'argument': conversion from 'WORD' to 'BYTE', possible loss of data
+  (compiling source file '/SendKeys.cpp')
+  
+E:\PubCode\Ditto\SendKeys.cpp(597,25): warning C4244: 'argument': conversion from 'WORD' to 'BYTE', possible loss of data
+  (compiling source file '/SendKeys.cpp')
+  
+  SymbolEdit.cpp
+E:\PubCode\Ditto\SymbolEdit.cpp(897,48): warning C4018: '>': signed/unsigned mismatch
+  (compiling source file '/SymbolEdit.cpp')
+  
+  SystemTray.cpp
+  TabCtrl.cpp
+  Theme.cpp
+  AlphaBlend.cpp
+  DialogResizer.cpp
+  FormattedTextDraw.cpp
+  GroupStatic.cpp
+  HyperLink.cpp
+E:\PubCode\Ditto\HyperLink.cpp(72,18): warning C4311: 'type cast': pointer truncation from 'HINSTANCE' to 'int'
+  (compiling source file '/HyperLink.cpp')
+  
+E:\PubCode\Ditto\HyperLink.cpp(72,18): warning C4302: 'type cast': truncation from 'HINSTANCE' to 'int'
+  (compiling source file '/HyperLink.cpp')
+  
+E:\PubCode\Ditto\HyperLink.cpp(403,9): warning C4311: 'type cast': pointer truncation from 'HINSTANCE' to 'UINT'
+  (compiling source file '/HyperLink.cpp')
+  
+E:\PubCode\Ditto\HyperLink.cpp(403,9): warning C4302: 'type cast': truncation from 'HINSTANCE' to 'UINT'
+  (compiling source file '/HyperLink.cpp')
+  
+E:\PubCode\Ditto\HyperLink.cpp(425,26): warning C4312: 'type cast': conversion from 'UINT' to 'HINSTANCE' of greater size
+  (compiling source file '/HyperLink.cpp')
+  
+  NumberEdit.cpp
+  QListCtrl.cpp
+E:\PubCode\Ditto\QListCtrl.cpp(885,14): warning C4311: 'type cast': pointer truncation from 'POSITION' to 'int'
+  (compiling source file '/QListCtrl.cpp')
+  
+E:\PubCode\Ditto\QListCtrl.cpp(885,14): warning C4302: 'type cast': truncation from 'POSITION' to 'int'
+  (compiling source file '/QListCtrl.cpp')
+  
+  RichEditCtrlEx.cpp
+  SearchEditBox.cpp
+  ToolTipEx.cpp
+E:\PubCode\Ditto\ToolTipEx.cpp(264,15): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+  (compiling source file '/ToolTipEx.cpp')
+  
+E:\PubCode\Ditto\ToolTipEx.cpp(1543,15): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+  (compiling source file '/ToolTipEx.cpp')
+  
+  TrayWnd.cpp
+  UAC_Helper.cpp
+  UAC_Thread.cpp
+  WildCardMatch.cpp
+  Generating Code...
+  Compiling...
+  WndEx.cpp
+  Client.cpp
+E:\PubCode\Ditto\Client.cpp(164,9): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+  (compiling source file '/Client.cpp')
+  
+E:\PubCode\Ditto\Client.cpp(167,24): warning C4996: 'gethostbyname': Use getaddrinfo() or GetAddrInfoW() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+  (compiling source file '/Client.cpp')
+  
+E:\PubCode\Ditto\Client.cpp(207,40): warning C4244: '=': conversion from 'long' to 'short', possible loss of data
+  (compiling source file '/Client.cpp')
+  
+E:\PubCode\Ditto\Client.cpp(257,15): warning C4101: 'Convert': unreferenced local variable
+  (compiling source file '/Client.cpp')
+  
+  FileRecieve.cpp
+  FileSend.cpp
+  RecieveSocket.cpp
+E:\PubCode\Ditto\RecieveSocket.cpp(179,28): warning C4244: 'argument': conversion from 'SOCKET' to 'int', possible loss of data
+  (compiling source file '/RecieveSocket.cpp')
+  
+E:\PubCode\Ditto\RecieveSocket.cpp(172,7): warning C4101: 'res': unreferenced local variable
+  (compiling source file '/RecieveSocket.cpp')
+  
+E:\PubCode\Ditto\RecieveSocket.cpp(171,10): warning C4101: 'readset': unreferenced local variable
+  (compiling source file '/RecieveSocket.cpp')
+  
+  SendSocket.cpp
+  Server.cpp
+E:\PubCode\Ditto\Server.cpp(48,27): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+  (compiling source file '/Server.cpp')
+  
+E:\PubCode\Ditto\Server.cpp(79,19): warning C4996: 'inet_ntoa': Use inet_ntop() or InetNtop() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+  (compiling source file '/Server.cpp')
+  
+E:\PubCode\Ditto\Server.cpp(384,15): warning C4101: 'Convert': unreferenced local variable
+  (compiling source file '/Server.cpp')
+  
+  Generating Code...
+  DrawHTML.C
+E:\PubCode\Ditto\DrawHTML.C(18,5): warning C4133: 'initializing': incompatible types - from 'unsigned short [2]' to 'char *'
+E:\PubCode\Ditto\DrawHTML.C(19,5): warning C4133: 'initializing': incompatible types - from 'unsigned short [2]' to 'char *'
+E:\PubCode\Ditto\DrawHTML.C(80,58): warning C4133: 'function': incompatible types - from 'char *' to 'const wchar_t *'
+E:\PubCode\Ditto\DrawHTML.C(81,24): warning C4133: 'function': incompatible types - from 'char *' to 'const wchar_t *'
+E:\PubCode\Ditto\DrawHTML.C(239,12): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+E:\PubCode\Ditto\DrawHTML.C(397,20): warning C4133: 'function': incompatible types - from 'char [2]' to 'LPCWSTR'
+  sqlite3mc_amalgamation.c
+E:\PubCode\Ditto\sqlite\sqlite3mc_amalgamation.c(280479,7): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+E:\PubCode\Ditto\sqlite\sqlite3mc_amalgamation.c(280821,11): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+E:\PubCode\Ditto\sqlite\sqlite3mc_amalgamation.c(280824,13): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+E:\PubCode\Ditto\sqlite\sqlite3mc_amalgamation.c(280825,13): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+E:\PubCode\Ditto\sqlite\sqlite3mc_amalgamation.c(306264,5): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+E:\PubCode\Ditto\sqlite\sqlite3mc_amalgamation.c(306278,7): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+E:\PubCode\Ditto\sqlite\sqlite3mc_amalgamation.c(306327,3): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+E:\PubCode\Ditto\sqlite\sqlite3mc_amalgamation.c(306330,5): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  Generating Code...
+  DittoCopyBuffer.cpp
+  tinystr.cpp
+  tinyxml.cpp
+  tinyxmlerror.cpp
+  tinyxmlparser.cpp
+  Generating Code...
+  CP_Main.vcxproj -> E:\PubCode\Ditto\Debug64\Ditto.exe

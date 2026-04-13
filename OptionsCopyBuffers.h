@@ -1,31 +1,26 @@
 #pragma once
-#include "afxcmn.h"
-
 
 // COptionsCopyBuffers dialog
 
-class COptionsCopyBuffers : public CPropertyPage
+class COptionsCopyBuffers : public CPropertyPageImpl<COptionsCopyBuffers>
 {
-	DECLARE_DYNCREATE(COptionsCopyBuffers)
-
 public:
 	COptionsCopyBuffers();
 	~COptionsCopyBuffers();
 
-// Dialog Data
 	enum { IDD = IDD_OPTIONS_COPY_BUFFERS };
 
-protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	BEGIN_MSG_MAP(COptionsCopyBuffers)
+		MSG_WM_INITDIALOG(OnInitDialog)
+		CHAIN_MSG_MAP(CPropertyPageImpl<COptionsCopyBuffers>)
+	END_MSG_MAP()
 
+	BOOL OnInitDialog(HWND hWndFocus, LPARAM lParam);
+	int OnApply();
+
+private:
 	CString m_csTitle;
 
-	// Generated message map functions
-	//{{AFX_MSG(COptionsCopyBuffers)
-	virtual BOOL OnInitDialog();
-	virtual BOOL OnApply();
-	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP()
 public:
 	CHotKeyCtrl m_CopyBuffer1;
 	CHotKeyCtrl m_PasteBuffer1;

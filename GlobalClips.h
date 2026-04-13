@@ -2,35 +2,38 @@
 
 #include "DialogResizer.h"
 #include "ShowTaskBarIcon.h"
-// GlobalClips dialog
+#include <atlbase.h>
+#include <atlwin.h>
+#include <atldlgs.h>
+#include <atlctrls.h>
 
-class GlobalClips : public CDialogEx
+class GlobalClips : public CDialogImpl<GlobalClips>
 {
-	DECLARE_DYNAMIC(GlobalClips)
-
 public:
-	GlobalClips(CWnd* pParent = NULL);   // standard constructor
-	virtual ~GlobalClips();
-
-// Dialog Data
 	enum { IDD = IDD_GLOBAL_CLIPS };
 
-protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	GlobalClips() : m_hWndParent(NULL) {}
+
+	void SetNotifyWnd(HWND hWnd);
+
+	BEGIN_MSG_MAP(GlobalClips)
+		MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
+		MESSAGE_HANDLER(WM_CLOSE, OnClose)
+		MESSAGE_HANDLER(WM_SIZE, OnSize)
+		MESSAGE_HANDLER(WM_NCDESTROY, OnNcDestroy)
+	END_MSG_MAP()
+
+	LRESULT OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
+	LRESULT OnClose(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
+	LRESULT OnSize(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lParam, BOOL& /*bHandled*/);
+	LRESULT OnNcDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
+
+private:
 	void InitListCtrlCols();
-	virtual void OnCancel();
 	void LoadItems();
 
 	CDialogResizer m_Resize;
-	CListCtrl	m_List;
+	CListViewCtrl m_List;
 	HWND m_hWndParent;
 	CShowTaskBarIcon m_showTaskbar;
-	DECLARE_MESSAGE_MAP()
-public:
-	void SetNotifyWnd(HWND hWnd);
-
-	virtual BOOL OnInitDialog();
-	afx_msg void OnClose();
-	afx_msg void OnSize(UINT nType, int cx, int cy);
-	afx_msg void OnNcDestroy();
 };

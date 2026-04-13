@@ -8,9 +8,7 @@
 
 // COptionsCopyBuffers dialog
 
-IMPLEMENT_DYNCREATE(COptionsCopyBuffers, CPropertyPage)
-
-COptionsCopyBuffers::COptionsCopyBuffers() : CPropertyPage(COptionsCopyBuffers::IDD)
+COptionsCopyBuffers::COptionsCopyBuffers()
 {
 	m_csTitle = theApp.m_Language.GetString("CopyBuffers", "Copy Buffers");
 	m_psp.pszTitle = m_csTitle;
@@ -21,35 +19,27 @@ COptionsCopyBuffers::~COptionsCopyBuffers()
 {
 }
 
-void COptionsCopyBuffers::DoDataExchange(CDataExchange* pDX)
+BOOL COptionsCopyBuffers::OnInitDialog(HWND hWndFocus, LPARAM lParam)
 {
-	CDialog::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_COPY_1, m_CopyBuffer1);
-	DDX_Control(pDX, IDC_PASTE_1, m_PasteBuffer1);
-	DDX_Control(pDX, IDC_CUT_1, m_CutBuffer1);
-	DDX_Control(pDX, IDC_COPY_2, m_CopyBuffer2);
-	DDX_Control(pDX, IDC_PASTE_2, m_PasteBuffer2);
-	DDX_Control(pDX, IDC_CUT_2, m_CutBuffer2);
-	DDX_Control(pDX, IDC_COPY_3, m_CopyBuffer3);
-	DDX_Control(pDX, IDC_PASTE_3, m_PasteBuffer3);
-	DDX_Control(pDX, IDC_CUT_3, m_CutBuffer3);
+	BOOL bRet = CPropertyPageImpl<COptionsCopyBuffers>::OnInitDialog(hWndFocus, lParam);
 
-	DDX_Control(pDX, IDC_COPY_4, m_CopyBuffer4);
-	DDX_Control(pDX, IDC_PASTE_4, m_PasteBuffer4);
-	DDX_Control(pDX, IDC_CUT_4, m_CutBuffer4);
+	m_CopyBuffer1.Attach(GetDlgItem(IDC_COPY_1));
+	m_PasteBuffer1.Attach(GetDlgItem(IDC_PASTE_1));
+	m_CutBuffer1.Attach(GetDlgItem(IDC_CUT_1));
+	m_CopyBuffer2.Attach(GetDlgItem(IDC_COPY_2));
+	m_PasteBuffer2.Attach(GetDlgItem(IDC_PASTE_2));
+	m_CutBuffer2.Attach(GetDlgItem(IDC_CUT_2));
+	m_CopyBuffer3.Attach(GetDlgItem(IDC_COPY_3));
+	m_PasteBuffer3.Attach(GetDlgItem(IDC_PASTE_3));
+	m_CutBuffer3.Attach(GetDlgItem(IDC_CUT_3));
 
-	DDX_Control(pDX, IDC_COPY_5, m_CopyBuffer5);
-	DDX_Control(pDX, IDC_PASTE_5, m_PasteBuffer5);
-	DDX_Control(pDX, IDC_CUT_5, m_CutBuffer5);
-}
+	m_CopyBuffer4.Attach(GetDlgItem(IDC_COPY_4));
+	m_PasteBuffer4.Attach(GetDlgItem(IDC_PASTE_4));
+	m_CutBuffer4.Attach(GetDlgItem(IDC_CUT_4));
 
-
-BEGIN_MESSAGE_MAP(COptionsCopyBuffers, CPropertyPage)
-END_MESSAGE_MAP()
-
-BOOL COptionsCopyBuffers::OnInitDialog()
-{
-	CPropertyPage::OnInitDialog();
+	m_CopyBuffer5.Attach(GetDlgItem(IDC_COPY_5));
+	m_PasteBuffer5.Attach(GetDlgItem(IDC_PASTE_5));
+	m_CutBuffer5.Attach(GetDlgItem(IDC_CUT_5));
 
 	CCopyBufferItem Item;
 	
@@ -85,10 +75,10 @@ BOOL COptionsCopyBuffers::OnInitDialog()
 
 	theApp.m_Language.UpdateOptionCopyBuffers(this);
 
-	return TRUE;
+	return bRet;
 }
 
-BOOL COptionsCopyBuffers::OnApply()
+int COptionsCopyBuffers::OnApply()
 {
 	ARRAY keys;
 	g_HotKeys.GetKeys(keys); // save old keys just in case new ones are invalid
@@ -147,12 +137,12 @@ BOOL COptionsCopyBuffers::OnApply()
 		str += " cannot be the same.";
 		MessageBox(str);
 		g_HotKeys.SetKeys(keys); // restore the original values
-		return FALSE;
+		return PSNRET_INVALID_NOCHANGEPAGE;
 	}
 
 	g_HotKeys.SaveAllKeys();
 	g_HotKeys.RegisterAll(true);
 
-	return CPropertyPage::OnApply();
+	return CPropertyPageImpl<COptionsCopyBuffers>::OnApply();
 }
 

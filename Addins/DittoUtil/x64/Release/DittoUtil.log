@@ -1,0 +1,14 @@
+﻿  stdafx.cpp
+  TextConvert.cpp
+  Tokenizer.cpp
+  DialogResizer.cpp
+  DittoUtil.cpp
+  Exports.cpp
+  PasteAnyAsText.cpp
+  PasteImageAsHtmlImage.cpp
+  ReadOnlyFlag.cpp
+  RemoveLineFeeds.cpp
+  SelectPasteFormat.cpp
+  正在生成代码...
+    正在创建库 E:\PubCode\Ditto\Release64\Addins\DittoUtil.lib 和对象 E:\PubCode\Ditto\Release64\Addins\DittoUtil.exp
+  DittoUtil.vcxproj -> E:\PubCode\Ditto\Release64\Addins\DittoUtil.dll

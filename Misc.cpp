@@ -1302,7 +1302,7 @@ void OnInitMenuPopupEx(CMenu *pPopupMenu, UINT nIndex, BOOL bSysMenu, CWnd *pWnd
 	// Determine if menu is popup in top-level menu and set m_pOther to
 	// it if so (m_pParentMenu == NULL indicates that it is secondary popup).
 	HMENU hParentMenu;
-	if (AfxGetThreadState()->m_hTrackingMenu == pPopupMenu->m_hMenu)
+	if (GetActiveWindow() == pPopupMenu->GetParent())
 	{
 		state.m_pParentMenu = pPopupMenu;    // Parent == child for tracking popup.
 	}

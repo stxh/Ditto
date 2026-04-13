@@ -1,6 +1,3 @@
-// OptionsTypes.cpp : implementation file
-//
-
 #include "stdafx.h"
 #include "CP_Main.h"
 #include "OptionsTypes.h"
@@ -8,53 +5,15 @@
 #include "DimWnd.h"
 #include "Misc.h"
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-/////////////////////////////////////////////////////////////////////////////
-// COptionsTypes property page
-
-IMPLEMENT_DYNCREATE(COptionsTypes, CPropertyPage)
-
-COptionsTypes::COptionsTypes() : CPropertyPage(COptionsTypes::IDD)
+COptionsTypes::COptionsTypes()
 {
 	m_csTitle = theApp.m_Language.GetString("SupportedTypesTitle", "Supported Types");
 	m_psp.pszTitle = m_csTitle;
-	m_psp.dwFlags |= PSP_USETITLE; 
-
-	//{{AFX_DATA_INIT(COptionsTypes)
-	//}}AFX_DATA_INIT
-
+	m_psp.dwFlags |= PSP_USETITLE;
 	m_bSave = false;
 }
 
-COptionsTypes::~COptionsTypes()
-{
-}
-
-void COptionsTypes::DoDataExchange(CDataExchange* pDX)
-{
-	CPropertyPage::DoDataExchange(pDX);
-	//{{AFX_DATA_MAP(COptionsTypes)
-	DDX_Control(pDX, IDC_LIST1, m_List);
-	//}}AFX_DATA_MAP
-}
-
-
-BEGIN_MESSAGE_MAP(COptionsTypes, CPropertyPage)
-	//{{AFX_MSG_MAP(COptionsTypes)
-	ON_BN_CLICKED(IDC_DELETE, OnDelete)
-	ON_BN_CLICKED(IDC_ADD, OnAdd)
-	//}}AFX_MSG_MAP
-END_MESSAGE_MAP()
-
-/////////////////////////////////////////////////////////////////////////////
-// COptionsTypes message handlers
-
-BOOL COptionsTypes::OnApply() 
+int COptionsTypes::OnApply() 
 {
 	if(m_bSave)
 	{
@@ -77,12 +36,12 @@ BOOL COptionsTypes::OnApply()
 		theApp.ReloadTypes();
 	}
 	
-	return CPropertyPage::OnApply();
+	return PSNRET_NOERROR;
 }
 
-BOOL COptionsTypes::OnInitDialog() 
+LRESULT COptionsTypes::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) 
 {
-	CPropertyPage::OnInitDialog();
+	m_List.Attach(GetDlgItem(IDC_LIST1));
 
 	try
 	{
@@ -111,10 +70,10 @@ BOOL COptionsTypes::OnInitDialog()
 
 	theApp.m_Language.UpdateOptionSupportedTypes(this);
 	
-	return FALSE;
+	return 0;
 }
 
-void COptionsTypes::OnDelete() 
+LRESULT COptionsTypes::OnDelete(WORD, WORD, HWND, BOOL&) 
 {
 	int nCount = m_List.GetSelCount();
 	if(nCount)
@@ -128,10 +87,11 @@ void COptionsTypes::OnDelete()
 		for(int i = 0; i < nCount; i++)
 			m_List.DeleteString(items[i]);
 	}
+	return 0;
 }
 
 #include "AddType.h"
-void COptionsTypes::OnAdd() 
+LRESULT COptionsTypes::OnAdd(WORD, WORD, HWND, BOOL&) 
 {
 	CDimWnd dim(this->GetParent());
 	CAddType add(this);
@@ -148,7 +108,8 @@ void COptionsTypes::OnAdd()
 					m_List.AddString(add.m_csSelectedTypes[i]);
 			}
 		}
-	}	
+	}
+	return 0;
 }
 
 BOOL COptionsTypes::TextAllReadyThere(const CString &cs)

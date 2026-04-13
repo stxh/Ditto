@@ -1,69 +1,24 @@
-// QuickPasteKeyboard.cpp : implementation file
-//
-
 #include "stdafx.h"
 #include "CP_Main.h"
 #include "QuickPasteKeyboard.h"
-#include "afxdialogex.h"
 #include "ActionEnums.h"
 #include "HotKeys.h"
 
-// CQuickPasteKeyboard dialog
-
-IMPLEMENT_DYNAMIC(CQuickPasteKeyboard, CPropertyPage)
-
 CQuickPasteKeyboard::CQuickPasteKeyboard()
-	: CPropertyPage(CQuickPasteKeyboard::IDD)
 {
 	m_csTitle = theApp.m_Language.GetString("QuickPasteKeyboardTitle", "Quick Paste Keyboard");
 	m_psp.pszTitle = m_csTitle;
 	m_psp.dwFlags |= PSP_USETITLE;
 }
 
-CQuickPasteKeyboard::~CQuickPasteKeyboard()
+LRESULT CQuickPasteKeyboard::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 {
-}
-
-void CQuickPasteKeyboard::DoDataExchange(CDataExchange* pDX)
-{
-	CPropertyPage::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_LIST1, m_list);
-	DDX_Control(pDX, IDC_HOTKEY1, m_hotKey1);
-	DDX_Control(pDX, IDC_HOTKEY2, m_hotKey2);
-	DDX_Control(pDX, IDC_COMBO_ALL_ASSIGNED, m_assignedCombo);
-	DDX_Control(pDX, IDC_MOUSE_1, m_mouseType1);
-	DDX_Control(pDX, IDC_MOUSE_2, m_mouseType2);
-}
-
-
-BEGIN_MESSAGE_MAP(CQuickPasteKeyboard, CPropertyPage)
-	ON_NOTIFY(LVN_ITEMACTIVATE, IDC_LIST1, &CQuickPasteKeyboard::OnLvnItemActivateList1)
-	ON_NOTIFY(LVN_ITEMCHANGED, IDC_LIST1, &CQuickPasteKeyboard::OnLvnItemchangedList1)
-	ON_BN_CLICKED(IDC_ASSIGN, &CQuickPasteKeyboard::OnBnClickedAssign)
-	ON_CBN_SELCHANGE(IDC_COMBO_ALL_ASSIGNED, &CQuickPasteKeyboard::OnCbnSelchangeComboAllAssigned)
-	ON_BN_CLICKED(IDC_BUTTON_REMOVE, &CQuickPasteKeyboard::OnBnClickedButtonRemove)
-	ON_BN_CLICKED(IDC_BUTTON_ADD, &CQuickPasteKeyboard::OnBnClickedButtonAdd)
-	ON_CBN_KILLFOCUS(IDC_COMBO_ENTER_MODIFIER, &CQuickPasteKeyboard::OnCbnKillfocusComboEnterModifier)
-	ON_EN_KILLFOCUS(IDC_HOTKEY1, &CQuickPasteKeyboard::OnEnKillfocusEdit1)
-	ON_WM_KILLFOCUS()
-	ON_BN_CLICKED(IDC_BUTTON_ENTER, &CQuickPasteKeyboard::OnBnClickedButtonEnter)
-	ON_BN_CLICKED(IDC_BUTTON_ENTER2, &CQuickPasteKeyboard::OnBnClickedButtonEnter2)
-	ON_WM_KEYUP()
-	ON_BN_CLICKED(IDC_BUTTON_RESET, &CQuickPasteKeyboard::OnBnClickedButtonReset)
-	ON_BN_CLICKED(IDC_RADIO_KEYBOARD_1, &CQuickPasteKeyboard::OnBnClickedRadioKeyboard1)
-	ON_BN_CLICKED(IDC_RADIO_MOUSE_1, &CQuickPasteKeyboard::OnBnClickedRadioMouse1)
-	ON_BN_CLICKED(IDC_RADIO_KEYBOARD_2, &CQuickPasteKeyboard::OnBnClickedRadioKeyboard2)
-	ON_BN_CLICKED(IDC_RADIO_MOUSE_2, &CQuickPasteKeyboard::OnBnClickedRadioMouse2)
-	ON_BN_CLICKED(IDC_CHECK_ENABLE_SECOND_PRESS, &CQuickPasteKeyboard::OnBnClickedCheckEnableSecondPress)
-END_MESSAGE_MAP()
-
-
-// CQuickPasteKeyboard message handlers
-
-
-BOOL CQuickPasteKeyboard::OnInitDialog()
-{
-	CPropertyPage::OnInitDialog();
+	m_list.Attach(GetDlgItem(IDC_LIST1));
+	m_hotKey1.Attach(GetDlgItem(IDC_HOTKEY1));
+	m_hotKey2.Attach(GetDlgItem(IDC_HOTKEY2));
+	m_assignedCombo.Attach(GetDlgItem(IDC_COMBO_ALL_ASSIGNED));
+	m_mouseType1.Attach(GetDlgItem(IDC_MOUSE_1));
+	m_mouseType2.Attach(GetDlgItem(IDC_MOUSE_2));
 
 	InitListCtrlCols();
 	LoadItems();
@@ -95,12 +50,9 @@ BOOL CQuickPasteKeyboard::OnInitDialog()
 	m_mouseType1.SetCurSel(0);
 	m_mouseType2.SetCurSel(0);
 
-	//SetWindowText(_T("Quick Paste Shortcuts"));
-
 	theApp.m_Language.UpdateOptionQuickPasteKeyboard(this);
 
-	return TRUE;  // return TRUE unless you set the focus to a control
-	// EXCEPTION: OCX Property Pages should return FALSE
+	return 0;
 }
 
 void CQuickPasteKeyboard::InitListCtrlCols()
@@ -132,20 +84,18 @@ void CQuickPasteKeyboard::LoadItems()
 {
 	m_list.DeleteAllItems();
 
-	// Use the LV_ITEM structure to insert the items
 	LVITEM lvi;
 	CString strItem;
 	int row = 0;
 
 	for (DWORD i = ActionEnums::FIRST_ACTION + 1; i < ActionEnums::LAST_ACTION; i++)
 	{
-		ActionEnums::ActionEnumValues action = (ActionEnums::ActionEnumValues) i;
+		ActionEnums::ActionEnumValues action = (ActionEnums::ActionEnumValues)i;
 
 		if (ActionEnums::UserConfigurable(action))
 		{
-			// Insert the first item
 			lvi.mask = LVIF_TEXT;
-			lvi.iItem = (int) i;
+			lvi.iItem = (int)i;
 
 			KeyboardArray ar;
 			for (int x = 0; x < 10; x++)
@@ -157,7 +107,7 @@ void CQuickPasteKeyboard::LoadItems()
 			CString shortCutText = GetShortCutText(ar);
 
 			lvi.iSubItem = 0;
-			lvi.pszText = (LPTSTR) (LPCTSTR) (shortCutText);
+			lvi.pszText = (LPTSTR)(LPCTSTR)(shortCutText);
 			m_list.InsertItem(&lvi);
 
 			CString col2 = ActionEnums::EnumDescription(action);
@@ -172,9 +122,8 @@ void CQuickPasteKeyboard::LoadItems()
 
 	int dummyId = -1;
 
-	for (auto & element : CGetSetOptions::m_pasteScripts.m_list)
+	for (auto& element : CGetSetOptions::m_pasteScripts.m_list)
 	{
-		// Insert the first item
 		lvi.mask = LVIF_TEXT;
 		lvi.iItem = (int)row;
 
@@ -210,7 +159,7 @@ void CQuickPasteKeyboard::LoadItems()
 }
 
 CString CQuickPasteKeyboard::GetShortCutText(KeyboardAB ab)
-{	
+{
 	CString shA;
 	CString shB;
 	if (ab.A > 0)
@@ -251,8 +200,8 @@ CString CQuickPasteKeyboard::GetShortCutText(KeyboardArray ar)
 		{
 			break;
 		}
-		
-		if(all.GetLength() > 0)
+
+		if (all.GetLength() > 0)
 		{
 			all += _T(", ");
 		}
@@ -263,22 +212,19 @@ CString CQuickPasteKeyboard::GetShortCutText(KeyboardArray ar)
 	return all;
 }
 
-void CQuickPasteKeyboard::OnLvnItemActivateList1(NMHDR *pNMHDR, LRESULT *pResult)
+LRESULT CQuickPasteKeyboard::OnLvnItemActivateList1(int, LPNMHDR pNMHDR, BOOL&)
 {
-	LPNMITEMACTIVATE pNMIA = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-	// TODO: Add your control notification handler code here
-	*pResult = 0;
+	return 0;
 }
 
-
-void CQuickPasteKeyboard::OnLvnItemchangedList1(NMHDR *pNMHDR, LRESULT *pResult)
+LRESULT CQuickPasteKeyboard::OnLvnItemchangedList1(int, LPNMHDR pNMHDR, BOOL&)
 {
-	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
-	
+	LPNMLISTVIEW pNMLV = (LPNMLISTVIEW)pNMHDR;
+
 	if ((pNMLV->uChanged & LVIF_STATE)
 		&& (pNMLV->uNewState & LVIS_SELECTED))
 	{
-		int id = (int) m_list.GetItemData(pNMLV->iItem);
+		int id = (int)m_list.GetItemData(pNMLV->iItem);
 
 		m_assignedCombo.ResetContent();
 
@@ -286,7 +232,7 @@ void CQuickPasteKeyboard::OnLvnItemchangedList1(NMHDR *pNMHDR, LRESULT *pResult)
 
 		for (int i = 0; i < 10; i++)
 		{
-			if(m_map[id].Array[i].A > 0)
+			if (m_map[id].Array[i].A > 0)
 			{
 				CString shortcut = GetShortCutText(m_map[id].Array[i]);
 				int pos = m_assignedCombo.AddString(shortcut);
@@ -308,11 +254,10 @@ void CQuickPasteKeyboard::OnLvnItemchangedList1(NMHDR *pNMHDR, LRESULT *pResult)
 		LoadHotKey(m_map[id].Array[0]);
 	}
 
-	*pResult = 0;
+	return 0;
 }
 
-
-void CQuickPasteKeyboard::OnBnClickedAssign()
+LRESULT CQuickPasteKeyboard::OnBnClickedAssign(WORD, WORD, HWND, BOOL&)
 {
 	int shortCutId = SelectedCommandShortCutId();
 	int id = SelectedCommandId();
@@ -324,24 +269,23 @@ void CQuickPasteKeyboard::OnBnClickedAssign()
 	{
 		m_map[id].Array[shortCutId].Dirty = true;
 
-		if (this->IsDlgButtonChecked(IDC_RADIO_KEYBOARD_1) == BST_CHECKED)
+		if (IsDlgButtonChecked(IDC_RADIO_KEYBOARD_1) == BST_CHECKED)
 		{
-			//remove the extended key flag, don't think this is needed now days
 			m_map[id].Array[shortCutId].A = ACCEL_MAKEKEY(LOBYTE(m_hotKey1.GetHotKey()), (HIBYTE(m_hotKey1.GetHotKey()) & ~HOTKEYF_EXT));
 		}
-		else if (this->IsDlgButtonChecked(IDC_RADIO_MOUSE_1) == BST_CHECKED)
+		else if (IsDlgButtonChecked(IDC_RADIO_MOUSE_1) == BST_CHECKED)
 		{
 			WORD vk = (WORD)m_mouseType1.GetItemData(m_mouseType1.GetCurSel());
 			WORD mod = 0;
-			if (this->IsDlgButtonChecked(IDC_CHECK_SHIFT_1) == BST_CHECKED)
+			if (IsDlgButtonChecked(IDC_CHECK_SHIFT_1) == BST_CHECKED)
 			{
 				mod |= HOTKEYF_SHIFT;
 			}
-			if (this->IsDlgButtonChecked(IDC_CHECK_CONTROL_1) == BST_CHECKED)
-			{ 
+			if (IsDlgButtonChecked(IDC_CHECK_CONTROL_1) == BST_CHECKED)
+			{
 				mod |= HOTKEYF_CONTROL;
 			}
-			if (this->IsDlgButtonChecked(IDC_CHECK_ALT_1) == BST_CHECKED)
+			if (IsDlgButtonChecked(IDC_CHECK_ALT_1) == BST_CHECKED)
 			{
 				mod |= HOTKEYF_ALT;
 			}
@@ -351,24 +295,23 @@ void CQuickPasteKeyboard::OnBnClickedAssign()
 
 		if (IsDlgButtonChecked(IDC_CHECK_ENABLE_SECOND_PRESS) == BST_CHECKED)
 		{
-			if (this->IsDlgButtonChecked(IDC_RADIO_KEYBOARD_2) == BST_CHECKED)
+			if (IsDlgButtonChecked(IDC_RADIO_KEYBOARD_2) == BST_CHECKED)
 			{
-				//remove the extended key flag, don't think this is needed now days
 				m_map[id].Array[shortCutId].B = ACCEL_MAKEKEY(LOBYTE(m_hotKey2.GetHotKey()), (HIBYTE(m_hotKey2.GetHotKey()) & ~HOTKEYF_EXT));
 			}
-			else if (this->IsDlgButtonChecked(IDC_RADIO_MOUSE_2) == BST_CHECKED)
+			else if (IsDlgButtonChecked(IDC_RADIO_MOUSE_2) == BST_CHECKED)
 			{
 				WORD vk = (WORD)m_mouseType2.GetItemData(m_mouseType2.GetCurSel());
 				WORD mod = 0;
-				if (this->IsDlgButtonChecked(IDC_CHECK_SHIFT_2) == BST_CHECKED)
+				if (IsDlgButtonChecked(IDC_CHECK_SHIFT_2) == BST_CHECKED)
 				{
 					mod |= HOTKEYF_SHIFT;
 				}
-				if (this->IsDlgButtonChecked(IDC_CHECK_CONTROL_2) == BST_CHECKED)
+				if (IsDlgButtonChecked(IDC_CHECK_CONTROL_2) == BST_CHECKED)
 				{
 					mod |= HOTKEYF_CONTROL;
 				}
-				if (this->IsDlgButtonChecked(IDC_CHECK_ALT_2) == BST_CHECKED)
+				if (IsDlgButtonChecked(IDC_CHECK_ALT_2) == BST_CHECKED)
 				{
 					mod |= HOTKEYF_ALT;
 				}
@@ -384,9 +327,9 @@ void CQuickPasteKeyboard::OnBnClickedAssign()
 		CString sh = GetShortCutText(m_map[id]);
 		LVITEM lvi;
 		lvi.mask = LVIF_TEXT;
-		lvi.iItem = (int) row;
+		lvi.iItem = (int)row;
 		lvi.iSubItem = 0;
-		lvi.pszText = (LPTSTR) (LPCTSTR) (sh);
+		lvi.pszText = (LPTSTR)(LPCTSTR)(sh);
 		m_list.SetItem(&lvi);
 
 		CString shItem = GetShortCutText(m_map[id].Array[shortCutId]);
@@ -396,9 +339,11 @@ void CQuickPasteKeyboard::OnBnClickedAssign()
 		m_assignedCombo.SetItemData(pos, shortCutId);
 		m_assignedCombo.SetCurSel(pos);
 	}
+
+	return 0;
 }
 
-BOOL CQuickPasteKeyboard::OnApply()
+int CQuickPasteKeyboard::OnApply()
 {
 	for (std::map<DWORD, KeyboardArray>::iterator it = m_map.begin(); it != m_map.end(); ++it)
 	{
@@ -419,10 +364,10 @@ BOOL CQuickPasteKeyboard::OnApply()
 		}
 	}
 
-	return CPropertyPage::OnApply();
+	return PSNRET_NOERROR;
 }
 
-void CQuickPasteKeyboard::OnCbnSelchangeComboAllAssigned()
+LRESULT CQuickPasteKeyboard::OnCbnSelchangeComboAllAssigned(WORD, WORD, HWND, BOOL&)
 {
 	int shortCutId = SelectedCommandShortCutId();
 	int id = SelectedCommandId();
@@ -433,11 +378,13 @@ void CQuickPasteKeyboard::OnCbnSelchangeComboAllAssigned()
 	{
 		LoadHotKey(m_map[id].Array[shortCutId]);
 	}
+
+	return 0;
 }
 
-void CQuickPasteKeyboard::OnBnClickedButtonRemove()
+LRESULT CQuickPasteKeyboard::OnBnClickedButtonRemove(WORD, WORD, HWND, BOOL&)
 {
-	int shortCutId = SelectedCommandShortCutId();	
+	int shortCutId = SelectedCommandShortCutId();
 	int id = SelectedCommandId();
 
 	if (m_map.find(id) != m_map.end() &&
@@ -458,56 +405,24 @@ void CQuickPasteKeyboard::OnBnClickedButtonRemove()
 			int pos = m_assignedCombo.AddString(shortcut);
 			m_assignedCombo.SetItemData(pos, 0);
 		}
-		/*else
-		{
-			if (m_map[id].Array[shortCutId + 1].A > 0)
-			{
-				for (int resetRow = shortCutId; resetRow < (10 - 1); resetRow++)
-				{
-					m_map[id].Array[resetRow].A = m_map[id].Array[resetRow + 1].A;
-					m_map[id].Array[resetRow].B = m_map[id].Array[resetRow + 1].B;
-					if (m_map[id].Array[resetRow].A > 0)
-					{
-						m_map[id].Array[resetRow].Dirty = true;
-						m_map[id].Array[resetRow + 1].Dirty = true;
-					}
-				}
-
-				if (m_map[id].Array[9].A > 0)
-				{
-					m_map[id].Array[9].Dirty = true;
-				}
-				m_map[id].Array[9].A = -1;
-				m_map[id].Array[9].B = -1;
-			}
-
-			int comboCount = m_assignedCombo.GetCount();
-			for (int comboIndex = 0; comboIndex < comboCount; comboIndex++)
-			{
-				int rowId = m_assignedCombo.GetItemData(comboIndex);
-				if (rowId >= shortCutId)
-				{
-					m_assignedCombo.SetItemData(comboIndex, rowId-1);
-				}
-			}
-		}*/
 
 		CString sh = GetShortCutText(m_map[id]);
 		LVITEM lvi;
 		lvi.mask = LVIF_TEXT;
-		lvi.iItem = (int) row;
+		lvi.iItem = (int)row;
 		lvi.iSubItem = 0;
-		lvi.pszText = (LPTSTR) (LPCTSTR) (sh);
+		lvi.pszText = (LPTSTR)(LPCTSTR)(sh);
 		m_list.SetItem(&lvi);
 
 		m_assignedCombo.SetCurSel(0);
 
 		LoadHotKey(m_map[id].Array[0]);
 	}
+
+	return 0;
 }
 
-
-void CQuickPasteKeyboard::OnBnClickedButtonAdd()
+LRESULT CQuickPasteKeyboard::OnBnClickedButtonAdd(WORD, WORD, HWND, BOOL&)
 {
 	int count = m_assignedCombo.GetCount();
 	if (count < 10)
@@ -533,6 +448,8 @@ void CQuickPasteKeyboard::OnBnClickedButtonAdd()
 			}
 		}
 	}
+
+	return 0;
 }
 
 int CQuickPasteKeyboard::SelectedCommandId()
@@ -544,7 +461,7 @@ int CQuickPasteKeyboard::SelectedCommandId()
 		while (pos)
 		{
 			int row = m_list.GetNextSelectedItem(pos);
-			id = (int) m_list.GetItemData(row);
+			id = (int)m_list.GetItemData(row);
 		}
 	}
 
@@ -595,23 +512,22 @@ void CQuickPasteKeyboard::LoadHotKey(KeyboardAB ab)
 
 		switch (LOBYTE((DWORD)a))
 		{
-			case VK_LEFT:
-			case VK_UP:
-			case VK_RIGHT:
-			case VK_DOWN: // arrow keys
-			case VK_PRIOR:
-			case VK_NEXT: // page up and page down
-			case VK_END:
-			case VK_HOME:
-			case VK_INSERT:
-			case VK_DELETE:
-			case VK_DIVIDE: // numpad slash
-			case VK_NUMLOCK:
-			{
-				a = ACCEL_MAKEKEY(LOBYTE(a), (HIBYTE(a) | HOTKEYF_EXT));
-				break;
-			}
-			
+		case VK_LEFT:
+		case VK_UP:
+		case VK_RIGHT:
+		case VK_DOWN:
+		case VK_PRIOR:
+		case VK_NEXT:
+		case VK_END:
+		case VK_HOME:
+		case VK_INSERT:
+		case VK_DELETE:
+		case VK_DIVIDE:
+		case VK_NUMLOCK:
+		{
+			a = ACCEL_MAKEKEY(LOBYTE(a), (HIBYTE(a) | HOTKEYF_EXT));
+			break;
+		}
 		}
 
 		switch (LOBYTE((DWORD)a))
@@ -622,16 +538,16 @@ void CQuickPasteKeyboard::LoadHotKey(KeyboardAB ab)
 		case VK_MOUSE_MIDDLE_CLICK:
 			SelectMouseTypeCombo(m_mouseType1, LOBYTE((DWORD)a));
 			CheckDlgButton(IDC_RADIO_MOUSE_1, BST_CHECKED);
-			
-			{
-				BYTE mod = HIBYTE(a);
-				if (mod & HOTKEYF_SHIFT)
-					CheckDlgButton(IDC_CHECK_SHIFT_1, BST_CHECKED);
-				if (mod & HOTKEYF_CONTROL)
-					CheckDlgButton(IDC_CHECK_CONTROL_1, BST_CHECKED);
-				if (mod & HOTKEYF_ALT)
-					CheckDlgButton(IDC_CHECK_ALT_1, BST_CHECKED);
-			}
+
+		{
+			BYTE mod = HIBYTE(a);
+			if (mod & HOTKEYF_SHIFT)
+				CheckDlgButton(IDC_CHECK_SHIFT_1, BST_CHECKED);
+			if (mod & HOTKEYF_CONTROL)
+				CheckDlgButton(IDC_CHECK_CONTROL_1, BST_CHECKED);
+			if (mod & HOTKEYF_ALT)
+				CheckDlgButton(IDC_CHECK_ALT_1, BST_CHECKED);
+		}
 
 			break;
 		default:
@@ -656,14 +572,14 @@ void CQuickPasteKeyboard::LoadHotKey(KeyboardAB ab)
 			case VK_LEFT:
 			case VK_UP:
 			case VK_RIGHT:
-			case VK_DOWN: // arrow keys
+			case VK_DOWN:
 			case VK_PRIOR:
-			case VK_NEXT: // page up and page down
+			case VK_NEXT:
 			case VK_END:
 			case VK_HOME:
 			case VK_INSERT:
 			case VK_DELETE:
-			case VK_DIVIDE: // numpad slash
+			case VK_DIVIDE:
 			case VK_NUMLOCK:
 			{
 				b = ACCEL_MAKEKEY(LOBYTE(b), (HIBYTE(b) | HOTKEYF_EXT));
@@ -686,15 +602,15 @@ void CQuickPasteKeyboard::LoadHotKey(KeyboardAB ab)
 				::ShowWindow(::GetDlgItem(m_hWnd, IDC_CHECK_CONTROL_2), SW_SHOW);
 				::ShowWindow(::GetDlgItem(m_hWnd, IDC_CHECK_ALT_2), SW_SHOW);
 
-				{
-					BYTE mod = HIBYTE(b);
-					if (mod & HOTKEYF_SHIFT)
-						CheckDlgButton(IDC_CHECK_SHIFT_2, BST_CHECKED);
-					if (mod & HOTKEYF_CONTROL)
-						CheckDlgButton(IDC_CHECK_CONTROL_2, BST_CHECKED);
-					if (mod & HOTKEYF_ALT)
-						CheckDlgButton(IDC_CHECK_ALT_2, BST_CHECKED);
-				}
+			{
+				BYTE mod = HIBYTE(b);
+				if (mod & HOTKEYF_SHIFT)
+					CheckDlgButton(IDC_CHECK_SHIFT_2, BST_CHECKED);
+				if (mod & HOTKEYF_CONTROL)
+					CheckDlgButton(IDC_CHECK_CONTROL_2, BST_CHECKED);
+				if (mod & HOTKEYF_ALT)
+					CheckDlgButton(IDC_CHECK_ALT_2, BST_CHECKED);
+			}
 
 				break;
 			default:
@@ -705,7 +621,7 @@ void CQuickPasteKeyboard::LoadHotKey(KeyboardAB ab)
 			}
 		}
 		else
-		{ 
+		{
 			CheckDlgButton(IDC_CHECK_ENABLE_SECOND_PRESS, BST_UNCHECKED);
 			CheckDlgButton(IDC_RADIO_KEYBOARD_2, BST_CHECKED);
 
@@ -728,11 +644,12 @@ void CQuickPasteKeyboard::LoadHotKey(KeyboardAB ab)
 		CheckDlgButton(IDC_RADIO_KEYBOARD_2, BST_CHECKED);
 	}
 
-	OnBnClickedRadioMouse1();
-	//ShowSecondPress(FALSE);
+	OnBnClickedRadioMouse1(0, 0, 0, (BOOL&)bDummy);
 }
 
-void CQuickPasteKeyboard::SelectMouseTypeCombo(CComboBox &combo, int value)
+BOOL bDummy = FALSE;
+
+void CQuickPasteKeyboard::SelectMouseTypeCombo(CComboBox& combo, int value)
 {
 	int count = combo.GetCount();
 	for (int i = 0; i < count; i++)
@@ -746,30 +663,24 @@ void CQuickPasteKeyboard::SelectMouseTypeCombo(CComboBox &combo, int value)
 	}
 }
 
-
-void CQuickPasteKeyboard::OnCbnKillfocusComboEnterModifier()
+LRESULT CQuickPasteKeyboard::OnCbnKillfocusComboEnterModifier(WORD, WORD, HWND, BOOL&)
 {
-	// TODO: Add your control notification handler code here
+	return 0;
 }
 
-
-void CQuickPasteKeyboard::OnEnKillfocusEdit1()
+LRESULT CQuickPasteKeyboard::OnEnKillfocusEdit1(WORD, WORD, HWND, BOOL&)
 {
-	// TODO: Add your control notification handler code here
+	return 0;
 }
 
-
-void CQuickPasteKeyboard::OnKillFocus(CWnd* pNewWnd)
+LRESULT CQuickPasteKeyboard::OnKillFocus(UINT, WPARAM, LPARAM, BOOL&)
 {
-	CPropertyPage::OnKillFocus(pNewWnd);
-
-	// TODO: Add your message handler code here
+	return 0;
 }
-
 
 BOOL CQuickPasteKeyboard::PreTranslateMessage(MSG* pMsg)
 {
-	switch(pMsg->message)
+	switch (pMsg->message)
 	{
 	case WM_KILLFOCUS:
 		break;
@@ -790,21 +701,19 @@ BOOL CQuickPasteKeyboard::PreTranslateMessage(MSG* pMsg)
 		break;
 	}
 
-	return CPropertyPage::PreTranslateMessage(pMsg);
+	return FALSE;
 }
-
 
 BOOL CQuickPasteKeyboard::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 {
-	NMHDR* pNMHDR = (NMHDR *) lParam;
-	if (pNMHDR &&pNMHDR->code == WM_KILLFOCUS)
+	NMHDR* pNMHDR = (NMHDR*)lParam;
+	if (pNMHDR && pNMHDR->code == WM_KILLFOCUS)
 	{
-		CWnd *pFocus = CWnd::GetFocus(); // call to a static function 
+		CWnd* pFocus = CWnd::GetFocus();
 		if (pFocus && (pFocus->GetParent() == this))
 		{
 			if (pFocus->GetDlgCtrlID() != IDCANCEL)
 			{
-				// Ok, if the focus is not in the cancelbutton... 
 				if (pNMHDR->idFrom)
 				{
 					int k = 0;
@@ -813,67 +722,57 @@ BOOL CQuickPasteKeyboard::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResul
 		}
 	}
 
-
-	return CPropertyPage::OnNotify(wParam, lParam, pResult);
+	return FALSE;
 }
-
 
 BOOL CQuickPasteKeyboard::OnCommand(WPARAM wParam, LPARAM lParam)
 {
-	UINT notificationCode = (UINT) HIWORD(wParam);
+	UINT notificationCode = (UINT)HIWORD(wParam);
 
-	// For List control I handle it in another way....
 	if ((notificationCode == EN_KILLFOCUS) ||
 		(notificationCode == LBN_KILLFOCUS) ||
 		(notificationCode == CBN_KILLFOCUS) ||
 		(notificationCode == NM_KILLFOCUS) ||
 		(notificationCode == WM_KILLFOCUS)) {
 
-		CWnd *pFocus = CWnd::GetFocus();
-		// call to a static function 
-
-		// If we are changing the focus to another
-		// control of the same window... 
+		CWnd* pFocus = CWnd::GetFocus();
 
 		if (pFocus && (pFocus->GetParent() == this))
 		{
-			// Ok, if the focus is not in the cancel button...
-			if (pFocus->GetDlgCtrlID() != IDCANCEL) 
+			if (pFocus->GetDlgCtrlID() != IDCANCEL)
 			{
 				int k = 9;
 			}
 		}
 	}
 
-	return CPropertyPage::OnCommand(wParam, lParam);
+	return FALSE;
 }
 
-
-void CQuickPasteKeyboard::OnBnClickedButtonEnter()
+LRESULT CQuickPasteKeyboard::OnBnClickedButtonEnter(WORD, WORD, HWND, BOOL&)
 {
 	DWORD hk = m_hotKey1.GetHotKey();
 	BYTE currentModifiers = CAccels::GetKeyStateModifiers();
 	m_hotKey1.SetHotKey(VK_RETURN, currentModifiers);
+
+	return 0;
 }
 
-
-void CQuickPasteKeyboard::OnBnClickedButtonEnter2()
+LRESULT CQuickPasteKeyboard::OnBnClickedButtonEnter2(WORD, WORD, HWND, BOOL&)
 {
 	DWORD hk = m_hotKey2.GetHotKey();
 	BYTE currentModifiers = CAccels::GetKeyStateModifiers();
 	m_hotKey2.SetHotKey(VK_RETURN, currentModifiers);
+
+	return 0;
 }
 
-
-void CQuickPasteKeyboard::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
+LRESULT CQuickPasteKeyboard::OnKeyUp(UINT, WPARAM, LPARAM, BOOL&)
 {
-	// TODO: Add your message handler code here and/or call default
-
-	CPropertyPage::OnKeyUp(nChar, nRepCnt, nFlags);
+	return 0;
 }
 
-
-void CQuickPasteKeyboard::OnBnClickedButtonReset()
+LRESULT CQuickPasteKeyboard::OnBnClickedButtonReset(WORD, WORD, HWND, BOOL&)
 {
 	for (std::map<DWORD, KeyboardArray>::iterator it = m_map.begin(); it != m_map.end(); ++it)
 	{
@@ -897,7 +796,7 @@ void CQuickPasteKeyboard::OnBnClickedButtonReset()
 	for (int row = 0; row < count; row++)
 	{
 		int actionId = (int)m_list.GetItemData(row);
-		
+
 		CString sh = GetShortCutText(m_map[actionId]);
 
 		LVITEM lvi;
@@ -908,7 +807,9 @@ void CQuickPasteKeyboard::OnBnClickedButtonReset()
 		m_list.SetItem(&lvi);
 	}
 
-	SelectedRow(0);	
+	SelectedRow(0);
+
+	return 0;
 }
 
 void CQuickPasteKeyboard::SelectedRow(int row)
@@ -919,13 +820,13 @@ void CQuickPasteKeyboard::SelectedRow(int row)
 	m_list.EnsureVisible(row, FALSE);
 }
 
-
-void CQuickPasteKeyboard::OnBnClickedRadioKeyboard1()
+LRESULT CQuickPasteKeyboard::OnBnClickedRadioKeyboard1(WORD, WORD, HWND, BOOL&)
 {
-	OnBnClickedRadioMouse1();
+	OnBnClickedRadioMouse1(0, 0, 0, (BOOL&)bDummy);
+	return 0;
 }
 
-void CQuickPasteKeyboard::OnBnClickedRadioMouse1()
+LRESULT CQuickPasteKeyboard::OnBnClickedRadioMouse1(WORD, WORD, HWND, BOOL&)
 {
 	if (IsDlgButtonChecked(IDC_RADIO_KEYBOARD_1) == BST_CHECKED)
 	{
@@ -971,20 +872,23 @@ void CQuickPasteKeyboard::OnBnClickedRadioMouse1()
 			::ShowWindow(::GetDlgItem(m_hWnd, IDC_CHECK_ALT_2), SW_SHOW);
 		}
 	}
+
+	return 0;
 }
 
-
-void CQuickPasteKeyboard::OnBnClickedRadioKeyboard2()
+LRESULT CQuickPasteKeyboard::OnBnClickedRadioKeyboard2(WORD, WORD, HWND, BOOL&)
 {
-	OnBnClickedRadioMouse1();
+	OnBnClickedRadioMouse1(0, 0, 0, (BOOL&)bDummy);
+	return 0;
 }
 
-void CQuickPasteKeyboard::OnBnClickedRadioMouse2()
+LRESULT CQuickPasteKeyboard::OnBnClickedRadioMouse2(WORD, WORD, HWND, BOOL&)
 {
-	OnBnClickedRadioMouse1();
+	OnBnClickedRadioMouse1(0, 0, 0, (BOOL&)bDummy);
+	return 0;
 }
 
-void CQuickPasteKeyboard::OnBnClickedCheckEnableSecondPress()
+LRESULT CQuickPasteKeyboard::OnBnClickedCheckEnableSecondPress(WORD, WORD, HWND, BOOL&)
 {
 	int shortCutId = SelectedCommandShortCutId();
 	int id = SelectedCommandId();
@@ -1032,4 +936,6 @@ void CQuickPasteKeyboard::OnBnClickedCheckEnableSecondPress()
 
 		::ShowWindow(::GetDlgItem(m_hWnd, IDC_STATIC_SECOND_PRESS), SW_HIDE);
 	}
+
+	return 0;
 }

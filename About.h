@@ -13,42 +13,29 @@
 #include "hyperlink.h"
 #include "HListBox.h"
 
-class CAbout : public CPropertyPage
+class CAbout : public CPropertyPageImpl<CAbout>
 {
-	DECLARE_DYNCREATE(CAbout)
-
-// Construction
 public:
 	CAbout();
 	~CAbout();
 
 // Dialog Data
-	//{{AFX_DATA(CAbout)
 	enum { IDD = IDD_ABOUT };
 	CHyperLink	m_Link;
 	CHyperLink	m_HyperLink;
 	CHListBox	m_List;
-	//}}AFX_DATA
-
-
-// Overrides
-	// ClassWizard generate virtual function overrides
-	//{{AFX_VIRTUAL(CAbout)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
 
 // Implementation
 protected:
-
 	CString m_csTitle;
 
-	// Generated message map functions
-	//{{AFX_MSG(CAbout)
-	virtual BOOL OnInitDialog();
-	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP()
+	// WTL Message Map
+	BEGIN_MSG_MAP(CAbout)
+		MSG_WM_INITDIALOG(OnInitDialog)
+		CHAIN_MSG_MAP(CPropertyPageImpl<CAbout>)
+	END_MSG_MAP()
 
+	BOOL OnInitDialog(CWindow wndFocus, LPARAM lInitParam);
 };
 
 //{{AFX_INSERT_LOCATION}}

@@ -15,21 +15,10 @@
 #include "Misc.h"
 #include "QuickPasteKeyboard.h"
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif 
-
-
 /////////////////////////////////////////////////////////////////////////////
 // COptionsSheet
-
-IMPLEMENT_DYNAMIC(COptionsSheet, CPropertySheet)
-
-COptionsSheet::COptionsSheet(LPCTSTR pszCaption, CWnd* pParentWnd, UINT iSelectPage)
-	:CPropertySheet(pszCaption, pParentWnd, iSelectPage)
-{
+COptionsSheet::COptionsSheet(LPCTSTR pszCaption, HWND hWndParent, UINT iSelectPage)
+	:CPropertySheetImpl<COptionsSheet>(pszCaption, iSelectPage, hWndParent){
 	m_themeChanged = FALSE;
 	m_pKeyBoardOptions = NULL;
 	m_pGeneralOptions = NULL;
@@ -88,52 +77,36 @@ COptionsSheet::~COptionsSheet()
 	delete m_pQuickPasteShortCuts;	
 }
 
-BEGIN_MESSAGE_MAP(COptionsSheet, CPropertySheet)
-	//{{AFX_MSG_MAP(COptionsSheet)
-		// NOTE - the ClassWizard will add and remove mapping macros here.
-	ON_WM_DESTROY()
-	ON_WM_NCDESTROY()
-	//ON_WM_CLOSE()
-	//}}AFX_MSG_MAP
-END_MESSAGE_MAP()
-
-/////////////////////////////////////////////////////////////////////////////
-// COptionsSheet message handlers
-
-void COptionsSheet::OnDestroy()
-{
-	CPropertySheet::OnDestroy();
-}
-
 void COptionsSheet::SetNotifyWnd(HWND hWnd)
 {
 	m_hWndParent = hWnd;
 }
 
-BOOL COptionsSheet::OnInitDialog() 
+BOOL COptionsSheet::OnInitDialog(HWND hWndFocus, LPARAM lParam) 
 {
-	m_bModeless = FALSE;   
-	m_nFlags |= WF_CONTINUEMODAL;
+	BOOL bResult = CPropertySheetImpl<COptionsSheet>::OnInitDialog(hWndFocus, lParam);
 
-	HICON b = (HICON)LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_MAINFRAME), IMAGE_ICON, 64, 64, LR_SHARED);
+	HICON b = (HICON)LoadImage(theApp.GetModuleInstance(), MAKEINTRESOURCE(IDR_MAINFRAME), IMAGE_ICON, 64, 64, LR_SHARED);
 	SetIcon(b, TRUE);
-
-	BOOL bResult = CPropertySheet::OnInitDialog();
 
 	SetWindowText(_T("Options"));
 
 	theApp.m_Language.UpdateOptionsSheet(this);
 
-	::ShowWindow(::GetDlgItem(m_hWnd, ID_APPLY_NOW), SW_HIDE);
-
-	m_bModeless = TRUE;
-	m_nFlags &= ~WF_CONTINUEMODAL;
+	::ShowWindow(GetDlgItem(ID_APPLY_NOW), SW_HIDE);
 
 	return bResult;
 }
 
-void COptionsSheet::OnNcDestroy()
+LRESULT COptionsSheet::OnDestroy(UINT, WPARAM, LPARAM, BOOL& bHandled)
 {
-	CPropertySheet::OnNcDestroy();
+	bHandled = FALSE;
+	return 0;
+}
+
+LRESULT COptionsSheet::OnNcDestroy(UINT, WPARAM, LPARAM, BOOL& bHandled)
+{
+	bHandled = FALSE;
 	::PostMessage(m_hWndParent, WM_OPTIONS_CLOSED, m_themeChanged, 0);
+	return 0;
 }

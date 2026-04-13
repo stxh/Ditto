@@ -1,110 +1,85 @@
-// MoveToGroupDlg.cpp : implementation file
-//
-
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "cp_main.h"
 #include "MoveToGroupDlg.h"
 #include "GroupName.h"
 #include "ProcessPaste.h"
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-/////////////////////////////////////////////////////////////////////////////
-// CMoveToGroupDlg dialog
-
-
-CMoveToGroupDlg::CMoveToGroupDlg(CWnd* pParent /*=NULL*/)
-	: CDialog(CMoveToGroupDlg::IDD, pParent)
+CMoveToGroupDlg::CMoveToGroupDlg()
+    : m_nSelectedGroup(-1)
 {
-	//{{AFX_DATA_INIT(CMoveToGroupDlg)
-		// NOTE: the ClassWizard will add member initialization here
-	//}}AFX_DATA_INIT
-	m_nSelectedGroup = -1;
 }
 
-
-void CMoveToGroupDlg::DoDataExchange(CDataExchange* pDX)
+LRESULT CMoveToGroupDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 {
-	CDialog::DoDataExchange(pDX);
-	//{{AFX_DATA_MAP(CMoveToGroupDlg)
-	DDX_Control(pDX, IDC_TREE, m_Tree);
-	//}}AFX_DATA_MAP
+    HWND hTree = GetDlgItem(IDC_TREE);
+    if (hTree != nullptr)
+    {
+        m_Tree.SubclassWindow(hTree);
+    }
+
+    m_Tree.m_selectedFolderID = m_nSelectedGroup;
+    m_Tree.SetNotificationWndEx(m_hWnd);
+    m_Tree.FillTree();
+
+    theApp.m_Language.UpdateMoveToGroups(this);
+
+    return TRUE;
 }
 
-
-BEGIN_MESSAGE_MAP(CMoveToGroupDlg, CDialog)
-	//{{AFX_MSG_MAP(CMoveToGroupDlg)
-	ON_WM_SIZE()
-	ON_BN_CLICKED(IDC_BUTTON_NEW_GROUP, OnButtonNewGroup)
-	//}}AFX_MSG_MAP
-	ON_MESSAGE(NM_GROUP_TREE_MESSAGE, OnTreeSelect)
-END_MESSAGE_MAP()
-
-/////////////////////////////////////////////////////////////////////////////
-// CMoveToGroupDlg message handlers
-
-BOOL CMoveToGroupDlg::OnInitDialog() 
+LRESULT CMoveToGroupDlg::OnOk(WORD, WORD, HWND, BOOL&)
 {
-	CDialog::OnInitDialog();
-	
-	m_Tree.m_selectedFolderID = m_nSelectedGroup;
-	m_Tree.SetNotificationWndEx(m_hWnd);
-	m_Tree.FillTree();
-
-	theApp.m_Language.UpdateMoveToGroups(this);
-	
-	return TRUE;  // return TRUE unless you set the focus to a control
-	              // EXCEPTION: OCX Property Pages should return FALSE
+    m_nSelectedGroup = m_Tree.GetSelectedTree();
+    EndDialog(IDOK);
+    return 0;
 }
 
-LRESULT CMoveToGroupDlg::OnTreeSelect(WPARAM wParam, LPARAM lParam)
+LRESULT CMoveToGroupDlg::OnCancel(WORD, WORD, HWND, BOOL&)
 {
-	int nID = (int)wParam;
-	if(nID != 0)
-	{
-		m_nSelectedGroup = nID;
-		OnOK();
-	}
-	else
-	{
-		OnCancel();
-	}
-
-	return TRUE;
+    EndDialog(IDCANCEL);
+    return 0;
 }
 
-void CMoveToGroupDlg::OnOK() 
+void CMoveToGroupDlg::OnSize(UINT nType, CSize size)
 {
-	m_nSelectedGroup = m_Tree.GetSelectedTree();
-	
-	CDialog::OnOK();
+    UNREFERENCED_PARAMETER(nType);
+    if (m_Tree.IsWindow())
+    {
+        m_Tree.SetWindowPos(nullptr, 0, 0, size.cx, size.cy, SWP_NOZORDER | SWP_NOACTIVATE);
+    }
 }
 
-void CMoveToGroupDlg::OnSize(UINT nType, int cx, int cy) 
+LRESULT CMoveToGroupDlg::OnButtonNewGroup(WORD, WORD, HWND, BOOL&)
 {
-	CDialog::OnSize(nType, cx, cy);
-	
-	// TODO: Add your message handler code here
-	
+    CGroupName nameDlg;
+    if (nameDlg.DoModal() != IDOK)
+    {
+        return 0;
+    }
+
+    CString csName = nameDlg.m_csName;
+
+    long lID = NewGroupID(m_Tree.GetSelectedTree(), csName);
+    if (lID >= 0)
+    {
+        m_Tree.AddNode(csName, static_cast<int>(lID));
+    }
+
+    m_Tree.SetFocus();
+    return 0;
 }
 
-void CMoveToGroupDlg::OnButtonNewGroup() 
+LRESULT CMoveToGroupDlg::OnTreeSelect(UINT, WPARAM wParam, LPARAM, BOOL&)
 {
-	CGroupName Name;
-	if(Name.DoModal() != IDOK)
-		return;
-		
-	CString csName = Name.m_csName;
-	
-	long lID = NewGroupID(m_Tree.GetSelectedTree(), csName);
-	if(lID >= 0)
-	{
-		m_Tree.AddNode(csName, lID);
-	}
+    int nID = static_cast<int>(wParam);
+    if (nID != 0)
+    {
+        m_nSelectedGroup = nID;
+        EndDialog(IDOK);
+    }
+    else
+    {
+        EndDialog(IDCANCEL);
+    }
 
-	m_Tree.SetFocus();
+    return 0;
 }

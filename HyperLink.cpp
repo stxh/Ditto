@@ -6,7 +6,7 @@
 // Copyright (C) 1997, 1998 Chris Maunder
 // All rights reserved. May not be sold for profit.
 //
-// Thanks to Pål K. Tønder for auto-size and window caption changes.
+// Thanks to Pï¿½l K. Tï¿½nder for auto-size and window caption changes.
 //
 // "GotoURL" function by Stuart Patterson
 // As seen in the August, 1997 Windows Developer's Journal.
@@ -282,7 +282,7 @@ BOOL CHyperLink::GetAutoSize() const
 // then the window is merely shrunk, but if it is centred or right
 // justified then the window will have to be moved as well.
 //
-// Suggested by Pål K. Tønder 
+// Suggested by Pï¿½l K. Tï¿½nder 
 
 void CHyperLink::PositionWindow()
 {
@@ -389,7 +389,7 @@ void CHyperLink::ReportError(int nError)
         default:                      str.Format(_T("Unknown Error (%d) occurred."), nError); break;
     }
     str = "Unable to open hyperlink:\n\n" + str;
-    AfxMessageBox(str, MB_ICONEXCLAMATION | MB_OK);
+    MessageBox(NULL, str, _T("Error"), MB_ICONEXCLAMATION | MB_OK);
 }
 
 HINSTANCE CHyperLink::GotoURL(LPCTSTR url, int showcmd)

@@ -5,13 +5,6 @@
 #include "stdafx.h"
 #include "CP_Main.h"
 #include "QuickPaste.h"
-
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
-#define new DEBUG_NEW
-#endif
-
 #define ID_QPASTE_WND			0x1001
 
 //////////////////////////////////////////////////////////////////////

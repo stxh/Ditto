@@ -40,7 +40,10 @@ bool CDittoCopyBuffer::StartCopy(long lCopyBuffer, bool bCut)
 
 		//Create a thread to track if they have copied anything, if thread has exited before they have
 		//copied something then the copy buffer copy is canceled
-		AfxBeginThread(CDittoCopyBuffer::StartCopyTimer, (LPVOID)this, THREAD_PRIORITY_LOWEST);
+		// Use Windows API instead of MFC AfxBeginThread
+	HANDLE hThread1 = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)CDittoCopyBuffer::StartCopyTimer, (LPVOID)this, 0, NULL);
+	if (hThread1)
+		CloseHandle(hThread1);
 
 		m_bActive = true;
 		m_lCurrentDittoBuffer = lCopyBuffer;
@@ -176,7 +179,10 @@ bool CDittoCopyBuffer::PastCopyBuffer(long lCopyBuffer)
 
 					Log(StrF(_T("PastCopyBuffer sent paste, starting thread to restore clipboard, Delay = %d"), m_pClipboard->m_lRestoreDelay));
 
-					AfxBeginThread(CDittoCopyBuffer::DelayRestoreClipboard, (LPVOID)this, THREAD_PRIORITY_LOWEST);
+					// Use Windows API instead of MFC AfxBeginThread
+	HANDLE hThread2 = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)CDittoCopyBuffer::DelayRestoreClipboard, (LPVOID)this, 0, NULL);
+	if (hThread2)
+		CloseHandle(hThread2);
 
 					bRet = true;
 				}

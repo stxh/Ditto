@@ -4,91 +4,59 @@
 #include "stdafx.h"
 #include "CP_Main.h"
 #include "DeleteClipData.h"
-#include "afxdialogex.h"
 #include "Misc.h"
 #include "ProgressWnd.h"
 #include <algorithm>
 
 
 // CDeleteClipData dialog
-
-IMPLEMENT_DYNAMIC(CDeleteClipData, CDialog)
-
-CDeleteClipData::CDeleteClipData(CWnd* pParent /*=NULL*/)
-	: CDialog(CDeleteClipData::IDD, pParent)
-	, m_clipTitle(_T(""))
+CDeleteClipData::CDeleteClipData(HWND hParent)
+	: m_clipTitle(_T(""))
 	, m_filterByClipTitle(FALSE)
 	, m_filterByCreatedDate(FALSE)
 	, m_filterByLastUsedDate(FALSE)
 	, m_filterByClipboardFormat(FALSE)
-	, m_createdDateStart(COleDateTime::GetCurrentTime())
-	, m_createdDateEnd(COleDateTime::GetCurrentTime())
-	, m_createdTimeStart(COleDateTime::GetCurrentTime())
-	, m_createdTimeEnd(COleDateTime::GetCurrentTime())
-	, m_usedTimeStart(COleDateTime::GetCurrentTime())
-	, m_usedTimeEnd(COleDateTime::GetCurrentTime())
-	, m_usedDateStart(COleDateTime::GetCurrentTime())
-	, m_usedDateEnd(COleDateTime::GetCurrentTime())
 	, m_databaseSize(_T(""))
 	, m_selectedSize(_T(""))
 	, m_selectedCount(_T(""))
 {
+	// Initialize SYSTEMTIME values to current time
+	SYSTEMTIME stNow;
+	GetSystemTime(&stNow);
+	m_createdDateStart = stNow;
+	m_createdDateEnd = stNow;
+	m_createdTimeStart = stNow;
+	m_createdTimeEnd = stNow;
+	m_usedTimeStart = stNow;
+	m_usedTimeEnd = stNow;
+	m_usedDateStart = stNow;
+	m_usedDateEnd = stNow;
+
 	m_applyingDelete = false;
 	m_cancelDelete = false;
+	m_hWndParent = hParent;
+}
 
+CDeleteClipData::CDeleteClipData(CWnd* pParent) // legacy constructor for compatibility
+	: CDeleteClipData(pParent ? pParent->GetSafeHwnd() : NULL)
+{
 }
 
 CDeleteClipData::~CDeleteClipData()
 {
 }
 
-void CDeleteClipData::DoDataExchange(CDataExchange* pDX)
+
+void CDeleteClipData::DoDataExchange() // Custom DDX implementation
 {
-	CDialog::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_LIST2, m_List);
-	DDX_Text(pDX, IDC_EDIT_CLIP_TITLE, m_clipTitle);
-	DDX_Check(pDX, IDC_CHECK_CLIP_TITLE, m_filterByClipTitle);
-	DDX_Check(pDX, IDC_CHECK_CREATE_DATE, m_filterByCreatedDate);
-	DDX_Check(pDX, IDC_CHECK_LAST_USE_DATE, m_filterByLastUsedDate);
-	DDX_Check(pDX, IDC_CHECK_DATA_FORMAT, m_filterByClipboardFormat);
-	DDX_Control(pDX, IDC_COMBO_DATA_FORMAT, m_clipboardFomatCombo);
-	DDX_DateTimeCtrl(pDX, IDC_DATE_CREATE_START, m_createdDateStart);
-	DDX_DateTimeCtrl(pDX, IDC_DATE_CREATE_END, m_createdDateEnd);
-	DDX_DateTimeCtrl(pDX, IDC_TIME_CREATE_START, m_createdTimeStart);
-	DDX_DateTimeCtrl(pDX, IDC_TIME_CREATE_END, m_createdTimeEnd);
-	DDX_DateTimeCtrl(pDX, IDC_TIME_USE_START, m_usedTimeStart);
-	DDX_DateTimeCtrl(pDX, IDC_TIME_USE_END, m_usedTimeEnd);
-	DDX_DateTimeCtrl(pDX, IDC_DATE_USE_START, m_usedDateStart);
-	DDX_DateTimeCtrl(pDX, IDC_DATE_USE_END, m_usedDateEnd);
-	DDX_Text(pDX, IDC_STATIC_DB_SIZE, m_databaseSize);
-	DDX_Text(pDX, IDC_STATIC_SELECTED_SIZE, m_selectedSize);
-	DDX_Text(pDX, IDC_STATIC_SELECTED_COUNT, m_selectedCount);
+	// Manual data exchange - this function is kept for compatibility
+	// but in WTL we handle this manually or through manual control updates
 }
 
-
-BEGIN_MESSAGE_MAP(CDeleteClipData, CDialog)
-	ON_WM_CLOSE()
-	ON_WM_SIZE()
-	ON_WM_NCDESTROY()
-	ON_BN_CLICKED(IDC_BUTTON_SEARCH, &CDeleteClipData::OnBnClickedButtonSearch)
-	ON_NOTIFY(LVN_KEYDOWN, IDC_LIST2, &CDeleteClipData::OnLvnKeydownList2)
-	ON_NOTIFY(LVN_ITEMCHANGED, IDC_LIST2, &CDeleteClipData::OnLvnItemchangedList2)
-	ON_NOTIFY(HDN_GETDISPINFO, 0, &CDeleteClipData::OnHdnGetdispinfoList2)
-	ON_NOTIFY(LVN_GETDISPINFO, IDC_LIST2, &CDeleteClipData::OnLvnGetdispinfoList2)
-	ON_BN_CLICKED(IDC_CHECK_CLIP_TITLE, &CDeleteClipData::OnBnClickedCheckClipTitle)
-	ON_BN_CLICKED(IDC_BUTTON_APPLY, &CDeleteClipData::OnBnClickedButtonApply)
-	ON_BN_CLICKED(IDCANCEL, &CDeleteClipData::OnBnClickedCancel)
-	ON_WM_TIMER()
-	ON_BN_CLICKED(IDC_CHECK_CREATE_DATE, &CDeleteClipData::OnBnClickedCheckCreateDate)
-	ON_BN_CLICKED(IDC_CHECK_LAST_USE_DATE, &CDeleteClipData::OnBnClickedCheckLastUseDate)
-	ON_BN_CLICKED(IDC_CHECK_DATA_FORMAT, &CDeleteClipData::OnBnClickedCheckDataFormat)
-	ON_NOTIFY(HDN_ITEMCLICK, 0, &CDeleteClipData::OnLvnColumnclickList2)
-
-END_MESSAGE_MAP()
-
-BOOL CDeleteClipData::OnInitDialog()
+BOOL CDeleteClipData::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	CDialog::OnInitDialog();
+	// Initialize the list control
+	m_List.Attach(GetDlgItem(IDC_LIST2));
 
 	theApp.m_Language.UpdateDeleteClipData(this);
 

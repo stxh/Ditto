@@ -5,37 +5,35 @@
 #pragma once
 
 #include "ExternalWindowTracker.h"
-#include "afxwin.h"
 
-
-// CFocusHighlightDlg dialog
-class CFocusHighlightDlg : public CDialogEx
+class CFocusHighlightDlg : public CDialogImpl<CFocusHighlightDlg>
 {
-// Construction
 public:
-	CFocusHighlightDlg(CWnd* pParent = NULL);	// standard constructor
-
-// Dialog Data
 	enum { IDD = IDD_FOCUSHIGHLIGHT_DIALOG };
 
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
+	CFocusHighlightDlg();
 
+	BEGIN_MSG_MAP(CFocusHighlightDlg)
+		MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
+		MESSAGE_HANDLER(WM_TIMER, OnTimer)
+		COMMAND_ID_HANDLER(IDC_BUTTON_HIGHLIGHT_ACTIVE, OnHighlightActive)
+		COMMAND_ID_HANDLER(IDC_BUTTON_HIGHLIGHT_FOCUS, OnHighlightFocus)
+		COMMAND_ID_HANDLER(IDOK, OnCloseCmd)
+		COMMAND_ID_HANDLER(IDCANCEL, OnCloseCmd)
+	END_MSG_MAP()
 
-// Implementation
-protected:
-	ExternalWindowTracker m_tracker;
+	LRESULT OnInitDialog(UINT, WPARAM, LPARAM, BOOL&);
+	LRESULT OnTimer(UINT, WPARAM, LPARAM, BOOL&);
+	LRESULT OnHighlightActive(WORD, WORD, HWND, BOOL&);
+	LRESULT OnHighlightFocus(WORD, WORD, HWND, BOOL&);
+	LRESULT OnCloseCmd(WORD, WORD wID, HWND, BOOL&);
 
+private:
 	void StayOnTop();
+	void HighlightWindow(HWND hWnd);
 
-	// Generated message map functions
-	virtual BOOL OnInitDialog();
-	DECLARE_MESSAGE_MAP()
-public:
-	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	ExternalWindowTracker m_tracker;
 	CEdit m_activeEdit;
 	CEdit m_focusEdit;
 	CButton m_trackFocusChangesCheck;
-	afx_msg void OnBnClickedButtonHighlightActive();
-	afx_msg void OnBnClickedButtonHighlightFocus();
 };

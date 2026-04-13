@@ -81,7 +81,10 @@ UINT  MTServerThread(LPVOID pParam)
 
 		if (socket != INVALID_SOCKET)
 		{
-			AfxBeginThread(ClientThread, (LPVOID)pParams);
+			// Use Windows API instead of MFC AfxBeginThread
+	HANDLE hThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)ClientThread, (LPVOID)pParams, 0, NULL);
+	if (hThread)
+		CloseHandle(hThread);
 		}
 		else
 		{

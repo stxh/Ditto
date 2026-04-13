@@ -1,131 +1,92 @@
-
-// FocusHighlightDlg.cpp : implementation file
-//
+// FocusHighlightDlg.cpp : WTL dialog implementation
 
 #include "stdafx.h"
-#include "FocusHighlight.h"
+#include "resource.h"
 #include "FocusHighlightDlg.h"
-#include "afxdialogex.h"
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#endif
-
-
-
-CFocusHighlightDlg::CFocusHighlightDlg(CWnd* pParent /*=NULL*/)
-	: CDialogEx(CFocusHighlightDlg::IDD, pParent)
+CFocusHighlightDlg::CFocusHighlightDlg()
 {
 }
 
-void CFocusHighlightDlg::DoDataExchange(CDataExchange* pDX)
+LRESULT CFocusHighlightDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 {
-	CDialogEx::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_EDIT_ACTIVE, m_activeEdit);
-	DDX_Control(pDX, IDC_EDIT_FOCUS, m_focusEdit);
-	DDX_Control(pDX, IDC_CHECK_TRACK_FOCUS_CHANGES, m_trackFocusChangesCheck);
+    m_activeEdit.Attach(GetDlgItem(IDC_EDIT_ACTIVE));
+    m_focusEdit.Attach(GetDlgItem(IDC_EDIT_FOCUS));
+    m_trackFocusChangesCheck.Attach(GetDlgItem(IDC_CHECK_TRACK_FOCUS_CHANGES));
+
+    StayOnTop();
+
+    m_trackFocusChangesCheck.SetCheck(BST_CHECKED);
+    SetTimer(1, 2000);
+
+    CenterWindow();
+
+    return TRUE;
 }
 
-BEGIN_MESSAGE_MAP(CFocusHighlightDlg, CDialogEx)
-	ON_WM_TIMER()
-	ON_BN_CLICKED(IDC_BUTTON_HIGHLIGHT_ACTIVE, &CFocusHighlightDlg::OnBnClickedButtonHighlightActive)
-	ON_BN_CLICKED(IDC_BUTTON_HIGHLIGHT_FOCUS, &CFocusHighlightDlg::OnBnClickedButtonHighlightFocus)
-END_MESSAGE_MAP()
-
-BOOL CFocusHighlightDlg::OnInitDialog()
+LRESULT CFocusHighlightDlg::OnTimer(UINT, WPARAM wParam, LPARAM, BOOL& bHandled)
 {
-	CDialogEx::OnInitDialog();
+    if (wParam == 1 && m_trackFocusChangesCheck.GetCheck() != 0)
+    {
+        m_tracker.TrackActiveWnd();
 
-	StayOnTop();
+        CString cs;
+        cs.Format(_T("0x%08x - %s"), m_tracker.ActiveWnd(), m_tracker.ActiveWndName());
+        m_activeEdit.SetWindowText(cs);
 
-	::CheckDlgButton(m_hWnd, IDC_CHECK_TRACK_FOCUS_CHANGES, BST_CHECKED);
-	SetTimer(1, 2000, NULL);	
+        cs.Format(_T("0x%08x - %s"), m_tracker.FocusWnd(), m_tracker.FocusWndName());
+        m_focusEdit.SetWindowText(cs);
+    }
 
-	return TRUE;  // return TRUE  unless you set the focus to a control
+    bHandled = TRUE;
+    return 0;
 }
 
-void CFocusHighlightDlg::OnTimer(UINT_PTR nIDEvent)
+LRESULT CFocusHighlightDlg::OnHighlightActive(WORD, WORD, HWND, BOOL&)
 {
-	switch(nIDEvent)
-	{
-	case 1:
+    HighlightWindow(m_tracker.ActiveWnd());
+    return 0;
+}
 
-		if(::IsDlgButtonChecked(m_hWnd, IDC_CHECK_TRACK_FOCUS_CHANGES) != 0)
-		{
-			m_tracker.TrackActiveWnd();
+LRESULT CFocusHighlightDlg::OnHighlightFocus(WORD, WORD, HWND, BOOL&)
+{
+    HighlightWindow(m_tracker.FocusWnd());
+    return 0;
+}
 
-			CString cs;
-			cs.Format(_T("0x%08x - %s"), m_tracker.ActiveWnd(), m_tracker.ActiveWndName());
-			m_activeEdit.SetWindowText(cs);
-
-			cs.Format(_T("0x%08x - %s"), m_tracker.FocusWnd(), m_tracker.FocusWndName());
-			m_focusEdit.SetWindowText(cs);
-		}
-
-		break;
-	}
-
-	CDialogEx::OnTimer(nIDEvent);
+LRESULT CFocusHighlightDlg::OnCloseCmd(WORD /*wNotifyCode*/, WORD wID, HWND, BOOL&)
+{
+    KillTimer(1);
+    EndDialog(wID);
+    return 0;
 }
 
 void CFocusHighlightDlg::StayOnTop()
-{	
-	CRect rect;
-
-	// get the current window size and position
-	GetWindowRect( rect );
-
-	// now change the size, position, and Z order 
-	// of the window.
-	::SetWindowPos(m_hWnd ,       // handle to window
-		HWND_TOPMOST,  // placement-order handle
-		rect.left,     // horizontal position
-		rect.top,      // vertical position
-		rect.Width(),  // width
-		rect.Height(), // height
-		SWP_SHOWWINDOW); // window-positioning options);
+{
+    CRect rect;
+    GetWindowRect(rect);
+    SetWindowPos(HWND_TOPMOST, rect, SWP_SHOWWINDOW);
 }
 
-void CFocusHighlightDlg::OnBnClickedButtonHighlightActive()
+void CFocusHighlightDlg::HighlightWindow(HWND hWnd)
 {
-	HWND activeWnd = m_tracker.ActiveWnd();
+    if (!::IsWindow(hWnd))
+        return;
 
-	CRect cr;
-	::GetWindowRect(activeWnd, &cr);
-	::ScreenToClient(activeWnd, &cr.TopLeft());
-	::ScreenToClient(activeWnd, &cr.BottomRight());
+    CRect cr;
+    ::GetWindowRect(hWnd, &cr);
+    ::ScreenToClient(hWnd, &cr.TopLeft());
+    ::ScreenToClient(hWnd, &cr.BottomRight());
 
-	HDC hdc = ::GetWindowDC(activeWnd);
+    HDC hdc = ::GetWindowDC(hWnd);
+    if (hdc == NULL)
+        return;
 
-	for(int i = 0; i < 10; i++)
-	{
-		::DrawFocusRect(hdc, cr);
-		
-		Sleep(200);
-	}
+    for (int i = 0; i < 10; i++)
+    {
+        ::DrawFocusRect(hdc, cr);
+        ::Sleep(200);
+    }
 
-	::ReleaseDC(activeWnd, hdc);
-}
-
-
-void CFocusHighlightDlg::OnBnClickedButtonHighlightFocus()
-{
-	HWND focusWnd = m_tracker.FocusWnd();
-
-	CRect cr;
-	::GetWindowRect(focusWnd, &cr);
-	::ScreenToClient(focusWnd, &cr.TopLeft());
-	::ScreenToClient(focusWnd, &cr.BottomRight());
-
-	HDC hdc = ::GetWindowDC(focusWnd);
-
-	for(int i = 0; i < 10; i++)
-	{
-		::DrawFocusRect(hdc, cr);
-		
-		Sleep(200);
-	}
-
-	::ReleaseDC(focusWnd, hdc);
-
+    ::ReleaseDC(hWnd, hdc);
 }

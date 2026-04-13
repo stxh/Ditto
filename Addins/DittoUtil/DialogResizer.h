@@ -9,8 +9,9 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include <afxtempl.h>
-
+#include <windows.h>
+#include <vector>
+#include <atlmisc.h>
 #define DR_MoveLeft			 1
 #define DR_MoveTop			 2
 #define DR_SizeWidth		 4
@@ -36,7 +37,6 @@ protected:
 
 public:
 	void MoveControls(CSize csNewSize);
-
 	void AddControl(int nControlID, int nFlags);
 	void AddControl(HWND hWnd, int nFlags);
 
@@ -44,10 +44,9 @@ public:
 
 protected:
 
-	CArray< CDR_Data, CDR_Data > m_Controls;
+	std::vector<CDR_Data> m_Controls;
 	CSize m_DlgSize;
 	HWND m_hWndParent;
-
 protected:
 };
 

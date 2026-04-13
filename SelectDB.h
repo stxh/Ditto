@@ -1,49 +1,25 @@
-#if !defined(AFX_SELECTDB_H__1B0F5220_5F1A_426F_BA9B_4722E7EA76A3__INCLUDED_)
-#define AFX_SELECTDB_H__1B0F5220_5F1A_426F_BA9B_4722E7EA76A3__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-// SelectDB.h : header file
-//
 
-/////////////////////////////////////////////////////////////////////////////
-// CSelectDB dialog
-
-class CSelectDB : public CDialog
+class CSelectDB : public CDialogImpl<CSelectDB>
 {
-// Construction
 public:
-	CSelectDB(CWnd* pParent = NULL);   // standard constructor
-
-// Dialog Data
-	//{{AFX_DATA(CSelectDB)
 	enum { IDD = IDD_SELECT_DB };
-	CEdit	m_ePath;
-	//}}AFX_DATA
 
+	CSelectDB() = default;
 
-// Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CSelectDB)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
+	CEdit m_ePath;
 
-// Implementation
-protected:
+	BEGIN_MSG_MAP(CSelectDB)
+		MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
+		COMMAND_ID_HANDLER(IDOK, OnOK)
+		COMMAND_ID_HANDLER(IDCANCEL, OnCancel)
+		COMMAND_HANDLER(IDC_SELECT, BN_CLICKED, OnSelect)
+		COMMAND_HANDLER(IDC_USE_DEFAULT, BN_CLICKED, OnUseDefault)
+	END_MSG_MAP()
 
-	// Generated message map functions
-	//{{AFX_MSG(CSelectDB)
-	virtual BOOL OnInitDialog();
-	virtual void OnOK();
-	afx_msg void OnSelect();
-	afx_msg void OnUseDefault();
-	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP()
+	LRESULT OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnOK(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnCancel(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnSelect(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnUseDefault(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 };
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
-
-#endif // !defined(AFX_SELECTDB_H__1B0F5220_5F1A_426F_BA9B_4722E7EA76A3__INCLUDED_)

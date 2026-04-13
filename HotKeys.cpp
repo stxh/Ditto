@@ -432,13 +432,12 @@ void CHotKeys::UnregisterAll(bool bMsgOnError, bool bOnShowDitto)
 		pHotKey = ElementAt(i);
 		if(!pHotKey->Unregister(bOnShowDitto))
 		{
-			str = "Error Unregistering ";
 			str += pHotKey->GetName();
-			Log(str);
-			if(bMsgOnError)
-				AfxMessageBox(str);
-		}
+		Log(str);
+		if(bMsgOnError)
+			MessageBox(NULL, str, _T("Error"), MB_OK | MB_ICONERROR);
 	}
+}
 }
 
 void CHotKeys::GetKeys(ARRAY& keys)

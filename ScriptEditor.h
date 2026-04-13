@@ -2,48 +2,53 @@
 
 #include "ChaiScriptXml.h"
 #include "DialogResizer.h"
+#include <atlbase.h>
+#include <atlwin.h>
+#include <atldlgs.h>
+#include <atlctrls.h>
+#include <atlctrlx.h>
 
-
-// CScriptEditor dialog
-
-class CScriptEditor : public CDialogEx
+class CScriptEditor : public CDialogImpl<CScriptEditor>
 {
-	DECLARE_DYNAMIC(CScriptEditor)
-
 public:
-	CScriptEditor(CWnd* pParent = NULL);   // standard constructor
-	virtual ~CScriptEditor();
+	enum { IDD = IDD_SCRIPT_EDITOR };
 
 	CChaiScriptXml m_xml;
-
 	CString m_title;
 
-protected:
-	
+	BEGIN_MSG_MAP(CScriptEditor)
+		MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
+		MESSAGE_HANDLER(WM_SIZE, OnSize)
+		COMMAND_ID_HANDLER(IDOK, OnOK)
+		COMMAND_ID_HANDLER(IDCANCEL, OnCancel)
+		COMMAND_HANDLER(IDC_LIST_SCRIPTS, LBN_SELCHANGE, OnLbnSelchangeListScripts)
+		COMMAND_ID_HANDLER(IDC_BUTTON_ADD_SCRIPT, OnBnClickedButtonAddScript)
+		COMMAND_HANDLER(IDC_EDIT_NAME, EN_KILLFOCUS, OnEnKillfocusEditName)
+		COMMAND_HANDLER(IDC_EDIT_DESC, EN_KILLFOCUS, OnEnKillfocusEditDesc)
+		COMMAND_HANDLER(IDC_RICHEDIT21, EN_KILLFOCUS, OnEnKillfocusEditScript)
+		COMMAND_ID_HANDLER(IDC_CHECK_ACTIVE, OnBnClickedCheckActive)
+		COMMAND_ID_HANDLER(IDC_BUTTON_DELETE_SCRIPT, OnBnClickedButtonDeleteScript)
+		COMMAND_ID_HANDLER(IDC_BUTTON_RUN, OnBnClickedButtonRun)
+	END_MSG_MAP()
+
+	LRESULT OnInitDialog(UINT, WPARAM, LPARAM, BOOL&);
+	LRESULT OnSize(UINT, WPARAM, LPARAM, BOOL&);
+	LRESULT OnOK(WORD, WORD, HWND, BOOL&);
+	LRESULT OnCancel(WORD, WORD, HWND, BOOL&);
+	LRESULT OnLbnSelchangeListScripts(WORD, WORD, HWND, BOOL&);
+	LRESULT OnBnClickedButtonAddScript(WORD, WORD, HWND, BOOL&);
+	LRESULT OnEnKillfocusEditName(WORD, WORD, HWND, BOOL&);
+	LRESULT OnEnKillfocusEditDesc(WORD, WORD, HWND, BOOL&);
+	LRESULT OnEnKillfocusEditScript(WORD, WORD, HWND, BOOL&);
+	LRESULT OnBnClickedCheckActive(WORD, WORD, HWND, BOOL&);
+	LRESULT OnBnClickedButtonDeleteScript(WORD, WORD, HWND, BOOL&);
+	LRESULT OnBnClickedButtonRun(WORD, WORD, HWND, BOOL&);
+	BOOL PreTranslateMessage(MSG* pMsg);
+
+private:
 	void EnableDisable(BOOL enable);
 
-// Dialog Data
-#ifdef AFX_DESIGN_TIME
-	enum { IDD = IDD_SCRIPT_EDITOR };	
-#endif
-	CListBox	m_scriptsList;
+	CListBox m_scriptsList;
 	CDialogResizer m_resize;
-
-protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-
-	DECLARE_MESSAGE_MAP()
-public:
-	virtual BOOL OnInitDialog();
-	afx_msg void OnLbnSelchangeListScripts();
-	afx_msg void OnBnClickedButtonAddScript();
-	afx_msg void OnEnKillfocusEditName();
-	afx_msg void OnEnKillfocusEditDesc();
-	afx_msg void OnEnKillfocusEditScript();
-	afx_msg void OnBnClickedCheckActive();
-	afx_msg void OnSize(UINT nType, int cx, int cy);
-	afx_msg void OnBnClickedButtonDeleteScript();
-	afx_msg void OnBnClickedButtonRun();
 	CRichEditCtrl m_rich;
-	virtual BOOL PreTranslateMessage(MSG* pMsg);
 };

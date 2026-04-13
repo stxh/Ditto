@@ -2,7 +2,7 @@
 
 #include "EventThread.h"
 #include "Clip.h"
-#include <afxmt.h>
+
 
 
 class CAutoSendToClientThread : public CEventThread

@@ -1,0 +1,14 @@
+﻿  stdafx.cpp
+  TextConvert.cpp
+  Tokenizer.cpp
+  DialogResizer.cpp
+  DittoUtil.cpp
+  Exports.cpp
+  PasteAnyAsText.cpp
+  PasteImageAsHtmlImage.cpp
+  ReadOnlyFlag.cpp
+  RemoveLineFeeds.cpp
+  SelectPasteFormat.cpp
+  Generating Code...
+     Creating library E:\PubCode\Ditto\Debug64\Addins\DittoUtil.lib and object E:\PubCode\Ditto\Debug64\Addins\DittoUtil.exp
+  DittoUtil.vcxproj -> E:\PubCode\Ditto\Debug64\Addins\DittoUtil.dll

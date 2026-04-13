@@ -1,5 +1,5 @@
 #include "StdAfx.h"
-#include ".\pasteimageashtmlimage.h"
+#include "pasteimageashtmlimage.h"
 #include "../../shared/TextConvert.h"
 
 CString g_csDIBImagePath = _T("");
@@ -106,39 +106,54 @@ bool CPasteImageAsHtmlImage::ConvertPathToHtmlImageTag(const CDittoInfo &DittoIn
 bool CPasteImageAsHtmlImage::WriteDataToFile(CString csPath, LPVOID data, ULONG size)
 {
 	bool bRet = false;
-	CFile file;
-	CFileException ex;
-	if(file.Open(csPath, CFile::modeCreate|CFile::modeWrite|CFile::typeBinary, &ex))
+	BITMAPINFO *lpBI = (BITMAPINFO *)data;
+
+	int nPaletteEntries = 1 << lpBI->bmiHeader.biBitCount;
+	if(lpBI->bmiHeader.biBitCount > 8)
+		nPaletteEntries = 0;
+	else if( lpBI->bmiHeader.biClrUsed != 0 )
+		nPaletteEntries = lpBI->bmiHeader.biClrUsed;
+
+	BITMAPFILEHEADER BFH;
+	memset(&BFH, 0, sizeof( BITMAPFILEHEADER));
+	BFH.bfType = 'MB';
+	BFH.bfSize = sizeof(BITMAPFILEHEADER) + size;
+	BFH.bfOffBits = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + nPaletteEntries * sizeof(RGBQUAD);
+
+	HANDLE hFile = ::CreateFile(csPath, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	if(hFile != INVALID_HANDLE_VALUE)
 	{
-		BITMAPINFO *lpBI = (BITMAPINFO *)data;
-
-		int nPaletteEntries = 1 << lpBI->bmiHeader.biBitCount;
-		if(lpBI->bmiHeader.biBitCount > 8)
-			nPaletteEntries = 0;
-		else if( lpBI->bmiHeader.biClrUsed != 0 )
-			nPaletteEntries = lpBI->bmiHeader.biClrUsed;
-
-		BITMAPFILEHEADER BFH;
-		memset(&BFH, 0, sizeof( BITMAPFILEHEADER));
-		BFH.bfType = 'MB';
-		BFH.bfSize = sizeof(BITMAPFILEHEADER) + size;
-		BFH.bfOffBits = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + nPaletteEntries * sizeof(RGBQUAD);
-
-		file.Write(&BFH, sizeof(BITMAPFILEHEADER));
-		file.Write(data, size);
-
-		file.Close();
-
-		bRet = true;
+		DWORD written = 0;
+		BOOL headerWritten = ::WriteFile(hFile, &BFH, sizeof(BITMAPFILEHEADER), &written, NULL);
+		headerWritten = headerWritten && (written == sizeof(BITMAPFILEHEADER));
+		written = 0;
+		BOOL dataWritten = ::WriteFile(hFile, data, size, &written, NULL);
+		dataWritten = dataWritten && (written == size);
+		::CloseHandle(hFile);
+		bRet = (headerWritten && dataWritten) ? true : false;
 	}
 	else
 	{
+		DWORD dwErr = ::GetLastError();
 		CString csError;
-		TCHAR exError[250];
-		ex.GetErrorMessage(exError, sizeof(exError));
-
-		csError.Format(_T("OutLookExpress Addin - Failed to write CF_DIB to file: %s, Error: %s"), csPath, exError);
-		OutputDebugString(csPath);
+		LPVOID lpMsgBuf = NULL;
+		FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+			NULL,
+			dwErr,
+			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+			(LPTSTR)&lpMsgBuf,
+			0,
+			NULL);
+		if(lpMsgBuf)
+		{
+			csError.Format(_T("Failed to write CF_DIB to file: %s, Error: %s"), csPath, (LPCTSTR)lpMsgBuf);
+			::LocalFree(lpMsgBuf);
+		}
+		else
+		{
+			csError.Format(_T("Failed to write CF_DIB to file: %s, Error: %lu"), csPath, dwErr);
+		}
+		ATLTRACE(_T("%s\n"), csError.GetString());
 	}
 
 	return bRet;
@@ -152,19 +167,27 @@ bool CPasteImageAsHtmlImage::CleanupPastedImages()
 		CreateLocalPath(false);
 	}
 
-	CFileFind find;
-	BOOL bCont = find.FindFile(g_csDIBImagePath + _T("\\*"));
-
-	while(bCont)
+	WIN32_FIND_DATA findData = {0};
+	CString searchPath = g_csDIBImagePath + _T("\\*");
+	HANDLE hFind = ::FindFirstFile(searchPath, &findData);
+	if(hFind != INVALID_HANDLE_VALUE)
 	{
-		bCont = find.FindNextFile();
-		DeleteFile(find.GetFilePath());
+		do
+		{
+			if((findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0)
+			{
+				CString filePath = g_csDIBImagePath + _T("\\") + findData.cFileName;
+				::DeleteFile(filePath);
+			}
+		}
+		while(::FindNextFile(hFind, &findData));
+
+		::FindClose(hFind);
 	}
-	find.Close();
 
-	bRet = RemoveDirectory(g_csDIBImagePath) == TRUE;
+	bRet = (::RemoveDirectory(g_csDIBImagePath) != FALSE);
 
-	return false;;
+	return bRet;
 }
 
 void CPasteImageAsHtmlImage::CreateLocalPath(bool bCreateDir)

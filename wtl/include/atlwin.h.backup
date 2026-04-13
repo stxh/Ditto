@@ -1,0 +1,274 @@
+// Windows Template Library
+// WTL - Windows Template Library
+// Copyright (C) Microsoft Corporation, WTL Team
+// All rights reserved.
+//
+// This file is a part of the Windows Template Library.
+// The use and distribution terms for this software are covered by the
+// Common Public License 1.0 (http://opensource.org/licenses/cpl1.0.php)
+// which can be found in the file CPL.TXT at the root of this distribution.
+// By using this software in any fashion, you are agreeing to be bound by
+// the terms of this license. You must not remove this notice, or
+// any other, from this software.
+
+#ifndef __ATLWIN_H__
+#define __ATLWIN_H__
+
+#pragma once
+
+#ifndef __cplusplus
+	#error ATL requires C++ compilation (use a .cpp suffix)
+#endif
+
+#include <atlbase.h>
+#include <atlapp.h>
+
+namespace WTL
+{
+
+// Basic window class
+template <class T>
+class CWindowImplRoot
+{
+public:
+	HWND m_hWnd;
+
+	CWindowImplRoot() : m_hWnd(NULL) { }
+
+	HWND Create(HWND hWndParent, RECT& rcPos, LPCTSTR szWindowName, 
+		DWORD dwStyle, DWORD dwExStyle, UINT nID)
+	{
+		return NULL;
+	}
+
+	BOOL DestroyWindow()
+	{
+		if(m_hWnd == NULL)
+			return FALSE;
+
+		BOOL bRet = ::DestroyWindow(m_hWnd);
+		if(bRet)
+			m_hWnd = NULL;
+		return bRet;
+	}
+
+	operator HWND() const { return m_hWnd; }
+};
+
+// Window implementation base
+template <class T, class TBase = CWindowImplRoot<T>, class TWinTraits = CControlWinTraits>
+class CWindowImpl : public TBase, public CMessageMap
+{
+public:
+	DECLARE_WND_CLASS(NULL)
+
+	virtual BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, 
+		LRESULT& lResult, DWORD dwMsgMapID = 0)
+	{
+		T* pThis = static_cast<T*>(this);
+		DWORD dwRet = pThis->ProcessWindowMessage(hWnd, uMsg, wParam, lParam, lResult, dwMsgMapID);
+		return dwRet;
+	}
+};
+
+// Frame window implementation
+template <class T, class TBase = CWindow, class TWinTraits = CFrameWinTraits>
+class CFrameWindowImpl : public CWindowImpl<T, TBase, TWinTraits>
+{
+public:
+	DECLARE_FRAME_WND_CLASS(NULL, 0)
+
+	BEGIN_MSG_MAP(CFrameWindowImpl)
+		MESSAGE_HANDLER(WM_CREATE, OnCreate)
+		MESSAGE_HANDLER(WM_DESTROY, OnDestroy)
+	END_MSG_MAP()
+
+	LRESULT OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+	{
+		return 0;
+	}
+
+	LRESULT OnDestroy(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+	{
+		PostQuitMessage(0);
+		return 0;
+	}
+};
+
+// Dialog implementation
+template <class T>
+class CDialogImpl : public CWindowImpl<T>
+{
+public:
+	const WORD m_lpDialogTemplate;
+
+	CDialogImpl() : m_lpDialogTemplate(0) { }
+
+	BOOL EndDialog(int nRetCode)
+	{
+		ATLASSERT(::IsWindow(m_hWnd));
+		return ::EndDialog(m_hWnd, nRetCode);
+	}
+
+	BEGIN_MSG_MAP(CDialogImpl)
+		MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
+		MESSAGE_HANDLER(WM_CLOSE, OnClose)
+	END_MSG_MAP()
+
+	LRESULT OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+	{
+		return TRUE;
+	}
+
+	LRESULT OnClose(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+	{
+		EndDialog(IDCANCEL);
+		return 0;
+	}
+};
+
+// Property sheet implementation
+template <class T>
+class CPropertySheetImpl : public CWindowImpl<T>
+{
+public:
+	CPropertySheetImpl() { }
+
+	void AddPage(HPROPSHEETPAGE hPage) { }
+	void SetTitle(LPCTSTR lpszText) { }
+};
+
+// Property page implementation
+template <class T>
+class CPropertyPageImpl : public CDialogImpl<T>
+{
+public:
+	BEGIN_MSG_MAP(CPropertyPageImpl)
+		MESSAGE_HANDLER(WM_NOTIFY, OnNotify)
+		CHAIN_MSG_MAP(CDialogImpl<T>)
+	END_MSG_MAP()
+
+	LRESULT OnNotify(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+	{
+		return 0;
+	}
+};
+
+}; // namespace WTL
+
+using namespace WTL;
+
+// Message map macros
+#define BEGIN_MSG_MAP(theClass) \
+public: \
+	BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID = 0) \
+	{ \
+		BOOL bHandled = TRUE; \
+		(hWnd); (uMsg); (wParam); (lParam); (lResult); (bHandled); \
+		switch(dwMsgMapID) \
+		{ \
+		case 0:
+
+#define END_MSG_MAP() \
+			break; \
+		default: \
+			ATLTRACE(ATL::atlTraceWindowing, 0, _T("Invalid message map ID (%i)\n"), dwMsgMapID); \
+			ATLASSERT(FALSE); \
+			break; \
+		} \
+		return FALSE; \
+	}
+
+#define MESSAGE_HANDLER(msg, func) \
+	if(uMsg == msg) \
+	{ \
+		bHandled = TRUE; \
+		lResult = func(uMsg, wParam, lParam, bHandled); \
+		if(bHandled) \
+			return TRUE; \
+	}
+
+#define MSG_WM_CREATE(func) \
+	MESSAGE_HANDLER(WM_CREATE, func)
+
+#define MSG_WM_DESTROY(func) \
+	MESSAGE_HANDLER(WM_DESTROY, func)
+
+#define MSG_WM_CLOSE(func) \
+	MESSAGE_HANDLER(WM_CLOSE, func)
+
+#define MSG_WM_INITDIALOG(func) \
+	MESSAGE_HANDLER(WM_INITDIALOG, func)
+
+#define MSG_WM_TIMER(func) \
+	MESSAGE_HANDLER(WM_TIMER, func)
+
+#define COMMAND_ID_HANDLER(id, func) \
+	if(uMsg == WM_COMMAND && id == LOWORD(wParam)) \
+	{ \
+		bHandled = TRUE; \
+		lResult = func(HIWORD(wParam), LOWORD(wParam), (HWND)lParam); \
+		if(bHandled) \
+			return TRUE; \
+	}
+
+#define COMMAND_ID_HANDLER_EX(id, func) \
+	if(uMsg == WM_COMMAND && id == LOWORD(wParam)) \
+	{ \
+		bHandled = TRUE; \
+		func(HIWORD(wParam), LOWORD(wParam), (HWND)lParam); \
+		if(bHandled) \
+			return TRUE; \
+	}
+
+#define NOTIFY_HANDLER(id, cd, func) \
+	if(uMsg == WM_NOTIFY && id == ((LPNMHDR)lParam)->idFrom && cd == ((LPNMHDR)lParam)->code) \
+	{ \
+		bHandled = TRUE; \
+		lResult = func((int)wParam, (LPNMHDR)lParam, bHandled); \
+		if(bHandled) \
+			return TRUE; \
+	}
+
+#define NOTIFY_HANDLER_EX(id, cd, func) \
+	if(uMsg == WM_NOTIFY && id == ((LPNMHDR)lParam)->idFrom && cd == ((LPNMHDR)lParam)->code) \
+	{ \
+		bHandled = TRUE; \
+		func((int)wParam, (LPNMHDR)lParam); \
+		if(bHandled) \
+			return TRUE; \
+	}
+
+#define CHAIN_MSG_MAP(theChainClass) \
+	{ \
+		BOOL bOldHandled = bHandled; \
+		lResult = theChainClass::ProcessWindowMessage(hWnd, uMsg, wParam, lParam, lResult, 0); \
+		bHandled = bHandled || bOldHandled; \
+		if(bHandled) \
+			return TRUE; \
+	}
+
+// Window class macros
+#define DECLARE_WND_CLASS(WndClassName) \
+	static ATL::CWndClassInfo& GetWndClassInfo() \
+	{ \
+		static ATL::CWndClassInfo wc = { \
+			{ sizeof(WNDCLASSEX), 0, StartWindowProc, \
+			  0, 0, NULL, NULL, NULL, (HBRUSH)(COLOR_WINDOW + 1), NULL, WndClassName, NULL }, \
+			NULL, NULL, IDC_ARROW, TRUE, 0, _T("") \
+		}; \
+		return wc; \
+	}
+
+#define DECLARE_FRAME_WND_CLASS(WndClassName, style) \
+	static ATL::CWndClassInfo& GetWndClassInfo() \
+	{ \
+		static ATL::CWndClassInfo wc = { \
+			{ sizeof(WNDCLASSEX), CS_HREDRAW | CS_VREDRAW | style, StartWindowProc, \
+			  0, 0, NULL, NULL, NULL, (HBRUSH)(COLOR_WINDOW + 1), NULL, WndClassName, NULL }, \
+			NULL, NULL, IDC_ARROW, TRUE, 0, _T("") \
+		}; \
+		return wc; \
+	}
+
+#endif // __ATLWIN_H__

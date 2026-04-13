@@ -1,34 +1,16 @@
-// OptionsQuickPaste.cpp : implementation file
-//
-
 #include "stdafx.h"
 #include "CP_Main.h"
 #include "OptionsQuickPaste.h"
 #include ".\optionsquickpaste.h"
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
 #define DEFAULT_THEME _T("(Default)")
 
-/////////////////////////////////////////////////////////////////////////////
-// COptionsQuickPaste property page
-
-IMPLEMENT_DYNCREATE(COptionsQuickPaste, CPropertyPage)
-
-COptionsQuickPaste::COptionsQuickPaste() : CPropertyPage(COptionsQuickPaste::IDD)
+COptionsQuickPaste::COptionsQuickPaste()
 {
 	m_csTitle = theApp.m_Language.GetString("QuickPasteTitle", "Quick Paste");
 	m_psp.pszTitle = m_csTitle;
-	m_psp.dwFlags |= PSP_USETITLE; 
-
-	//{{AFX_DATA_INIT(COptionsQuickPaste)
-		// NOTE: the ClassWizard will add member initialization here
-	//}}AFX_DATA_INIT
-
+	m_psp.dwFlags |= PSP_USETITLE;
+	m_pParent = NULL;
 	memset(&m_LogFont, 0, sizeof(LOGFONT));
 }
 
@@ -37,47 +19,26 @@ COptionsQuickPaste::~COptionsQuickPaste()
 	m_Font.DeleteObject();
 }
 
-void COptionsQuickPaste::DoDataExchange(CDataExchange* pDX)
+LRESULT COptionsQuickPaste::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) 
 {
-	CPropertyPage::DoDataExchange(pDX);
-	//{{AFX_DATA_MAP(COptionsQuickPaste)
-	DDX_Control(pDX, IDC_CHECK_ENTIRE_WINDOW_IS_VISIBLE, m_EnsureEntireWindowVisible);
-	DDX_Control(pDX, IDC_CHECK_SHOW_ALL_IN_MAIN_LIST, m_ShowAllInMainList);
-	DDX_Control(pDX, IDC_CHECK_FIND_AS_YOU_TYPE, m_FindAsYouType);
-	DDX_Control(pDX, IDC_DRAW_RTF, m_btDrawRTF);
-	DDX_Control(pDX, IDC_SHOW_THUMBNAILS, m_btShowThumbnails);
-	DDX_Control(pDX, IDC_BUTTON_DEFAULT_FAULT, m_btDefaultButton);
-	DDX_Control(pDX, IDC_BUTTON_FONT, m_btFont);
-	DDX_Control(pDX, IDC_SHOW_TEXT_FOR_FIRST_TEN_HOT_KEYS, m_btShowText);
-	DDX_Control(pDX, IDC_LINES_ROW, m_eLinesPerRow);
-	DDX_Control(pDX, IDC_TRANS_PERC, m_eTransparencyPercent);
-	DDX_Control(pDX, IDC_TRANSPARENCY, m_btEnableTransparency);
-	DDX_Control(pDX, IDC_DESC_SHOW_LEADING_WHITESPACE, m_btDescShowLeadingWhiteSpace);
-	//}}AFX_DATA_MAP
-	DDX_Control(pDX, IDC_CHECK_PROMPT_DELETE_CLIP, m_PromptForDelete);
-	DDX_Control(pDX, IDC_COMBO_THEME, m_cbTheme);
-	DDX_Control(pDX, IDC_CHECK_SHOW_SCROLL_BAR, m_alwaysShowScrollBar);
-	DDX_Control(pDX, IDC_CHECK_ELEVATE_PRIVILEGES, m_elevatedPrivileges);
-	DDX_Control(pDX, IDC_CHECK_SHOW_IN_TASKBAR, m_showInTaskBar);
-	DDX_Control(pDX, IDC_EDIT_DIFF_PATH, m_diffPathEditBox);
-}
-
-
-BEGIN_MESSAGE_MAP(COptionsQuickPaste, CPropertyPage)
-	//{{AFX_MSG_MAP(COptionsQuickPaste)
-	ON_BN_CLICKED(IDC_BUTTON_FONT, OnButtonFont)
-	ON_BN_CLICKED(IDC_BUTTON_DEFAULT_FAULT, OnButtonDefaultFault)
-	//}}AFX_MSG_MAP
-	ON_BN_CLICKED(IDC_BUTTON_THEME, OnBnClickedButtonTheme)
-	ON_BN_CLICKED(IDC_BUTTON_DIFF_BROWSE, &COptionsQuickPaste::OnBnClickedButtonDiffBrowse)
-END_MESSAGE_MAP()
-
-/////////////////////////////////////////////////////////////////////////////
-// COptionsQuickPaste message handlers
-
-BOOL COptionsQuickPaste::OnInitDialog() 
-{
-	CPropertyPage::OnInitDialog();
+	m_EnsureEntireWindowVisible.Attach(GetDlgItem(IDC_CHECK_ENTIRE_WINDOW_IS_VISIBLE));
+	m_ShowAllInMainList.Attach(GetDlgItem(IDC_CHECK_SHOW_ALL_IN_MAIN_LIST));
+	m_FindAsYouType.Attach(GetDlgItem(IDC_CHECK_FIND_AS_YOU_TYPE));
+	m_btDrawRTF.Attach(GetDlgItem(IDC_DRAW_RTF));
+	m_btShowThumbnails.Attach(GetDlgItem(IDC_SHOW_THUMBNAILS));
+	m_btDefaultButton.Attach(GetDlgItem(IDC_BUTTON_DEFAULT_FAULT));
+	m_btFont.Attach(GetDlgItem(IDC_BUTTON_FONT));
+	m_btShowText.Attach(GetDlgItem(IDC_SHOW_TEXT_FOR_FIRST_TEN_HOT_KEYS));
+	m_eLinesPerRow.Attach(GetDlgItem(IDC_LINES_ROW));
+	m_eTransparencyPercent.Attach(GetDlgItem(IDC_TRANS_PERC));
+	m_btEnableTransparency.Attach(GetDlgItem(IDC_TRANSPARENCY));
+	m_btDescShowLeadingWhiteSpace.Attach(GetDlgItem(IDC_DESC_SHOW_LEADING_WHITESPACE));
+	m_PromptForDelete.Attach(GetDlgItem(IDC_CHECK_PROMPT_DELETE_CLIP));
+	m_cbTheme.Attach(GetDlgItem(IDC_COMBO_THEME));
+	m_alwaysShowScrollBar.Attach(GetDlgItem(IDC_CHECK_SHOW_SCROLL_BAR));
+	m_elevatedPrivileges.Attach(GetDlgItem(IDC_CHECK_ELEVATE_PRIVILEGES));
+	m_showInTaskBar.Attach(GetDlgItem(IDC_CHECK_SHOW_IN_TASKBAR));
+	m_diffPathEditBox.Attach(GetDlgItem(IDC_EDIT_DIFF_PATH));
 
 	m_pParent = (COptionsSheet *)GetParent();
 	
@@ -130,10 +91,10 @@ BOOL COptionsQuickPaste::OnInitDialog()
 
 	theApp.m_Language.UpdateOptionQuickPaste(this);
 		
-	return FALSE;
+	return 0;
 }
 
-BOOL COptionsQuickPaste::OnApply() 
+int COptionsQuickPaste::OnApply() 
 {
 	CGetSetOptions::SetEnableTransparency(m_btEnableTransparency.GetCheck());
 	CGetSetOptions::SetTransparencyPercent(m_eTransparencyPercent.GetNumber());
@@ -202,10 +163,10 @@ BOOL COptionsQuickPaste::OnApply()
 	else
 		CGetSetOptions::SetShowIfClipWasPasted(FALSE);
 	
-	return CPropertyPage::OnApply();
+	return PSNRET_NOERROR;
 }
 
-void COptionsQuickPaste::OnButtonFont() 
+LRESULT COptionsQuickPaste::OnButtonFont(WORD, WORD, HWND, BOOL&) 
 {
 	CFontDialog dlg(&m_LogFont, (CF_TTONLY | CF_SCREENFONTS), 0, this);
 	if(dlg.DoModal() == IDOK)
@@ -222,9 +183,10 @@ void COptionsQuickPaste::OnButtonFont()
 		cs.Format(_T("Font - %s"), m_LogFont.lfFaceName);
 		m_btFont.SetWindowText(cs);
 	}
+	return 0;
 }
 
-void COptionsQuickPaste::OnButtonDefaultFault() 
+LRESULT COptionsQuickPaste::OnButtonDefaultFault(WORD, WORD, HWND, BOOL&) 
 {
 	CFont *ft =	m_btDefaultButton.GetFont();
 	ft->GetLogFont(&m_LogFont);
@@ -244,6 +206,7 @@ void COptionsQuickPaste::OnButtonDefaultFault()
 	CString cs;
 	cs.Format(_T("Font - %s"), m_LogFont.lfFaceName);
 	m_btFont.SetWindowText(cs);
+	return 0;
 }	
 
 void COptionsQuickPaste::FillThemes()
@@ -284,7 +247,7 @@ void COptionsQuickPaste::FillThemes()
 	}
 }
 
-void COptionsQuickPaste::OnBnClickedButtonTheme()
+LRESULT COptionsQuickPaste::OnBnClickedButtonTheme(WORD, WORD, HWND, BOOL&)
 {
 	CTheme theme;
 
@@ -292,7 +255,7 @@ void COptionsQuickPaste::OnBnClickedButtonTheme()
 	m_cbTheme.GetLBText(m_cbTheme.GetCurSel(), csTheme);
 
 	if(csTheme == DEFAULT_THEME)
-		return;
+		return 0;
 	
 	if(theme.Load(csTheme, true, false))
 	{
@@ -315,14 +278,15 @@ void COptionsQuickPaste::OnBnClickedButtonTheme()
 
 		MessageBox(csError, _T("Ditto"), MB_OK);
 	}
+	return 0;
 }
 
 
-void COptionsQuickPaste::OnBnClickedButtonDiffBrowse()
+LRESULT COptionsQuickPaste::OnBnClickedButtonDiffBrowse(WORD, WORD, HWND, BOOL&)
 {
-	OPENFILENAME	FileName;
-	TCHAR			szFileName[400];
-	TCHAR			szDir[400];
+	OPENFILENAME FileName;
+	TCHAR szFileName[400];
+	TCHAR szDir[400];
 
 	memset(&FileName, 0, sizeof(FileName));
 	memset(szFileName, 0, sizeof(szFileName));
@@ -338,9 +302,10 @@ void COptionsQuickPaste::OnBnClickedButtonDiffBrowse()
 	FileName.hwndOwner = m_hWnd;
 
 	if(GetOpenFileName(&FileName) == 0)
-		return;
+		return 0;
 
 	CString csPath(FileName.lpstrFile);
 
 	m_diffPathEditBox.SetWindowText(csPath);
+	return 0;
 }
