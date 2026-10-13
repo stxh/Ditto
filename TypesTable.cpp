@@ -14,7 +14,6 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CTypesTable
 
-IMPLEMENT_DYNAMIC(CTypesTable, CDaoRecordset)
 
 CTypesTable::CTypesTable(CDaoDatabase* pdb)
 	: CDaoRecordset(pdb)

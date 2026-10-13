@@ -31,7 +31,7 @@ public:
 	CString Save();
 	void Load(CString values);
 	CString GetScript(CString name, BOOL &active);	
-	void AddToMenu(CMenu *pMenu, CAccels *actions);
+	void AddToMenu(CMenuHandle *pMenu, CAccels *actions);
 
 	std::vector<CDittoChaiScriptXmlItem> m_list;
 	bool m_assignedGuidOnLoad;

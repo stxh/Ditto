@@ -5,7 +5,6 @@
 // Test class to verify WTL thread functionality
 class CTestThread : public WTL::CWinThread
 {
-    DECLARE_DYNCREATE(CTestThread)
 
 public:
     CTestThread() {}
@@ -39,7 +38,6 @@ public:
     }
 };
 
-IMPLEMENT_DYNCREATE(CTestThread, WTL::CWinThread)
 
 // Simple test function
 bool TestWTLThread()

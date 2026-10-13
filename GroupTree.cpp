@@ -20,7 +20,7 @@ CGroupTree::CGroupTree()
 	m_bHide = true;
 	m_selectedFolderID = -1;
 	m_bSendAllready = false;
-	m_showRightClickMenu = false;	
+	m_showRightClickMenu = false;
 }
 
 CGroupTree::~CGroupTree()
@@ -28,53 +28,22 @@ CGroupTree::~CGroupTree()
 }
 
 
-BEGIN_MESSAGE_MAP(CGroupTree, CTreeCtrl)
-	//{{AFX_MSG_MAP(CGroupTree)
-	ON_WM_CREATE()
-	ON_NOTIFY_REFLECT(TVN_SELCHANGED, OnSelchanged)
-	ON_NOTIFY_REFLECT(NM_RCLICK, OnRclickQuickPaste)
-	ON_WM_KILLFOCUS()
-	ON_WM_ACTIVATE()
-	ON_NOTIFY_REFLECT(NM_DBLCLK, OnDblclk)
-	ON_NOTIFY_REFLECT(TVN_KEYDOWN, OnKeydown)
-	ON_WM_RBUTTONDOWN()
-	//}}AFX_MSG_MAP
-	ON_COMMAND(ID_MENU_NEWGROUP32896, &CGroupTree::OnMenuNewgroup32896)
-	ON_COMMAND(ID_MENU_DELETEGROUP, &CGroupTree::OnMenuDeletegroup)
-	ON_COMMAND(ID_MENU_PROPERTIES32898, &CGroupTree::OnMenuProperties32898)
-	ON_UPDATE_COMMAND_UI(ID_MENU_NEWGROUP32896, &CGroupTree::OnUpdateMenuNewgroup32896)
-	ON_UPDATE_COMMAND_UI(ID_MENU_DELETEGROUP, &CGroupTree::OnUpdateMenuDeletegroup)
-	ON_UPDATE_COMMAND_UI(ID_MENU_PROPERTIES32898, &CGroupTree::OnUpdateMenuProperties32898)
-	ON_WM_INITMENUPOPUP() 
-END_MESSAGE_MAP()
-
-
 /////////////////////////////////////////////////////////////////////////////
 // CGroupTree message handlers
 
-BOOL CGroupTree::Create(LPCTSTR lpszClassName, LPCTSTR lpszWindowName, DWORD dwStyle, const RECT& rect, CWnd* pParentWnd, UINT nID, CCreateContext* pContext) 
+int CGroupTree::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
-	// TODO: Add your specialized code here and/or call the base class
-	
-	return CWnd::Create(lpszClassName, lpszWindowName, dwStyle, rect, pParentWnd, nID, pContext);
-}
-
-int CGroupTree::OnCreate(LPCREATESTRUCT lpCreateStruct) 
-{
-	if (CTreeCtrl::OnCreate(lpCreateStruct) == -1)
-		return -1;
-
 	CImageList iml;
 	iml.Create(18, 16, ILC_COLOR | ILC_MASK, 0, 1);
 
 	m_bmClosedFolder.LoadBitmap(IDB_CLOSED_FOLDER);
-	iml.Add(&m_bmClosedFolder, RGB(255, 0, 0));
+	iml.Add(m_bmClosedFolder, RGB(255, 0, 0));
 
 	m_bmOpenFolder.LoadBitmap(IDB_CLOSED_FOLDER);
-	iml.Add(&m_bmOpenFolder, RGB(255, 0, 0));
+	iml.Add(m_bmOpenFolder, RGB(255, 0, 0));
 	
 
-	SetImageList(&iml, TVSIL_NORMAL);
+	SetImageList(iml, TVSIL_NORMAL);
 	iml.Detach();
 
 	m_actions.AddAccel(ActionEnums::NEWGROUP, ACCEL_MAKEKEY(VK_F7, HOTKEYF_CONTROL));
@@ -93,7 +62,7 @@ BOOL CGroupTree::PreTranslateMessage(MSG *pMsg)
 		return TRUE;
 	}
 
-	return CTreeCtrl::PreTranslateMessage(pMsg);
+	return FALSE;
 }
 
 bool CGroupTree::CheckActions(MSG * pMsg) 
@@ -181,7 +150,7 @@ void CGroupTree::FillTree()
 	DeleteAllItems();
 	m_bSendAllready = false;
 
-	HTREEITEM hItem = InsertItem(_T("-No Group-"), TVI_ROOT);
+	HTREEITEM hItem = InsertItem(_T("-No Group-"), TVI_ROOT, TVI_LAST);
 	SetItemData(hItem, -1);
 
 	SetItemState(hItem, TVIS_EXPANDED, TVIS_EXPANDED);
@@ -207,12 +176,12 @@ void CGroupTree::FillTree(int parentID, HTREEITEM hParent)
 			{
 				if(q.getIntField(_T("lID")) == m_selectedFolderID)
 				{
-					hItem = InsertItem(q.getStringField(_T("mText")), 1, 1, hParent);
+					hItem = InsertItem(q.getStringField(_T("mText")), 1, 1, hParent, TVI_LAST);
 					SelectItem(hItem);
 				}
 				else
 				{				
-					hItem = InsertItem(q.getStringField(_T("mText")), 0, 0, hParent);
+					hItem = InsertItem(q.getStringField(_T("mText")), 0, 0, hParent, TVI_LAST);
 				}
 
 				SetItemData(hItem, q.getIntField(_T("lID")));
@@ -226,44 +195,64 @@ void CGroupTree::FillTree(int parentID, HTREEITEM hParent)
 	CATCH_SQLITE_EXCEPTION	
 }
 
-void CGroupTree::OnSelchanged(NMHDR* pNMHDR, LRESULT* pResult) 
+LRESULT CGroupTree::OnReflectNotify(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
-	// TODO: Add your control notification handler code here
-	
-//	if(m_bHide == true)
-//	{	
-//		::SendMessage(m_NotificationWnd, NM_GROUP_TREE_MESSAGE, GetItemData(pNMTreeView->itemNew.hItem), 0);
-//	}
-	
-	//*pResult = 0;
+	LPNMHDR pNMHDR = (LPNMHDR)lParam;
+
+	switch (pNMHDR->code)
+	{
+	case TVN_KEYDOWN:
+		{
+			TV_KEYDOWN* pTVKeyDown = (TV_KEYDOWN*)pNMHDR;
+			
+			switch(pTVKeyDown->wVKey)
+			{
+			case VK_RETURN:
+			{
+				HTREEITEM hItem = GetNextItem(TVI_ROOT, TVGN_CARET);
+				if(hItem)
+					SendToParent((int)GetItemData(hItem));
+				
+				break;
+			}
+			case VK_ESCAPE:
+				SendToParent(-1);
+				break;
+			}
+			
+			break;
+		}
+	case NM_DBLCLK:
+		{
+			HTREEITEM hItem = GetNextItem(TVI_ROOT, TVGN_CARET);
+			if(hItem)
+				SendToParent((int)GetItemData(hItem));
+			
+			break;
+		}
+	case NM_RCLICK:
+		ShowGroupMenu();
+		break;
+	default:
+		bHandled = FALSE;
+		break;
+	}
+
+	return 0;
 }
 
-void CGroupTree::OnKillFocus(CWnd* pNewWnd) 
+LRESULT CGroupTree::OnActivate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	CTreeCtrl::OnKillFocus(pNewWnd);
-}
-
-void CGroupTree::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized) 
-{
-	CTreeCtrl::OnActivate(nState, pWndOther, bMinimized);
-	
 	if(m_bHide)
 	{
-		if (nState == WA_INACTIVE)
-		{		
+		if (wParam == WA_INACTIVE)
+		{
 			SendToParent(-1);
 		}
 	}
-}
 
-void CGroupTree::OnDblclk(NMHDR* pNMHDR, LRESULT* pResult) 
-{
-	HTREEITEM hItem =  GetNextItem(TVI_ROOT, TVGN_CARET);
-	if(hItem)
-		SendToParent((int)GetItemData(hItem));
-			
-	*pResult = 1;
+	bHandled = FALSE;
+	return 0;
 }
 
 int CGroupTree::GetSelectedTree()
@@ -273,30 +262,6 @@ int CGroupTree::GetSelectedTree()
 		return (int)GetItemData(hItem);
 
 	return -1;
-}
-
-void CGroupTree::OnKeydown(NMHDR* pNMHDR, LRESULT* pResult) 
-{
-	TV_KEYDOWN* pTVKeyDown = (TV_KEYDOWN*)pNMHDR;
-	
-	switch(pTVKeyDown->wVKey)
-	{
-	case VK_RETURN:
-	{	
-		HTREEITEM hItem =  GetNextItem(TVI_ROOT, TVGN_CARET);
-		if(hItem)
-			SendToParent((int)GetItemData(hItem));
-		
-		break;
-	}
-	case VK_ESCAPE:
-	{	
-		SendToParent(-1);
-		break;
-	}	
-	}
-	
-	*pResult = 1;
 }
 
 
@@ -317,7 +282,7 @@ bool CGroupTree::AddNode(CString csText, int id)
 	if(hParent == NULL)
 		return false;
 		
-	hItem = InsertItem(csText, 1, 1, hParent);
+	hItem = InsertItem(csText, 1, 1, hParent, TVI_LAST);
 	SelectItem(hItem);
 
 	SetItemData(hItem, id);
@@ -325,8 +290,9 @@ bool CGroupTree::AddNode(CString csText, int id)
 	return true;
 }
 
-void CGroupTree::OnRButtonDown(UINT nFlags, CPoint point)
+LRESULT CGroupTree::OnRButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
+	CPoint point(LOWORD(lParam), HIWORD(lParam));
 	UINT nHitFlags = 0;
 	HTREEITEM hClickedItem = HitTest(point, &nHitFlags);
 
@@ -334,7 +300,8 @@ void CGroupTree::OnRButtonDown(UINT nFlags, CPoint point)
 		if (GetSelectedCount() < 2)
 			SelectItem(hClickedItem);
 
-	CTreeCtrl::OnRButtonDown(nFlags, point);
+	bHandled = FALSE;
+	return 0;
 }
 
 UINT CGroupTree::GetSelectedCount() const
@@ -348,86 +315,75 @@ UINT CGroupTree::GetSelectedCount() const
 	return uCount;
 }
 
-void CGroupTree::OnRclickQuickPaste(NMHDR *pNMHDR, LRESULT *pResult)
+void CGroupTree::ShowGroupMenu()
 {
 	if (m_showRightClickMenu == false)
-	{
-		*pResult = 0;
 		return;
-	}
+
 	POINT pp;
 	CMenu cmPopUp;
-	CMenu *cmSubMenu = NULL;
+	CMenuHandle cmSubMenu;
 
 	GetCursorPos(&pp);
 	if (cmPopUp.LoadMenu(IDR_MENU_GROUPS) != 0)
 	{
 		cmSubMenu = cmPopUp.GetSubMenu(0);
-		if (!cmSubMenu)
-		{
+		if (cmSubMenu.IsNull())
 			return;
-		}
 
 		theApp.m_Language.UpdateGroupsRightClickMenu(cmSubMenu);
 		
-		cmSubMenu->TrackPopupMenu(TPM_LEFTALIGN | TPM_TOPALIGN | TPM_RIGHTBUTTON, pp.x, pp.y, this, NULL);
+		cmSubMenu.TrackPopupMenu(TPM_LEFTALIGN | TPM_TOPALIGN | TPM_RIGHTBUTTON, pp.x, pp.y, m_hWnd, NULL);
 	}
-
-	*pResult = 0;
 }
 
-void CGroupTree::OnMenuNewgroup32896()
+LRESULT CGroupTree::OnMenuNewgroup32896(WORD wID, WORD wNotifyCode, HWND hWnd, BOOL& bHandled)
 {
 	DoAction(ActionEnums::NEWGROUP);
+	return 0;
 }
 
-
-void CGroupTree::OnMenuDeletegroup()
+LRESULT CGroupTree::OnMenuDeletegroup(WORD wID, WORD wNotifyCode, HWND hWnd, BOOL& bHandled)
 {
 	DoAction(ActionEnums::DELETE_SELECTED);
+	return 0;
 }
 
-void CGroupTree::OnMenuProperties32898()
+LRESULT CGroupTree::OnMenuProperties32898(WORD wID, WORD wNotifyCode, HWND hWnd, BOOL& bHandled)
 {
 	DoAction(ActionEnums::CLIP_PROPERTIES);
+	return 0;
 }
 
-void CGroupTree::OnUpdateMenuNewgroup32896(CCmdUI *pCmdUI)
+void CGroupTree::UpdateMenuShortCut(HMENU hMenu, DWORD action, UINT nID)
 {
-	UpdateMenuShortCut(pCmdUI, ActionEnums::NEWGROUP);
-}
-
-void CGroupTree::OnUpdateMenuDeletegroup(CCmdUI *pCmdUI)
-{
-	UpdateMenuShortCut(pCmdUI, ActionEnums::DELETE_SELECTED);	
-}
-
-void CGroupTree::OnUpdateMenuProperties32898(CCmdUI *pCmdUI)
-{
-	UpdateMenuShortCut(pCmdUI, ActionEnums::CLIP_PROPERTIES);	
-}
-
-void CGroupTree::UpdateMenuShortCut(CCmdUI *pCmdUI, DWORD action)
-{
-	if(pCmdUI == NULL ||
-		pCmdUI->m_pMenu == NULL)
-	{
-		return;
-	}
-
-	CString cs;
-	pCmdUI->m_pMenu->GetMenuString(pCmdUI->m_nID, cs, MF_BYCOMMAND);
 	CString shortcutText = m_actions.GetCmdKeyText(action);
-	if(shortcutText != _T("") &&
-		cs.Find("\t" + shortcutText) < 0)
+	if(shortcutText.IsEmpty())
+		return;
+
+	CString needle(_T("\t"));
+	needle += shortcutText;
+
+	CMenuHandle menu(hMenu);
+	CString cs;
+	if(menu.GetMenuString(nID, cs, MF_BYCOMMAND) == 0)
+		return;
+
+	if(cs.Find(needle) < 0)
 	{
-		cs += "\t";
-		cs += shortcutText;
-		pCmdUI->SetText(cs);
+		cs += needle;
+		menu.ModifyMenu(nID, MF_BYCOMMAND | MF_STRING, nID, cs);
 	}
 }
 
-void CGroupTree::OnInitMenuPopup(CMenu *pPopupMenu, UINT nIndex,BOOL bSysMenu)
+LRESULT CGroupTree::OnInitMenuPopup(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	OnInitMenuPopupEx(pPopupMenu, nIndex, bSysMenu, this);
+	HMENU hMenu = (HMENU)wParam;
+
+	UpdateMenuShortCut(hMenu, ActionEnums::NEWGROUP, ID_MENU_NEWGROUP32896);
+	UpdateMenuShortCut(hMenu, ActionEnums::DELETE_SELECTED, ID_MENU_DELETEGROUP);
+	UpdateMenuShortCut(hMenu, ActionEnums::CLIP_PROPERTIES, ID_MENU_PROPERTIES32898);
+
+	bHandled = FALSE;
+	return 0;
 }

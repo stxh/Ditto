@@ -1,65 +1,33 @@
-#if !defined(AFX_GROUPSTATIC_H__C7039DB6_84EE_4622_8054_6DBA48FA21A9__INCLUDED_)
-#define AFX_GROUPSTATIC_H__C7039DB6_84EE_4622_8054_6DBA48FA21A9__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-// GroupStatic.h : header file
-//
 
-/////////////////////////////////////////////////////////////////////////////
-// CGroupStatic window
-
-class CGroupStatic : public CStatic
+class CGroupStatic : public ATL::CWindowImpl<CGroupStatic, CStatic>
 {
-// Construction
 public:
+	DECLARE_WND_SUPERCLASS(NULL, CStatic::GetWndClassName())
+
 	CGroupStatic();
 
-// Attributes
-public:
+	void SetTextColor(COLORREF color) { m_dwTextColor = color; }
+	void SetBkColor(COLORREF color) { m_dwBkColor = color; }
+	void SetFont(int nPointSize, LPCTSTR lpszFaceName, HDC hDC = NULL);
+	void SetFont(HFONT hFont, BOOL bRepaint = TRUE) { ::SendMessage(m_hWnd, WM_SETFONT, (WPARAM)hFont, MAKELPARAM(bRepaint, 0)); }
+	void SetToggleCursor(bool toggle) { m_toggleCursorToHand = toggle; }
 
-// Operations
-public:
-
-	void SetTextColor( COLORREF color )		{ m_dwTextColor = color;	}
-	void SetBkColor( COLORREF color )		{ m_dwBkColor = color;		}
-	void SetFont( int nPointSize, LPCTSTR lpszFaceName, CDC* pDC = NULL );
-	void SetFont(CFont *pFont)				{ CStatic::SetFont(pFont);		}
-	void SetToggleCursor(bool toggle)		{ m_toggleCursorToHand = toggle; }
-
-// Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CGroupStatic)
-	public:
-	virtual BOOL OnChildNotify(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pLResult);
-	//}}AFX_VIRTUAL
-
-// Implementation
-public:
 	virtual ~CGroupStatic();
 
 protected:
+
+	BEGIN_MSG_MAP_EX(CGroupStatic)
+		MESSAGE_HANDLER(OCM_CTLCOLORSTATIC, OnCtlColorStatic)
+		MESSAGE_HANDLER(WM_SETCURSOR, OnSetCursor)
+	END_MSG_MAP()
+
+	LRESULT OnCtlColorStatic(UINT message, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnSetCursor(UINT message, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+
 	COLORREF m_dwTextColor;
 	COLORREF m_dwBkColor;
-	CFont*   m_pFont;
+	CFont    m_font;
 	CBrush   m_brush;
-	CString  m_strBuff;        // Holds the static controls contents before & after the control is displayed
-	bool m_toggleCursorToHand;
-
-
-	// Generated message map functions
-protected:
-	//{{AFX_MSG(CGroupStatic)
-	afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);
-	//}}AFX_MSG
-
-	DECLARE_MESSAGE_MAP()
+	bool     m_toggleCursorToHand;
 };
-
-/////////////////////////////////////////////////////////////////////////////
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
-
-#endif // !defined(AFX_GROUPSTATIC_H__C7039DB6_84EE_4622_8054_6DBA48FA21A9__INCLUDED_)

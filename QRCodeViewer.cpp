@@ -10,7 +10,6 @@
 
 // QRCodeViewer
 
-IMPLEMENT_DYNAMIC(QRCodeViewer, CWnd)
 
 QRCodeViewer::QRCodeViewer()
 {

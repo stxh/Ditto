@@ -81,8 +81,8 @@ BOOL CAlphaBlend::SetWindowHandle(HWND hWnd)
 
 BOOL CAlphaBlend::SetWindowHandle(CWnd *pWnd)
 {
-	if (pWnd && ::IsWindow(pWnd->GetSafeHwnd())) 
-		m_hWnd = pWnd->GetSafeHwnd();
+	if (pWnd && ::IsWindow(pWnd->m_hWnd)) 
+		m_hWnd = pWnd->m_hWnd;
 	else 
 		return false;
 	return true;

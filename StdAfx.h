@@ -28,6 +28,7 @@
 #include <atlbase.h>           // ATL base classes and smart pointers
 #include <atlwin.h>           // ATL window classes - REQUIRED for WTL compatibility
 #include <atlstr.h>           // ATL CString implementation
+#include <atlsync.h>          // ATL CCriticalSection/CEvent/CMutex
 #include <atltrace.h>         // ATL tracing support
 
 // Windows headers (before WTL to avoid conflicts)
@@ -37,12 +38,17 @@
 // WTL Compatibility Layer (imports core WTL headers)
 #include "wtl_compatibility.h"
 
+// Win32 file helpers used in place of MFC's CFile/CFileException/CFileFind
+#include "FileCompat.h"
+
+// Win32/COM helpers used in place of MFC's COleDataObject/COleDataSource
+#include "OleDataCompat.h"
+
 // Unicode support
 #include "UnicodeMacros.h"
 
 // RichEdit support
-#include "E:\PubCode\Ditto\Release64\riched20.tlh"
-//#import "riched20.dll" raw_interfaces_only, raw_native_types, no_namespace, named_guids, exclude("UINT_PTR"), exclude("LONG_PTR") 
+#import "riched20.dll" raw_interfaces_only, raw_native_types, no_namespace, named_guids, exclude("UINT_PTR"), exclude("LONG_PTR") 
 
 #pragma comment(linker, "/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 

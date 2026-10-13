@@ -89,7 +89,7 @@ LRESULT COptionsQuickPaste::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 
 	FillThemes();
 
-	theApp.m_Language.UpdateOptionQuickPaste(this);
+	theApp.m_Language.UpdateOptionQuickPaste(m_hWnd);
 		
 	return 0;
 }

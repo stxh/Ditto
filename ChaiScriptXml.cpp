@@ -110,7 +110,7 @@ CString CChaiScriptXml::Save()
 	return cs;
 }
 
-void CChaiScriptXml::AddToMenu(CMenu *pMenu, CAccels *actions)
+void CChaiScriptXml::AddToMenu(CMenuHandle *pMenu, CAccels *actions)
 {
 	if (m_list.size() > 0)
 	{

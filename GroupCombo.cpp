@@ -24,12 +24,6 @@ CGroupCombo::~CGroupCombo()
 }
 
 
-BEGIN_MESSAGE_MAP(CGroupCombo, CComboBox)
-	//{{AFX_MSG_MAP(CGroupCombo)
-		// NOTE - the ClassWizard will add and remove mapping macros here.
-	//}}AFX_MSG_MAP
-END_MESSAGE_MAP()
-
 /////////////////////////////////////////////////////////////////////////////
 // CGroupCombo message handlers
 

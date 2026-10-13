@@ -9,7 +9,7 @@
 #include <io.h>
 #include "Path.h"
 #include "Clip_ImportExport.h"
-#include "HyperLink.h"
+#include <atlctrlx.h>
 #include "OptionsSheet.h"
 #include "DittoCopyBuffer.h"
 #include "SendKeys.h"
@@ -668,7 +668,7 @@ bool CCP_MainApp::ToggleConnectCV()
 // - a check mark appears in the rare cases that the menu text actually represents
 //   the current state, e.g. if we are supposed to be connected, but we somehow
 //   lose that connection, "Disconnect from Clipboard" will have a check next to it.
-void CCP_MainApp::UpdateMenuConnectCV(CMenu* pMenu, UINT nMenuID)
+void CCP_MainApp::UpdateMenuConnectCV(CMenuHandle* pMenu, UINT nMenuID)
 {
 	if(pMenu == NULL)
 		return;

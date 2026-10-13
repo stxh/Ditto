@@ -1,6 +1,7 @@
 #pragma once
 #include "EventThread.h"
 #include "sqlite/CppSQLite3.h"
+#include <atlgdi.h>
 
 class CQPasteWndThread: public CEventThread
 {

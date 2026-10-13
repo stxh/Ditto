@@ -7,7 +7,6 @@
 
 class QRCodeViewer : public CWnd
 {
-	DECLARE_DYNAMIC(QRCodeViewer)
 
 public:
 	QRCodeViewer();

@@ -11,7 +11,6 @@ class CDataTable : public CDaoRecordset
 {
 public:
 	CDataTable(CDaoDatabase* pDatabase = NULL);
-	DECLARE_DYNAMIC(CDataTable)
 
 // Field/Param Data
 	//{{AFX_FIELD(CDataTable, CDaoRecordset)

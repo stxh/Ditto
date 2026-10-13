@@ -17,9 +17,13 @@ ChaiScriptOnCopy::~ChaiScriptOnCopy()
 }
 
 std::string FormatCurrentTime(const std::string &format) {
-	CTime t = CTime::GetCurrentTime();
-	CStringA x = t.Format(format.c_str());
-	return x;
+    time_t now = time(nullptr);
+    struct tm tmbuf;
+    localtime_s(&tmbuf, &now);
+    
+    char buffer[256];
+    strftime(buffer, sizeof(buffer), format.c_str(), &tmbuf);
+    return buffer;
 }
 
 bool ChaiScriptOnCopy::ProcessScript(CDittoChaiScript &clipData, std::string script)
@@ -83,12 +87,6 @@ bool ChaiScriptOnCopy::ProcessScript(CDittoChaiScript &clipData, std::string scr
 		eString += e.what();
 
 		m_lastError = CTextConvert::AnsiToUnicode(eString.c_str());
-	}
-	catch (CException *ex)
-	{
-		TCHAR szCause[255];
-		ex->GetErrorMessage(szCause, 255);
-		m_lastError.Format(_T("ProcessScript exception: %s"), szCause);
 	}
 	catch (...)
 	{

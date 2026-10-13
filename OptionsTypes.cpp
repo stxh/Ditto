@@ -68,7 +68,7 @@ LRESULT COptionsTypes::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 	
 	m_List.SetFocus();
 
-	theApp.m_Language.UpdateOptionSupportedTypes(this);
+	theApp.m_Language.UpdateOptionSupportedTypes(m_hWnd);
 	
 	return 0;
 }
@@ -93,7 +93,7 @@ LRESULT COptionsTypes::OnDelete(WORD, WORD, HWND, BOOL&)
 #include "AddType.h"
 LRESULT COptionsTypes::OnAdd(WORD, WORD, HWND, BOOL&) 
 {
-	CDimWnd dim(this->GetParent());
+	CDimWnd dim(this->GetParent().m_hWnd);
 	CAddType add(this);
 
 	if(add.DoModal() == IDOK)

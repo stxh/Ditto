@@ -15,7 +15,7 @@ public:
 	void Add(CString item, CString desc);
 	void Load();
 	void Save();
-	void AddToMenu(CMenu *pMenu);
+	void AddToMenu(CMenuHandle *pMenu);
 	CString GetSendTo(int id, bool &showDlg);
 	void ClearList();
 

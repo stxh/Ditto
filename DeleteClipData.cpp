@@ -58,7 +58,7 @@ BOOL CDeleteClipData::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL
 	// Initialize the list control
 	m_List.Attach(GetDlgItem(IDC_LIST2));
 
-	theApp.m_Language.UpdateDeleteClipData(this);
+	theApp.m_Language.UpdateDeleteClipData(m_hWnd);
 
 	m_Resize.SetParent(m_hWnd);
 	m_Resize.AddControl(IDC_LIST2, DR_SizeHeight | DR_SizeWidth);

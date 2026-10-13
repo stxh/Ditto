@@ -62,7 +62,7 @@ void CQPasteWndThread::OnSetListCount(void *param)
 {
     CQPasteWnd *pasteWnd = (CQPasteWnd*)param;
 
-    static CEvent UpdateTimeEvent(TRUE, TRUE, _T("Ditto_Update_Clip_Time"), NULL);
+    static CEvent UpdateTimeEvent(NULL, TRUE, TRUE, _T("Ditto_Update_Clip_Time"));
     //If we pasted then wait for the time on the pasted event to be updated before we query the db
     DWORD dRet = WaitForSingleObject(UpdateTimeEvent, 2000);
 
@@ -103,7 +103,7 @@ void CQPasteWndThread::OnLoadItems(void *param)
 		int listSize = 0;
 
 		{
-			ATL::CCritSecLock csLock(pasteWnd->m_CritSection.m_sect);
+			ATL::CCritSecLock csLock(pasteWnd->m_CritSection);
 
 		    if(pasteWnd->m_loadItems.size() > 0)
 		    {
@@ -137,7 +137,7 @@ void CQPasteWndThread::OnLoadItems(void *param)
 					int updateIndex = -1;
 
 					{
-						ATL::CCritSecLock csLock(pasteWnd->m_CritSection.m_sect);
+						ATL::CCritSecLock csLock(pasteWnd->m_CritSection);
 
 						if (pos < pasteWnd->m_listItems.size())
 						{
@@ -221,7 +221,7 @@ void CQPasteWndThread::OnLoadItems(void *param)
 
 				if(clearFirstLoadItem)
 				{
-					ATL::CCritSecLock csLock(pasteWnd->m_CritSection.m_sect);
+					ATL::CCritSecLock csLock(pasteWnd->m_CritSection);
 
 					pasteWnd->m_loadItems.erase(pasteWnd->m_loadItems.begin());
 				}
@@ -246,7 +246,7 @@ void CQPasteWndThread::OnLoadItems(void *param)
 
 void ReduceMapItems(CF_DibTypeMap &mapItem, CCriticalSection &critSection, CString mapName)
 {
-	ATL::CCritSecLock csLock(critSection.m_sect);
+	ATL::CCritSecLock csLock(critSection);
 
 	int maxSize = 50;
 	int reduceToSize = 30;
@@ -291,7 +291,7 @@ void CQPasteWndThread::OnLoadExtraData(void *param)
 
     std::list<CClipFormatQListCtrl> localFormats;
 	{
-		ATL::CCritSecLock csLock(pasteWnd->m_CritSection.m_sect);
+		ATL::CCritSecLock csLock(pasteWnd->m_CritSection);
 
 		for (std::list<CClipFormatQListCtrl>::iterator it = pasteWnd->m_ExtraDataLoadItems.begin(); it != pasteWnd->m_ExtraDataLoadItems.end(); it++)
 		{
@@ -306,7 +306,7 @@ void CQPasteWndThread::OnLoadExtraData(void *param)
 
 		if (it->m_cfType == CF_DIB)
 		{
-			ATL::CCritSecLock csLock(pasteWnd->m_CritSection.m_sect);
+			ATL::CCritSecLock csLock(pasteWnd->m_CritSection);
 
 			CF_DibTypeMap::iterator iterDib = pasteWnd->m_cf_dibCache.find(it->m_parentId);
 			if (iterDib != pasteWnd->m_cf_dibCache.end())
@@ -324,7 +324,7 @@ void CQPasteWndThread::OnLoadExtraData(void *param)
 		}
 		else if (it->m_cfType == theApp.m_RTFFormat)
 		{
-			ATL::CCritSecLock csLock(pasteWnd->m_CritSection.m_sect);
+			ATL::CCritSecLock csLock(pasteWnd->m_CritSection);
 
 			CF_DibTypeMap::iterator iterDib = pasteWnd->m_cf_rtfCache.find(it->m_parentId);
 			if (iterDib != pasteWnd->m_cf_rtfCache.end())
@@ -368,9 +368,9 @@ void CQPasteWndThread::OnLoadExtraData(void *param)
 				{
 					DWORD startConvertImage = GetTickCount();
 
-					HDC dc = GetDC(NULL);
+					CDCHandle dc(GetDC(NULL));
 
-					it->GetDibFittingToHeight(CDC::FromHandle(dc), m_rowHeight);
+					it->GetDibFittingToHeight(dc, m_rowHeight);
 
 					ReleaseDC(NULL, dc);
 
@@ -381,7 +381,7 @@ void CQPasteWndThread::OnLoadExtraData(void *param)
 					}
 
 					{
-						ATL::CCritSecLock csLock(pasteWnd->m_CritSection.m_sect);
+						ATL::CCritSecLock csLock(pasteWnd->m_CritSection);
 
 						pasteWnd->m_cf_dibCache[it->m_parentId] = *it;
 						//the cache now owns the format data, set it to delete the data in the destructor
@@ -392,7 +392,7 @@ void CQPasteWndThread::OnLoadExtraData(void *param)
 				}
 				else if (it->m_cfType == theApp.m_RTFFormat)
 				{
-					ATL::CCritSecLock csLock(pasteWnd->m_CritSection.m_sect);
+					ATL::CCritSecLock csLock(pasteWnd->m_CritSection);
 
 					pasteWnd->m_cf_rtfCache[it->m_parentId] = *it;
 					it->m_autoDeleteData = false;
@@ -406,7 +406,7 @@ void CQPasteWndThread::OnLoadExtraData(void *param)
 			}
 			else
 			{
-				ATL::CCritSecLock csLock(pasteWnd->m_CritSection.m_sect);
+				ATL::CCritSecLock csLock(pasteWnd->m_CritSection);
 
 				if (it->m_cfType == CF_DIB ||
 					it->m_cfType == theApp.m_PNG_Format)

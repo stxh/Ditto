@@ -66,7 +66,7 @@ LRESULT COptionsKeyBoard::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 
 	m_HotKey.SetFocus();
 
-	theApp.m_Language.UpdateOptionShortcuts(this);	
+	theApp.m_Language.UpdateOptionShortcuts(m_hWnd);	
 		
 	return 0;
 }

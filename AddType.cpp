@@ -19,7 +19,7 @@ LRESULT CAddType::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bH
 	
 	m_lbCandidateTypes.SetFocus();
 
-	theApp.m_Language.UpdateOptionSupportedTypesAdd(this);
+	theApp.m_Language.UpdateOptionSupportedTypesAdd(m_hWnd);
 	bHandled = FALSE;
 	return FALSE;
 }

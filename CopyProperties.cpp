@@ -95,7 +95,7 @@ LRESULT CCopyProperties::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, B
 	m_Resize.AddControl(IDC_STATIC_MD5, DR_MoveTop | DR_MoveLeft);
 	m_Resize.AddControl(IDC_EDIT_MD5, DR_MoveTop | DR_MoveLeft);
 	
-	theApp.m_Language.UpdateClipProperties(this);
+	theApp.m_Language.UpdateClipProperties(m_hWnd);
 
 	if (m_clip.ID() > 0)
 	{
@@ -109,39 +109,18 @@ LRESULT CCopyProperties::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, B
 	return FALSE;
 }
 
+static CString FormatClipTime(time_t nTime)
+{
+	if (nTime == 0)
+		return _T("");
+
+	return CTime(nTime).Format(_T("%m/%d/%Y %H:%M:%S"));
+}
+
 void CCopyProperties::LoadDataFromCClip(CClip &Clip)
 {
-	// Convert time_t to SYSTEMTIME for display
-	time_t clipTime = Clip.m_Time.GetTime();
-	SYSTEMTIME stTime;
-	if (clipTime != 0) {
-		FILETIME ftTime;
-		LONGLONG llTime = Int32x32To64(clipTime, 10000000) + 116444736000000000; // Convert to FILETIME
-		ftTime.dwLowDateTime = (DWORD)llTime;
-		ftTime.dwHighDateTime = llTime >> 32;
-		FileTimeToSystemTime(&ftTime, &stTime);
-		m_eDate.Format(_T("%02d/%02d/%04d %02d:%02d:%02d"), 
-			stTime.wMonth, stTime.wDay, stTime.wYear,
-			stTime.wHour, stTime.wMinute, stTime.wSecond);
-	} else {
-		m_eDate = _T("");
-	}
-	
-	// Convert last paste time
-	time_t lastPasteTime = Clip.m_lastPasteDate.GetTime();
-	SYSTEMTIME stLastPaste;
-	if (lastPasteTime != 0) {
-		FILETIME ftLastPaste;
-		LONGLONG llLastPaste = Int32x32To64(lastPasteTime, 10000000) + 116444736000000000; // Convert to FILETIME
-		ftLastPaste.dwLowDateTime = (DWORD)llLastPaste;
-		ftLastPaste.dwHighDateTime = llLastPaste >> 32;
-		FileTimeToSystemTime(&ftLastPaste, &stLastPaste);
-		m_lastPasteDate.Format(_T("%02d/%02d/%04d %02d:%02d:%02d"), 
-			stLastPaste.wMonth, stLastPaste.wDay, stLastPaste.wYear,
-			stLastPaste.wHour, stLastPaste.wMinute, stLastPaste.wSecond);
-	} else {
-		m_lastPasteDate = _T("");
-	}
+	m_eDate = FormatClipTime(Clip.m_Time);
+	m_lastPasteDate = FormatClipTime(Clip.m_lastPasteDate);
 
 	m_description.SetWindowText(Clip.m_Desc);
 	
@@ -226,7 +205,7 @@ void CCopyProperties::LoadDataFromCClip(CClip &Clip)
 	}
 
 	//show the selected data md5
-	OnLbnSelchangeCopyData();
+	UpdateSelectedDataMd5();
 	
 	if(Clip.m_bIsGroup == FALSE)
 	{
@@ -235,7 +214,7 @@ void CCopyProperties::LoadDataFromCClip(CClip &Clip)
 		::ShowWindow(::GetDlgItem(m_hWnd, IDC_CHECK_WIN_MOVE_TO_GROUP), SW_HIDE);
 		::ShowWindow(::GetDlgItem(m_hWnd, IDC_HOT_KEY_GLOBAL_MOVE_TO_GROUP), SW_HIDE);
 
-		RECT anchorRect;
+		CRect anchorRect;
 		::GetWindowRect(::GetDlgItem(m_hWnd, IDC_STATIC_HOT_KEY_MOVE_TO_GROUP), &anchorRect);
 		ScreenToClient(&anchorRect);
 		
@@ -245,7 +224,7 @@ void CCopyProperties::LoadDataFromCClip(CClip &Clip)
 		// loop through all child windows
 		while (hwnd)
 		{
-			RECT rect;
+			CRect rect;
 			::GetWindowRect(hwnd, &rect);
 			ScreenToClient(&rect);
 
@@ -261,7 +240,7 @@ void CCopyProperties::LoadDataFromCClip(CClip &Clip)
 			hwnd = ::GetNextWindow(hwnd, GW_HWNDNEXT);
 		}
 
-		RECT rect2;
+		CRect rect2;
 		::GetWindowRect(m_hWnd, &rect2);
 
 		::MoveWindow(m_hWnd, rect2.left, 
@@ -526,8 +505,8 @@ LRESULT CCopyProperties::OnCtlColor(UINT uMsg, WPARAM wParam, LPARAM lParam, BOO
 
 	// Return default brush for now - this should be modified based on your specific requirements
 	// For now, let's use system color for static text
-	if (GetDlgCtrlID(hwndChild) == IDC_DATE || 
-		GetDlgCtrlID(hwndChild) == IDC_DATE_LAST_USED)
+	if (::GetDlgCtrlID(hwndChild) == IDC_DATE || 
+		::GetDlgCtrlID(hwndChild) == IDC_DATE_LAST_USED)
 	{
 		SetBkColor(hdc, GetSysColor(COLOR_WINDOW));
 		return (LRESULT)GetSysColorBrush(COLOR_WINDOW);
@@ -539,6 +518,12 @@ LRESULT CCopyProperties::OnCtlColor(UINT uMsg, WPARAM wParam, LPARAM lParam, BOO
 
 
 LRESULT CCopyProperties::OnLbnSelchangeCopyData(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
+{
+	UpdateSelectedDataMd5();
+	return 0;
+}
+
+void CCopyProperties::UpdateSelectedDataMd5()
 {
 	int selCount = m_lCopyData.GetSelCount();
 	if (selCount > 0)
@@ -601,8 +586,6 @@ LRESULT CCopyProperties::OnLbnSelchangeCopyData(WORD wNotifyCode, WORD wID, HWND
 			break;
 		}
 	}
-	
-	return 0;
 }
 
 

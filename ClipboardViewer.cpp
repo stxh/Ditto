@@ -36,25 +36,12 @@ CClipboardViewer::~CClipboardViewer()
 }
 
 
-BEGIN_MESSAGE_MAP(CClipboardViewer, CWnd)
-	//{{AFX_MSG_MAP(CClipboardViewer)
-	ON_WM_CREATE()
-	ON_WM_CHANGECBCHAIN()
-	ON_WM_DRAWCLIPBOARD()
-	ON_WM_TIMER()
-	ON_WM_DESTROY()
-	//}}AFX_MSG_MAP
-	ON_MESSAGE(WM_SETCONNECT, OnSetConnect)
-	ON_MESSAGE(WM_CLIPBOARDUPDATE, OnClipboardChange)
-END_MESSAGE_MAP()
-
-
 /////////////////////////////////////////////////////////////////////////////
 // CClipboardViewer message handlers
 void CClipboardViewer::Create()
 {
-	CString strParentClass = AfxRegisterWndClass(0);
-	CWnd::CreateEx(0, strParentClass, _T("Ditto Clipboard Viewer"), 0, -1, -1, 0, 0, 0, 0);
+	CWindowImpl<CClipboardViewer>::Create(NULL, CRect(-1, -1, -1, -1),
+		_T("Ditto Clipboard Viewer"), 0, 0, 0);
 
 	if(m_connectOnStartup)
 	{
@@ -91,7 +78,7 @@ void CClipboardViewer::Connect()
 	if(useSetClipboardWnd)
 	{
 		Log(_T("Connecting to clipboard with function SetClipboardViewer"));
-		m_hNextClipboardViewer = CWnd::SetClipboardViewer();		
+		m_hNextClipboardViewer = ::SetClipboardViewer(m_hWnd);		
 	}
 
 	m_bCalling_SetClipboardViewer = false;
@@ -136,11 +123,11 @@ void CClipboardViewer::Disconnect(bool bSendPing)
 	{
 		Log(_T("Disconnecting from clipboard with function ChangeClipboardChain"));
 
-		BOOL bRet = CWnd::ChangeClipboardChain(m_hNextClipboardViewer);
+		BOOL bRet = ::ChangeClipboardChain(m_hWnd, m_hNextClipboardViewer);
 		if(!bRet)
 		{
 			Log(_T("Error disconnecting from clipboard"));
-			bRet = CWnd::ChangeClipboardChain(m_hNextClipboardViewer);
+			bRet = ::ChangeClipboardChain(m_hWnd, m_hNextClipboardViewer);
 			if(!bRet)
 			{
 				Log(_T("Error disconnecting from clipboard2"));
@@ -159,7 +146,7 @@ void CClipboardViewer::SendPing()
 {
 	if(CGetSetOptions::m_bEnsureConnectToClipboard)
 	{
-		if(OpenClipboard())
+		if(::OpenClipboard(m_hWnd))
 		{
 			m_bPinging = true;
 			SetClipboardData(theApp.m_PingFormat, NewGlobalP("Ditto Ping", sizeof("Ditto Ping")));
@@ -196,9 +183,6 @@ void CClipboardViewer::SetConnect(bool bConnect)
 
 int CClipboardViewer::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
-	if(CWnd::OnCreate(lpCreateStruct) == -1)
-		return -1;
-	
 	//Set up the clip board viewer
 	if(m_connectOnStartup)
 	{
@@ -211,7 +195,6 @@ int CClipboardViewer::OnCreate(LPCREATESTRUCT lpCreateStruct)
 void CClipboardViewer::OnDestroy()
 {
 	Disconnect();
-	CWnd::OnDestroy();
 }
 
 void CClipboardViewer::OnChangeCbChain(HWND hWndRemove, HWND hWndAfter) 
@@ -237,7 +220,7 @@ void CClipboardViewer::OnChangeCbChain(HWND hWndRemove, HWND hWndAfter)
     }
 }
 
-LRESULT CClipboardViewer::OnClipboardChange(WPARAM wParam, LPARAM lPara)
+LRESULT CClipboardViewer::OnClipboardChange(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	Log(StrF(_T("OnClipboardChange - Start")));
 	OnDrawClipboard();
@@ -439,10 +422,10 @@ void CClipboardViewer::OnTimer(UINT_PTR nIDEvent)
 		break;
 	}
 	
-	CWnd::OnTimer(nIDEvent);
+
 }
 
-LRESULT CClipboardViewer::OnSetConnect(WPARAM wParam, LPARAM lParam)
+LRESULT CClipboardViewer::OnSetConnect(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	bool bConnect = wParam == TRUE;
 	SetConnect(bConnect);

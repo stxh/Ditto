@@ -1,4 +1,4 @@
-﻿// MultiLanguage.cpp: implementation of the CMultiLanguage class.
+// MultiLanguage.cpp: implementation of the CMultiLanguage class.
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -153,98 +153,99 @@ CString CMultiLanguage::GetQuickPasteKeyboardString(int id, CString csDefault)
 	return csDefault;
 }
 
-bool CMultiLanguage::UpdateRightClickMenu(CMenu *pMenu)
+bool CMultiLanguage::UpdateRightClickMenu(HMENU hMenu)
 {
-	return UpdateMenuToLanguage(pMenu, m_RightClickMenu);
+	return UpdateMenuToLanguage(hMenu, m_RightClickMenu);
 }
 
-bool CMultiLanguage::UpdateGroupsRightClickMenu(CMenu *pMenu)
+bool CMultiLanguage::UpdateGroupsRightClickMenu(HMENU hMenu)
 {
-	return UpdateMenuToLanguage(pMenu, m_GroupsRightClickMenu);
+	return UpdateMenuToLanguage(hMenu, m_GroupsRightClickMenu);
 }
 
-bool CMultiLanguage::UpdateTrayIconRightClickMenu(CMenu *pMenu)
+bool CMultiLanguage::UpdateTrayIconRightClickMenu(HMENU hMenu)
 {
-	return UpdateMenuToLanguage(pMenu, m_TrayIconRightClickMenu);
+	return UpdateMenuToLanguage(hMenu, m_TrayIconRightClickMenu);
 }
 
-bool CMultiLanguage::UpdateClipProperties(CWnd *pParent)
+bool CMultiLanguage::UpdateClipProperties(HWND hWndParent)
 {
-	return UpdateWindowToLanguage(pParent, m_ClipProperties);
+	return UpdateWindowToLanguage(hWndParent, m_ClipProperties);
 }
 
-bool CMultiLanguage::UpdateOptionGeneral(CWnd *pParent)
+bool CMultiLanguage::UpdateOptionGeneral(HWND hWndParent)
 {
-	return UpdateWindowToLanguage(pParent, m_OptionsGeneral);
+	return UpdateWindowToLanguage(hWndParent, m_OptionsGeneral);
 }
 
-bool CMultiLanguage::UpdateOptionSupportedTypes(CWnd *pParent)
+bool CMultiLanguage::UpdateOptionSupportedTypes(HWND hWndParent)
 {
-	return UpdateWindowToLanguage(pParent, m_OptionsSupportedTypes);
+	return UpdateWindowToLanguage(hWndParent, m_OptionsSupportedTypes);
 }
 
-bool CMultiLanguage::UpdateOptionShortcuts(CWnd *pParent)
+bool CMultiLanguage::UpdateOptionShortcuts(HWND hWndParent)
 {
-	return UpdateWindowToLanguage(pParent, m_OptionsShortcuts);
+	return UpdateWindowToLanguage(hWndParent, m_OptionsShortcuts);
 }
 
-bool CMultiLanguage::UpdateOptionQuickPaste(CWnd *pParent)
+bool CMultiLanguage::UpdateOptionQuickPaste(HWND hWndParent)
 {
-	return UpdateWindowToLanguage(pParent, m_OptionsQuickPaste);
+	return UpdateWindowToLanguage(hWndParent, m_OptionsQuickPaste);
 }
 
-bool CMultiLanguage::UpdateOptionQuickPasteKeyboard(CWnd *pParent)
+bool CMultiLanguage::UpdateOptionQuickPasteKeyboard(HWND hWndParent)
 {
-	return UpdateWindowToLanguage(pParent, m_OptionsQuickPasteKeyboard);
+	return UpdateWindowToLanguage(hWndParent, m_OptionsQuickPasteKeyboard);
 }
 
-bool CMultiLanguage::UpdateOptionFriends(CWnd *pParent)
+bool CMultiLanguage::UpdateOptionFriends(HWND hWndParent)
 {
-	return UpdateWindowToLanguage(pParent, m_OptionsFriends);
+	return UpdateWindowToLanguage(hWndParent, m_OptionsFriends);
 }
 
-bool CMultiLanguage::UpdateOptionFriendsDetail(CWnd *pParent)
+bool CMultiLanguage::UpdateOptionFriendsDetail(HWND hWndParent)
 {
-	return UpdateWindowToLanguage(pParent, m_OptionsFriendsDetail);
+	return UpdateWindowToLanguage(hWndParent, m_OptionsFriendsDetail);
 }
 
-bool CMultiLanguage::UpdateOptionStats(CWnd *pParent)
+bool CMultiLanguage::UpdateOptionStats(HWND hWndParent)
 {
-	return UpdateWindowToLanguage(pParent, m_OptionsStats);
+	return UpdateWindowToLanguage(hWndParent, m_OptionsStats);
 }
 
-bool CMultiLanguage::UpdateOptionSupportedTypesAdd(CWnd *pParent)
+bool CMultiLanguage::UpdateOptionSupportedTypesAdd(HWND hWndParent)
 {
-	return UpdateWindowToLanguage(pParent, m_OptionsSupportedTypesAdd);
+	return UpdateWindowToLanguage(hWndParent, m_OptionsSupportedTypesAdd);
 }
 
-bool CMultiLanguage::UpdateMoveToGroups(CWnd *pParent)
+bool CMultiLanguage::UpdateMoveToGroups(HWND hWndParent)
 {
-	return UpdateWindowToLanguage(pParent, m_MoveToGroups);
+	return UpdateWindowToLanguage(hWndParent, m_MoveToGroups);
 }
 
-bool CMultiLanguage::UpdateOptionsSheet(CWnd *pParent)
+bool CMultiLanguage::UpdateOptionsSheet(HWND hWndParent)
 {
-	return UpdateWindowToLanguage(pParent, m_OptionsSheet);
+	return UpdateWindowToLanguage(hWndParent, m_OptionsSheet);
 }
 
-bool CMultiLanguage::UpdateOptionCopyBuffers(CWnd *pParent)
+bool CMultiLanguage::UpdateOptionCopyBuffers(HWND hWndParent)
 {
-	return UpdateWindowToLanguage(pParent, m_OptionsCopyBuffers);
+	return UpdateWindowToLanguage(hWndParent, m_OptionsCopyBuffers);
 }
 
-bool CMultiLanguage::UpdateGlobalHotKeys(CWnd *pParent)
+bool CMultiLanguage::UpdateGlobalHotKeys(HWND hWndParent)
 {
-	return UpdateWindowToLanguage(pParent, m_GlobalHotKeys);
+	return UpdateWindowToLanguage(hWndParent, m_GlobalHotKeys);
 }
 
-bool CMultiLanguage::UpdateDeleteClipData(CWnd *pParent)
+bool CMultiLanguage::UpdateDeleteClipData(HWND hWndParent)
 {
-	return UpdateWindowToLanguage(pParent, m_DeleteClipData);
+	return UpdateWindowToLanguage(hWndParent, m_DeleteClipData);
 }
 
-bool CMultiLanguage::UpdateMenuToLanguage(CMenu *pMenu, LANGUAGE_ARRAY &Array)
+bool CMultiLanguage::UpdateMenuToLanguage(HMENU hMenu, LANGUAGE_ARRAY &Array)
 {
+	CMenuHandle menu(hMenu);
 	INT_PTR size = Array.GetSize();
 	for(int i = 0; i < size; i++)
 	{
@@ -254,17 +255,17 @@ bool CMultiLanguage::UpdateMenuToLanguage(CMenu *pMenu, LANGUAGE_ARRAY &Array)
 		{
 			if(plItem->m_nID > 0)
 			{
-				pMenu->ModifyMenu(plItem->m_nID, MF_BYCOMMAND, plItem->m_nID, plItem->m_csForeignLang);
+				menu.ModifyMenu(plItem->m_nID, MF_BYCOMMAND, plItem->m_nID, plItem->m_csForeignLang);
 			}
 			else
 			{
 				//If an item doesn't have a menu id then its a group menu
 				//just search for the text and update the text with the foreign text
 				int nMenuPos;
-				CMenu *pNewMenu = GetMenuPos(pMenu, plItem->m_csEnglishLang, nMenuPos);
-				if(pNewMenu)
+				HMENU hNewMenu = GetMenuPos(hMenu, plItem->m_csEnglishLang, nMenuPos);
+				if(hNewMenu)
 				{
-					pNewMenu->ModifyMenu(nMenuPos, MF_BYPOSITION, -1, plItem->m_csForeignLang);
+					CMenuHandle(hNewMenu).ModifyMenu(nMenuPos, MF_BYPOSITION, -1, plItem->m_csForeignLang);
 				}
 			}
 		}
@@ -273,7 +274,7 @@ bool CMultiLanguage::UpdateMenuToLanguage(CMenu *pMenu, LANGUAGE_ARRAY &Array)
 	return true;
 }
 
-bool CMultiLanguage::UpdateWindowToLanguage(CWnd *pParent, LANGUAGE_ARRAY &Array)
+bool CMultiLanguage::UpdateWindowToLanguage(HWND hWndParent, LANGUAGE_ARRAY &Array)
 {
 	INT_PTR size = Array.GetSize();
 	for(int i = 0; i < size; i++)
@@ -284,16 +285,16 @@ bool CMultiLanguage::UpdateWindowToLanguage(CWnd *pParent, LANGUAGE_ARRAY &Array
 		{
 			if(plItem->m_nID > 0)
 			{
-				CWnd *pWnd = pParent->GetDlgItem(plItem->m_nID);
-				if(pWnd)
+				HWND hWndChild = ::GetDlgItem(hWndParent, plItem->m_nID);
+				if(hWndChild)
 				{
-					pWnd->SetWindowText(plItem->m_csForeignLang);
+					::SetWindowText(hWndChild, plItem->m_csForeignLang);
 				}
 			}
 			//If item id is -1 then set the title for the dialog
 			else if(plItem->m_nID == -1)
 			{
-				pParent->SetWindowText(plItem->m_csForeignLang);
+				::SetWindowText(hWndParent, plItem->m_csForeignLang);
 			}
 		}
 	}
@@ -302,36 +303,37 @@ bool CMultiLanguage::UpdateWindowToLanguage(CWnd *pParent, LANGUAGE_ARRAY &Array
 }
 
 
-CMenu * CMultiLanguage::GetMenuPos(CMenu *pMenu, const CString &csLookingForMenuText, int &nMenuPos, bool returnChildIfOne)
+HMENU CMultiLanguage::GetMenuPos(HMENU hMenu, const CString &csLookingForMenuText, int &nMenuPos, bool returnChildIfOne)
 {
-	CMenu *pSubMenu;
+	CMenuHandle menu(hMenu);
+	CMenuHandle subMenu;
 	CString csMenuText;
 
-	int nCount = pMenu->GetMenuItemCount();
+	int nCount = menu.GetMenuItemCount();
 	for(int i = 0; i < nCount; i++)
 	{
-		pMenu->GetMenuString(i, csMenuText, MF_BYPOSITION);
+		menu.GetMenuString(i, csMenuText, MF_BYPOSITION);
 
 		if(csMenuText == csLookingForMenuText)
 		{
 			nMenuPos = i;
 			if (returnChildIfOne)
 			{
-				pSubMenu = pMenu->GetSubMenu(i);
-				if (pSubMenu != NULL)
+				subMenu = menu.GetSubMenu(i);
+				if (!subMenu.IsNull())
 				{
-					return pSubMenu;
+					return subMenu;
 				}
 			}
-			return pMenu;
+			return hMenu;
 		}
 
-		pSubMenu = pMenu->GetSubMenu(i);
-		if(pSubMenu)
+		subMenu = menu.GetSubMenu(i);
+		if(!subMenu.IsNull())
 		{
-			CMenu *pMenuReturn = GetMenuPos(pSubMenu, csLookingForMenuText, nMenuPos, returnChildIfOne);
-			if(pMenuReturn)
-				return pMenuReturn;
+			HMENU hMenuReturn = GetMenuPos(subMenu, csLookingForMenuText, nMenuPos, returnChildIfOne);
+			if(hMenuReturn)
+				return hMenuReturn;
 		}
 	}
 

@@ -1,14 +1,13 @@
 #pragma once
 
-#include <atlbase.h>
-#include <atlwin.h>
+#include "stdafx.h"
 
 class CDimWnd : public CFrameWindowImpl<CDimWnd>
 {
 public:
 	DECLARE_FRAME_WND_CLASS(NULL, 0)
 
-	CDimWnd(CWnd* pParent);
+	CDimWnd(HWND hWndParent);
 
 	BEGIN_MSG_MAP(CDimWnd)
 		MESSAGE_HANDLER(WM_ERASEBKGND, OnEraseBkgnd)

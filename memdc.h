@@ -14,72 +14,57 @@
 #if !defined(AFX_CMemDC_H__F666A491_3847_11D3_A58E_00805FC1DE10__INCLUDED_)
 #define AFX_CMemDC_H__F666A491_3847_11D3_A58E_00805FC1DE10__INCLUDED_
 
-class CMemDCEx : public CDC {
+class CMemDCEx : public WTL::CDC {
 private:
-	CBitmap m_bitmap; // Offscreen bitmap
-	CBitmap* m_oldBitmap; // bitmap originally found in CMemDC
-	CDC* m_pDC; // Saves CDC passed in constructor
-	CRect m_rect; // Rectangle of drawing area.
-	BOOL m_bMemDC; // TRUE if CDC really is a Memory DC.
+	WTL::CBitmap m_bitmap;  // Offscreen bitmap
+	HBITMAP      m_oldBitmap; // bitmap originally found in CMemDC
+	HDC          m_hSrcDC;  // Source DC passed in constructor
+	CRect        m_rect;    // Rectangle of drawing area.
+	BOOL         m_bMemDC;  // TRUE if the memory DC was created.
 public:
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Function Header
-	CMemDCEx(CDC* pDC, CRect rect = CRect(0,0,0,0), BOOL bCopyFirst = FALSE) : CDC(), m_oldBitmap(NULL), m_pDC(pDC)
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	CMemDCEx(HDC hDC, CRect rect = CRect(0, 0, 0, 0), BOOL bCopyFirst = FALSE) :
+		WTL::CDC(), m_oldBitmap(NULL), m_hSrcDC(hDC), m_bMemDC(FALSE)
 	{
-		ASSERT(m_pDC != NULL); // If you asserted here, you passed in a NULL CDC.
+		ATLASSERT(m_hSrcDC != NULL);
 
-		m_bMemDC = !pDC->IsPrinting();
+		if (m_hSrcDC != NULL)
+		{
+			m_bMemDC = TRUE;
+			CreateCompatibleDC(m_hSrcDC);
 
-		if (m_bMemDC){
-			// Create a Memory DC
-			CreateCompatibleDC(pDC);
-			if ( rect == CRect(0,0,0,0) )
-				pDC->GetClipBox(&m_rect);
+			if (rect.IsRectEmpty())
+				GetClipBox(&m_rect);
 			else
 				m_rect = rect;
 
-			m_bitmap.CreateCompatibleBitmap(pDC, m_rect.Width(), m_rect.Height());
-			m_oldBitmap = SelectObject(&m_bitmap);
+			m_bitmap.CreateCompatibleBitmap(m_hSrcDC, m_rect.Width(), m_rect.Height());
+			m_oldBitmap = SelectBitmap(m_bitmap);
 			SetWindowOrg(m_rect.left, m_rect.top);
-			if(bCopyFirst)
-			{
-				this->BitBlt(m_rect.left, m_rect.top, m_rect.Width(), m_rect.Height(),
-					m_pDC, m_rect.left, m_rect.top, SRCCOPY);
-			}
-		} else {
-			// Make a copy of the relevent parts of the current DC for printing
-			m_bPrinting = pDC->m_bPrinting;
-			m_hDC = pDC->m_hDC;
-			m_hAttribDC = pDC->m_hAttribDC;
+
+			if (bCopyFirst)
+				BitBlt(m_rect.left, m_rect.top, m_rect.Width(), m_rect.Height(),
+					m_hSrcDC, m_rect.left, m_rect.top, SRCCOPY);
 		}
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Function Header
 	~CMemDCEx()
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	{
-		if (m_bMemDC) {
-			// Copy the offscreen bitmap onto the screen.
-			m_pDC->BitBlt(m_rect.left, m_rect.top, m_rect.Width(), m_rect.Height(),
-				this, m_rect.left, m_rect.top, SRCCOPY);
-			//Swap back the original bitmap.
-			SelectObject(m_oldBitmap);
-		} else {
-			// All we need to do is replace the DC with an illegal value,
-			// this keeps us from accidently deleting the handles associated with
-			// the CDC that was passed to the constructor.
-			m_hDC = m_hAttribDC = NULL;
+		if (m_bMemDC)
+		{
+			// Copy the offscreen bitmap onto the source DC.
+			BitBlt(m_rect.left, m_rect.top, m_rect.Width(), m_rect.Height(),
+				m_hSrcDC, m_rect.left, m_rect.top, SRCCOPY);
+			// Swap back the original bitmap.
+			SelectBitmap(m_oldBitmap);
+		}
+		else
+		{
+			// Don't let the base class delete a DC we don't own.
+			Detach();
 		}
 	}
-
-	// Allow usage as a pointer
-	CMemDCEx* operator->() {return this;}
-
-	// Allow usage as a pointer
-	operator CMemDCEx*() {return this;}
 };
 
 #endif
 // End CMemDC
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-

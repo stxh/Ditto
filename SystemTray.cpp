@@ -92,7 +92,6 @@ static char THIS_FILE[] = __FILE__;
 #define _countof(x) ( sizeof(x) / sizeof(x[0]) )
 #endif
 
-IMPLEMENT_DYNAMIC(CSystemTray, CWnd)
 
 const UINT CSystemTray::m_nTimerID    = 4567;
 UINT CSystemTray::m_nMaxTooltipLength  = 64;     // This may change...

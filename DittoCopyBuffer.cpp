@@ -23,7 +23,7 @@ bool CDittoCopyBuffer::StartCopy(long lCopyBuffer, bool bCut)
 	Log(StrF(_T("Start of Ditto Copy buffer = %d"), lCopyBuffer));
 
 	//Tell the timer thread to exit
-	m_ActiveTimer.SetEvent();
+	m_ActiveTimer.Set();
 	//Make sure the end copy thread has exited
 	EndRestoreThread();
 
@@ -61,7 +61,7 @@ UINT CDittoCopyBuffer::StartCopyTimer(LPVOID pParam)
 	CDittoCopyBuffer *pBuffer = (CDittoCopyBuffer*)pParam;
 	if(pBuffer)
 	{
-		pBuffer->m_ActiveTimer.ResetEvent();
+		pBuffer->m_ActiveTimer.Reset();
 
 		DWORD dRes = WaitForSingleObject(pBuffer->m_ActiveTimer, 1500);
 		if(dRes == WAIT_TIMEOUT)
@@ -88,7 +88,7 @@ bool CDittoCopyBuffer::EndCopy(long lID)
 		return false;
 	}
 
-	m_ActiveTimer.SetEvent();
+	m_ActiveTimer.Set();
 	m_bActive = false;
 
 	Log(StrF(_T("Start - Ditto EndCopy buffer = %d"), m_lCurrentDittoBuffer));
@@ -150,8 +150,8 @@ bool CDittoCopyBuffer::PastCopyBuffer(long lCopyBuffer)
 		return false;
 	}
 
-	m_RestoreTimer.ResetEvent();
-	m_Pasting.ResetEvent();
+	m_RestoreTimer.Reset();
+	m_Pasting.Reset();
 	bool bRet = false;
 
 	Log(StrF(_T("Start - PastCopyBuffer buffer = %d"), m_lCurrentDittoBuffer));
@@ -196,7 +196,7 @@ bool CDittoCopyBuffer::PastCopyBuffer(long lCopyBuffer)
 	CATCH_SQLITE_EXCEPTION
 
 	if(bRet == false)
-		m_Pasting.SetEvent();
+		m_Pasting.Set();
 
 	return bRet;
 }
@@ -204,7 +204,7 @@ bool CDittoCopyBuffer::PastCopyBuffer(long lCopyBuffer)
 void CDittoCopyBuffer::EndRestoreThread()
 {
 	//Tell the thread to stop waiting and restore the clipboard
-	m_RestoreTimer.SetEvent();
+	m_RestoreTimer.Set();
 
 	//make sure it's ended
 	WaitForSingleObject(m_Pasting, 5000);
@@ -238,7 +238,7 @@ UINT CDittoCopyBuffer::DelayRestoreClipboard(LPVOID pParam)
 		delete pLocalClipboard;
 		pLocalClipboard = NULL;
 
-		pBuffer->m_Pasting.SetEvent();
+		pBuffer->m_Pasting.Set();
 	}
 
 	return TRUE;

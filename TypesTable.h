@@ -14,7 +14,6 @@ class CTypesTable : public CDaoRecordset
 {
 public:
 	CTypesTable(CDaoDatabase* pDatabase = NULL);
-	DECLARE_DYNAMIC(CTypesTable)
 
 // Field/Param Data
 	//{{AFX_FIELD(CTypesTable, CDaoRecordset)

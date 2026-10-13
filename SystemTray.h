@@ -64,7 +64,6 @@ public:
                 DWORD dwBalloonIcon = NIIF_NONE, UINT uBalloonTimeout = 10);
     virtual ~CSystemTray();
 
-    DECLARE_DYNAMIC(CSystemTray)
 
 // Operations
 public:

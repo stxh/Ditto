@@ -29,18 +29,18 @@ CBitmapHelper::~CBitmapHelper()
 int CBitmapHelper::GetCBitmapWidth(const CBitmap & cbm)
 {
 	BITMAP bm;
-	cbm.GetObject(sizeof(BITMAP),&bm);
+	cbm.GetBitmap(&bm);
 	return bm.bmWidth;
 }
 
 int CBitmapHelper::GetCBitmapHeight(const CBitmap & cbm)
 {
 	BITMAP bm;
-	cbm.GetObject(sizeof(BITMAP),&bm);
+	cbm.GetBitmap(&bm);
 	return bm.bmHeight;
 } 
 
-BOOL CBitmapHelper::GetCBitmap(void	*pClip2, CDC *pDC, CBitmap *pBitMap, int nMaxHeight)
+BOOL CBitmapHelper::GetCBitmap(void	*pClip2, HDC hdc, CBitmap *pBitMap, int nMaxHeight)
 {
 	CClipFormat		*pClip = (CClipFormat *)pClip2;
 
@@ -70,13 +70,13 @@ BOOL CBitmapHelper::GetCBitmap(void	*pClip2, CDC *pDC, CBitmap *pBitMap, int nMa
 	const int nWidth = (nHeight * gdipWidth) / gdipHeight;
 
 	//do the resize
-	pBitMap->CreateCompatibleBitmap(pDC, nWidth, nHeight);
+	pBitMap->CreateCompatibleBitmap(hdc, nWidth, nHeight);
 	ASSERT(pBitMap->m_hObject != NULL);
 
 	CDC MemDc2;
-	MemDc2.CreateCompatibleDC(pDC);
+	MemDc2.CreateCompatibleDC(hdc);
 
-	CBitmap* oldBitmap2 = MemDc2.SelectObject(pBitMap);
+	HBITMAP oldBitmap2 = MemDc2.SelectBitmap(*pBitMap);
 
 	Gdiplus::Rect dest(0, 0, nWidth, nHeight);
 	Gdiplus::ImageAttributes attrs;
@@ -92,13 +92,13 @@ BOOL CBitmapHelper::GetCBitmap(void	*pClip2, CDC *pDC, CBitmap *pBitMap, int nMa
 	graphics.SetPixelOffsetMode(Gdiplus::PixelOffsetModeHalf);
 	graphics.DrawImage(gdipBitmap, dest, 0, 0, gdipWidth, gdipHeight, Gdiplus::UnitPixel, &attrs);
 
-	MemDc2.SelectObject(oldBitmap2);
+	MemDc2.SelectBitmap(oldBitmap2);
 	delete gdipBitmap;
 
 	return true;
 }
 
-BOOL CBitmapHelper::GetCBitmap(CClipFormats &clips, CDC* pDC, CBitmap* pBitMap, BOOL horizontal)
+BOOL CBitmapHelper::GetCBitmap(CClipFormats &clips, HDC hdc, CBitmap* pBitMap, BOOL horizontal)
 {
 	BOOL bRet = FALSE;
 	if (!pBitMap)
@@ -128,13 +128,13 @@ BOOL CBitmapHelper::GetCBitmap(CClipFormats &clips, CDC* pDC, CBitmap* pBitMap, 
 		delete gdipBitmap;
 	}
 
-	pBitMap->CreateCompatibleBitmap(pDC, width, height);
+	pBitMap->CreateCompatibleBitmap(hdc, width, height);
 	ASSERT(pBitMap->m_hObject != NULL);
 
 	CDC MemDc2;
-	MemDc2.CreateCompatibleDC(pDC);
+	MemDc2.CreateCompatibleDC(hdc);
 
-	CBitmap* oldBitmap2 = MemDc2.SelectObject(pBitMap);
+	HBITMAP oldBitmap2 = MemDc2.SelectBitmap(*pBitMap);
 
 	Gdiplus::Graphics graphics(MemDc2);
 	graphics.SetInterpolationMode(Gdiplus::InterpolationModeHighQualityBicubic);
@@ -178,7 +178,7 @@ BOOL CBitmapHelper::GetCBitmap(CClipFormats &clips, CDC* pDC, CBitmap* pBitMap, 
 		bRet = TRUE;
 	}
 
-	MemDc2.SelectObject(oldBitmap2);
+	MemDc2.SelectBitmap(oldBitmap2);
 
 	return bRet;
 }
@@ -356,7 +356,7 @@ HANDLE CBitmapHelper::hBitmapToDIB(HBITMAP hBitmap, DWORD dwCompression, HPALETT
 }
 
 
-bool CBitmapHelper::DrawDIB(CDC *pDC, HANDLE hData, int nLeft, int nRight, int &nWidth)
+bool CBitmapHelper::DrawDIB(HDC hdc, HANDLE hData, int nLeft, int nRight, int &nWidth)
 {
 	LPBITMAPINFO	lpBI ;
 	void*           pDIBBits;
@@ -377,7 +377,7 @@ bool CBitmapHelper::DrawDIB(CDC *pDC, HANDLE hData, int nLeft, int nRight, int &
 		pDIBBits = (LPVOID)(lpBI->bmiColors + nColors);
 	}
 
-	::StretchDIBits(pDC->m_hDC,
+	::StretchDIBits(hdc,
 				nLeft, nRight, 
 				lpBI->bmiHeader.biWidth, lpBI->bmiHeader.biHeight,
 				0, 0, lpBI->bmiHeader.biWidth, 

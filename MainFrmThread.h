@@ -2,7 +2,6 @@
 #include "EventThread.h"
 #include "Clip.h"
 #include "AutoSendToClientThread.h"
-#include <afxmt.h>
 
 class CMainFrmThread : public CEventThread
 {

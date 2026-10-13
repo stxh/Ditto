@@ -16,7 +16,6 @@ public:
 
 class CDittoDropTarget : public COleDropTarget
 {
-	DECLARE_DYNAMIC(CDittoDropTarget)
 
 public:
 	CDittoDropTarget();

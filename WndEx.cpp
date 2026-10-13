@@ -4,7 +4,6 @@
 #include "stdafx.h"
 #include "CP_Main.h"
 #include "WndEx.h"
-#include ".\wndex.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -44,59 +43,20 @@ void CWndEx::GetWindowRectEx(LPRECT lpRect)
 		return;
 	}
 	
-	CWnd::GetWindowRect(lpRect);
+	::GetWindowRect(m_hWnd, lpRect);
 }
 
-BEGIN_MESSAGE_MAP(CWndEx, CWnd)
-//{{AFX_MSG_MAP(CWndEx)
-	ON_WM_CREATE()
-	ON_WM_NCPAINT()
-	ON_WM_NCCALCSIZE()
-	ON_WM_NCHITTEST()
-	ON_WM_NCLBUTTONDOWN()
-	ON_WM_NCMOUSEMOVE()
-	ON_WM_NCLBUTTONUP()
-	ON_WM_ERASEBKGND()
-	ON_WM_TIMER()
-	ON_WM_WINDOWPOSCHANGING()
-	ON_WM_INITMENUPOPUP() 
-//}}AFX_MSG_MAP
-ON_WM_SIZE()
-ON_WM_MOVING()
-ON_WM_ENTERSIZEMOVE()
-END_MESSAGE_MAP()
-
-
-/////////////////////////////////////////////////////////////////////////////
-// CWndEx message handlers
-
-BOOL CWndEx::Create(const CRect& crStart, CWnd* pParentWnd)
+BOOL CWndEx::Create(const CRect& crStart, CWindow* pParentWnd)
 {
-	WNDCLASS wc;	
-	wc.style = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW;
-	wc.lpfnWndProc = AfxWndProc;
-	wc.cbClsExtra = 0;
-	wc.cbWndExtra = 0;
-	wc.hInstance = AfxGetInstanceHandle();
-	wc.hIcon = NULL;
-	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-	wc.hbrBackground = (HBRUSH) GetStockObject(WHITE_BRUSH);
-	wc.lpszMenuName =  NULL;
-	wc.lpszClassName = _T("QPasteClass");
-	
-	// Create the QPaste window class
-	if (!AfxRegisterClass(&wc))
-		return FALSE;		
-	
-	return CWndEx::CreateEx(0, _T("QPasteClass"), _T("Quick Paste"), WS_POPUP,
-		crStart, pParentWnd, 0);
+	HWND hWndParent = (pParentWnd != NULL) ? pParentWnd->m_hWnd : NULL;
+
+	CRect rc = crStart;
+	return CWindowImpl<CWndEx, CWindow, CNullTraits>::Create(hWndParent, &rc,
+		_T("Quick Paste"), WS_POPUP, 0, 0U, NULL);
 }
 
 int CWndEx::OnCreate(LPCREATESTRUCT lpCreateStruct) 
 {
-	if (CWnd::OnCreate(lpCreateStruct) == -1)
-		return -1;
-	
 	m_DittoWindow.DoCreate(this);
 	m_DittoWindow.m_bDrawMinimize = false;
 	m_DittoWindow.m_bDrawMaximize = false;
@@ -112,12 +72,15 @@ int CWndEx::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_DittoWindow.SetCaptionOn(this, CGetSetOptions::GetCaptionPos(), true, CGetSetOptions::m_Theme.GetCaptionSize(), CGetSetOptions::m_Theme.GetCaptionFontSize());
 	SetAutoMaxDelay(CGetSetOptions::GetAutoMaxDelay());
 
-	m_toolTip.Create(this);
+	m_toolTip.Create(m_hWnd);
 	CRect r;
-	GetWindowRect(&r);
-	ScreenToClient(&r);
+	::GetWindowRect(m_hWnd, &r);
+	POINT ptLT = r.TopLeft(), ptRB = r.BottomRight();
+	::ScreenToClient(m_hWnd, &ptLT);
+	::ScreenToClient(m_hWnd, &ptRB);
+	r.SetRect(ptLT, ptRB);
 	r.InflateRect(m_DittoWindow.m_dpi.Scale(25), m_DittoWindow.m_dpi.Scale(25));
-	m_toolTip.AddTool(this, _T("Ditto"), r, 1);
+	m_toolTip.AddTool(m_hWnd, _T("Ditto"), &r, 1);
 	
 	return 0;
 }
@@ -152,23 +115,26 @@ void CWndEx::SetCaptionOn(int nPos, bool bOnstartup, int captionSize, int captio
 	m_DittoWindow.SetCaptionOn(this, nPos, bOnstartup, captionSize, captionFontSize);
 }
 
-void CWndEx::OnNcPaint()
+LRESULT CWndEx::OnNcPaint(HRGN hRgn)
 {
 	m_DittoWindow.DoNcPaint(this);
+	return 0;
 }
 
-void CWndEx::OnNcCalcSize(BOOL bCalcValidRects, NCCALCSIZE_PARAMS FAR* lpncsp) 
+LRESULT CWndEx::OnNcCalcSize(BOOL bCalcValidRects, LPARAM lpncsp) 
 {
-	CWnd::OnNcCalcSize(bCalcValidRects, lpncsp);
+	LRESULT lResult = DefWindowProc(WM_NCCALCSIZE, (WPARAM)bCalcValidRects, lpncsp);
 	
-	m_DittoWindow.DoNcCalcSize(bCalcValidRects, lpncsp);
+	m_DittoWindow.DoNcCalcSize(bCalcValidRects, (NCCALCSIZE_PARAMS*)lpncsp);
+
+	return lResult;
 }
 
-HITTEST_RET CWndEx::OnNcHitTest(CPoint point) 
+LRESULT CWndEx::OnNcHitTest(CPoint point) 
 {
 	UINT Ret = m_DittoWindow.DoNcHitTest(this, point);
 	if(Ret == -1)
-		return CWnd::OnNcHitTest(point);
+		return DefWindowProc(WM_NCHITTEST, 0, MAKELPARAM(point.x, point.y));
 
 	return Ret;
 }
@@ -181,8 +147,6 @@ void CWndEx::OnNcLButtonDown(UINT nHitTest, CPoint point)
 	{
 		SetTimer(TIMER_BUTTON_UP, 100, NULL);
 	}
-
-	CWnd::OnNcLButtonDown(nHitTest, point);
 }
 
 void CWndEx::OnNcLButtonUp(UINT nHitTest, CPoint point) 
@@ -193,14 +157,12 @@ void CWndEx::OnNcLButtonUp(UINT nHitTest, CPoint point)
 		if(lRet == BUTTON_CHEVRON)
 		{
 			MinMaxWindow(SWAP_MIN_MAX);
-			OnNcPaint();
+			OnNcPaint(NULL);
 		}
 		return;
 	}
 
 	KillTimer(TIMER_BUTTON_UP);
-	
-	CWnd::OnNcLButtonUp(nHitTest, point);
 }
 
 
@@ -218,8 +180,6 @@ void CWndEx::OnNcMouseMove(UINT nHitTest, CPoint point)
 			m_bMaxSetTimer = true;
 		}
 	}
-	
-	CWnd::OnNcMouseMove(nHitTest, point);
 }
 
 BOOL CWndEx::PreTranslateMessage(MSG* pMsg) 
@@ -227,12 +187,12 @@ BOOL CWndEx::PreTranslateMessage(MSG* pMsg)
 	m_toolTip.RelayEvent(pMsg);
 	m_DittoWindow.DoPreTranslateMessage(pMsg);
 	
-	return CWnd::PreTranslateMessage(pMsg);
+	return FALSE;
 }
 
-BOOL CWndEx::OnEraseBkgnd(CDC* pDC) 
+LRESULT CWndEx::OnEraseBkgnd(HDC hDC) 
 {
-	return CWnd::OnEraseBkgnd(pDC);
+	return DefWindowProc(WM_ERASEBKGND, (WPARAM)hDC, 0);
 }
 
 void CWndEx::OnTimer(UINT_PTR nIDEvent)
@@ -246,7 +206,7 @@ void CWndEx::OnTimer(UINT_PTR nIDEvent)
 			
 			UINT nHitTest = (UINT)OnNcHitTest(cp);
 			
-			ScreenToClient(&cp);
+			::ScreenToClient(m_hWnd, &cp);
 			
 			if(nHitTest == HTCAPTION)
 			{
@@ -270,14 +230,10 @@ void CWndEx::OnTimer(UINT_PTR nIDEvent)
 			KillTimer(TIMER_BUTTON_UP);
 		}
 	}
-	
-	CWnd::OnTimer(nIDEvent);
 }
 
 void CWndEx::OnWindowPosChanging(WINDOWPOS* lpwndpos)
 {
-	CWnd::OnWindowPosChanging(lpwndpos);
-	
 	if(m_bMaxSetTimer)
 	{
 		KillTimer(TIMER_AUTO_MAX);
@@ -287,21 +243,20 @@ void CWndEx::OnWindowPosChanging(WINDOWPOS* lpwndpos)
 	//m_DittoWindow.SnapToEdge(this, lpwndpos);
 }
 
-void CWndEx::OnSize(UINT nType, int cx, int cy)
+LRESULT CWndEx::OnSize(UINT nType, CSize size)
 {
-	CWnd::OnSize(nType, cx, cy);
-	
 	//m_DittoWindow.DoSetRegion(this);
+	return 0;
 }
 
-void CWndEx::OnInitMenuPopup(CMenu *pPopupMenu, UINT nIndex, BOOL bSysMenu)
+void CWndEx::OnInitMenuPopup(HMENU hMenu, UINT nIndex, BOOL bSysMenu)
 {
-	OnInitMenuPopupEx(pPopupMenu, nIndex, bSysMenu, this);
+	OnInitMenuPopupEx(hMenu);
 } 
 
 void CWndEx::SetToolTipText(CString text)
 {
-	m_toolTip.UpdateTipText(text, this, 1);
+	m_toolTip.UpdateTipText((LPCTSTR)text, m_hWnd, 1);
 }
 
 void CWndEx::SetCustomWindowTitle(CString title)
@@ -324,16 +279,11 @@ void CWndEx::MinMaxWindow(long lOption)
 
 void CWndEx::OnMoving(UINT fwSide, LPRECT pRect)
 {
-	CWnd::OnMoving(fwSide, pRect);
-
 	m_snap.OnSnapMoving(m_hWnd, pRect);
-	// TODO: Add your message handler code here
 }
 
 
 void CWndEx::OnEnterSizeMove()
 {
 	m_snap.OnSnapEnterSizeMove(m_hWnd);
-
-	CWnd::OnEnterSizeMove();
 }

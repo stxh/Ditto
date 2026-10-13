@@ -11,7 +11,6 @@ class CMainTable : public CDaoRecordset
 {
 public:
 	CMainTable(CDaoDatabase* pDatabase = NULL);
-	DECLARE_DYNAMIC(CMainTable)
 
 
 // Field/Param Data

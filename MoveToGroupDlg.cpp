@@ -21,7 +21,7 @@ LRESULT CMoveToGroupDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
     m_Tree.SetNotificationWndEx(m_hWnd);
     m_Tree.FillTree();
 
-    theApp.m_Language.UpdateMoveToGroups(this);
+    theApp.m_Language.UpdateMoveToGroups(m_hWnd);
 
     return TRUE;
 }

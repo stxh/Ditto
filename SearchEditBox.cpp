@@ -1,18 +1,6 @@
-// SearchEditBox.cpp : implementation file
-//
-
 #include "stdafx.h"
 #include "cp_main.h"
 #include "SearchEditBox.h"
-
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-/////////////////////////////////////////////////////////////////////////////
-// CSearchEditBox
 
 CSearchEditBox::CSearchEditBox()
 {
@@ -22,25 +10,15 @@ CSearchEditBox::~CSearchEditBox()
 {
 }
 
-
-BEGIN_MESSAGE_MAP(CSearchEditBox, CEdit)
-	//{{AFX_MSG_MAP(CSearchEditBox)
-		// NOTE - the ClassWizard will add and remove mapping macros here.
-	//}}AFX_MSG_MAP
-END_MESSAGE_MAP()
-
-/////////////////////////////////////////////////////////////////////////////
-// CSearchEditBox message handlers
-
-BOOL CSearchEditBox::PreTranslateMessage(MSG* pMsg) 
+BOOL CSearchEditBox::PreTranslateMessage(MSG* pMsg)
 {
-	switch(pMsg->message) 
+	switch(pMsg->message)
 	{
 		case WM_KEYDOWN:
 		{
 			if(pMsg->wParam == VK_RETURN)
 			{
-				CWnd *pWnd = GetParent();
+				CWnd* pWnd = GetParent();
 				if(pWnd)
 				{
 					if(CGetSetOptions::m_bFindAsYouType)
@@ -49,20 +27,19 @@ BOOL CSearchEditBox::PreTranslateMessage(MSG* pMsg)
 					}
 					else
 					{
-						//Send a message to the parent to refill the lb from the search
 						pWnd->PostMessage(CB_SEARCH, 0, 0);
 					}
 				}
 
 				return TRUE;
-			}	
-			else if (pMsg->wParam == VK_DOWN ||
-						pMsg->wParam == VK_UP ||
-						pMsg->wParam == VK_F3)
+			}
+			else if(pMsg->wParam == VK_DOWN ||
+					pMsg->wParam == VK_UP ||
+					pMsg->wParam == VK_F3)
 			{
 				if(CGetSetOptions::m_bFindAsYouType)
 				{
-					CWnd *pWnd = GetParent();
+					CWnd* pWnd = GetParent();
 					if(pWnd)
 					{
 						pWnd->SendMessage(CB_UPDOWN, pMsg->wParam, pMsg->lParam);
@@ -77,7 +54,7 @@ BOOL CSearchEditBox::PreTranslateMessage(MSG* pMsg)
 				LONG lEditSel = GetSel();
 				if(LOWORD(lEditSel) == HIWORD(lEditSel))
 				{
-					CWnd *pWnd = GetParent();
+					CWnd* pWnd = GetParent();
 					if(pWnd)
 					{
 						pWnd->SendMessage(CB_UPDOWN, pMsg->wParam, pMsg->lParam);
@@ -88,6 +65,6 @@ BOOL CSearchEditBox::PreTranslateMessage(MSG* pMsg)
 			break;
 		}
 	}
-	
+
 	return CEdit::PreTranslateMessage(pMsg);
 }

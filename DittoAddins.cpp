@@ -66,7 +66,7 @@ bool CDittoAddins::LoadAll()
 	return m_Addins.size() > 0;
 }
 
-bool CDittoAddins::AddPrePasteAddinsToMenu(CMenu *pMenu)
+bool CDittoAddins::AddPrePasteAddinsToMenu(CMenuHandle *pMenu)
 {
 	bool bRet = false;
 

@@ -15,7 +15,6 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CMainTable
 
-IMPLEMENT_DYNAMIC(CMainTable, CDaoRecordset)
 
 CMainTable::CMainTable(CDaoDatabase* pdb)
 	: CDaoRecordset(pdb)

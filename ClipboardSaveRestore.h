@@ -10,7 +10,7 @@ public:
 
 	bool Save(BOOL textOnly);
 	bool Restore();
-	void Clear()	{ m_Clipboard.RemoveAll(); }
+	void Clear()	{ m_Clipboard.DeleteAll(); }
 	bool RestoreTextOnly();
 
 	CClipFormats m_Clipboard;

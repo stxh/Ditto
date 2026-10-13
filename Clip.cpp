@@ -318,7 +318,7 @@ bool CClip::AddFormat(CLIPFORMAT cfType, void* pData, UINT nLen, bool setDesc)
 	ASSERT(hGlobal);
 
 	// update the Clip statistics
-	m_Time = m_Time.GetCurrentTime();
+	m_Time = CTime::GetCurrentTime().GetTime();
 
 	if (setDesc)
 	{
@@ -521,7 +521,7 @@ int CClip::LoadFromClipboard(CClipTypes* pClipTypes, bool checkClipboardIgnore, 
 
 	Log(StrF(_T("End enumerating over supported types, Count: %d"), numTypes));
 	
-	m_Time = CTime::GetCurrentTime();
+	m_Time = CTime::GetCurrentTime().GetTime();
 	
 	if(!bIsDescSet)
 	{
@@ -921,7 +921,7 @@ bool CClip::AddToMainTable()
 		CString cs;
 		cs.Format(_T("INSERT into Main (lDate, mText, lShortCut, lDontAutoDelete, CRC, bIsGroup, lParentID, QuickPasteText, clipOrder, clipGroupOrder, globalShortCut, lastPasteDate, stickyClipOrder, stickyClipGroupOrder, MoveToGroupShortCut, GlobalMoveToGroupShortCut) ")
 						_T("values(%d, '%s', %d, %d, %d, %d, %d, '%s', %f, %f, %d, %d, %f, %f, %d, %d);"),
-							(int)m_Time.GetTime(),
+							(int)m_Time,
 							m_Desc,
 							m_shortCut,
 							m_dontAutoDelete,
@@ -1873,15 +1873,35 @@ BOOL CClip::WriteImageToFile(CString path)
 	CClipFormat *bitmap = this->m_Formats.FindFormat(CF_DIB);
 	CClipFormat *png = this->m_Formats.FindFormat(theApp.m_PNG_Format);
 	if (!bitmap && !png) return false;
-	
-	std::shared_ptr<CImage> i;
-	// png is more closer to original
-	if (png)
-		i = PNGImageHelper::CImageFromHGLOBAL(png->m_hgData);
-	else
-		i = DIBImageHelper::CImageFromHGLOBAL(bitmap->m_hgData);
 
-	return i->Save(path) == S_OK;
+	// png is more closer to original
+	Gdiplus::Bitmap *pImage = png ? PNGImageHelper::GdipImageFromHGLOBAL(png->m_hgData)
+		: DIBImageHelper::GdipImageFromHGLOBAL(bitmap->m_hgData);
+	if (pImage == NULL)
+		return false;
+
+	const CLSID *pClsid = &Gdiplus::ImageFormatPNG;
+	CString csExt = path.Mid(path.ReverseFind(_T('.')) + 1);
+	csExt.MakeLower();
+	if (csExt == _T("bmp"))
+		pClsid = &Gdiplus::ImageFormatBMP;
+	else if (csExt == _T("jpg") || csExt == _T("jpeg"))
+		pClsid = &Gdiplus::ImageFormatJPEG;
+	else if (csExt == _T("gif"))
+		pClsid = &Gdiplus::ImageFormatGIF;
+	else if (csExt == _T("tif") || csExt == _T("tiff"))
+		pClsid = &Gdiplus::ImageFormatTIFF;
+	else if (csExt == _T("emf"))
+		pClsid = &Gdiplus::ImageFormatEMF;
+	else if (csExt == _T("wmf"))
+		pClsid = &Gdiplus::ImageFormatWMF;
+	else if (csExt == _T("ico"))
+		pClsid = &Gdiplus::ImageFormatIcon;
+
+	Gdiplus::Status status = pImage->Save(path, pClsid);
+	delete pImage;
+
+	return status == Gdiplus::Ok;
 }
 
 bool CClip::AddFileDataToData(CString &errorMessage)

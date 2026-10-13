@@ -21,7 +21,7 @@ CMainFrmThread::~CMainFrmThread(void)
 
 void CMainFrmThread::AddClipToSave(CClip *pClip)
 {
-	ATL::CCritSecLock csLock(m_cs.m_sect);
+	ATL::CCritSecLock csLock(m_cs);
 
 	Log(_T("Adding clip to thread for save to db"));
 	m_saveClips.AddTail(pClip);
@@ -30,7 +30,7 @@ void CMainFrmThread::AddClipToSave(CClip *pClip)
 
 void CMainFrmThread::AddRemoteClipToSave(CClipList *pClipList)
 {
-	ATL::CCritSecLock csLock(m_cs.m_sect);
+	ATL::CCritSecLock csLock(m_cs);
 
 	Log(_T("Adding REMOTE clip to thread for save to db"));
 	
@@ -114,7 +114,7 @@ void CMainFrmThread::OnSaveClips()
 
 	//Save the clips locally
 	{
-		ATL::CCritSecLock csLock(m_cs.m_sect);
+		ATL::CCritSecLock csLock(m_cs);
 
 		POSITION pos;
 		CClip* pClip;
@@ -180,7 +180,7 @@ void CMainFrmThread::OnSaveRemoteClips()
 
 	//Save the clips locally
 	{
-		ATL::CCritSecLock csLock(m_cs.m_sect);
+		ATL::CCritSecLock csLock(m_cs);
 
 		POSITION pos;
 		CClip* pClip;

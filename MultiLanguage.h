@@ -40,25 +40,25 @@ public:
 
 	bool LoadLanguageFile(CString csFile);
 
-	bool UpdateRightClickMenu(CMenu *pMenu);
-	bool UpdateGroupsRightClickMenu(CMenu *pMenu);
-	bool UpdateTrayIconRightClickMenu(CMenu *pMenu);
+	bool UpdateRightClickMenu(HMENU hMenu);
+	bool UpdateGroupsRightClickMenu(HMENU hMenu);
+	bool UpdateTrayIconRightClickMenu(HMENU hMenu);
 
-	bool UpdateClipProperties(CWnd *pParent);
-	bool UpdateOptionGeneral(CWnd *pParent);
-	bool UpdateOptionSupportedTypes(CWnd *pParent);
-	bool UpdateOptionShortcuts(CWnd *pParent);
-	bool UpdateOptionQuickPaste(CWnd *pParent);
-	bool UpdateOptionQuickPasteKeyboard(CWnd *pParent);
-	bool UpdateOptionFriends(CWnd *pParent);
-	bool UpdateOptionFriendsDetail(CWnd *pParent);
-	bool UpdateOptionStats(CWnd *pParent);
-	bool UpdateOptionSupportedTypesAdd(CWnd *pParent);
-	bool UpdateMoveToGroups(CWnd *pParent);
-	bool UpdateOptionsSheet(CWnd *pParent);
-	bool UpdateOptionCopyBuffers(CWnd *pParent);
-	bool UpdateGlobalHotKeys(CWnd *pParent);
-	bool UpdateDeleteClipData(CWnd *pParent);
+	bool UpdateClipProperties(HWND hWndParent);
+	bool UpdateOptionGeneral(HWND hWndParent);
+	bool UpdateOptionSupportedTypes(HWND hWndParent);
+	bool UpdateOptionShortcuts(HWND hWndParent);
+	bool UpdateOptionQuickPaste(HWND hWndParent);
+	bool UpdateOptionQuickPasteKeyboard(HWND hWndParent);
+	bool UpdateOptionFriends(HWND hWndParent);
+	bool UpdateOptionFriendsDetail(HWND hWndParent);
+	bool UpdateOptionStats(HWND hWndParent);
+	bool UpdateOptionSupportedTypesAdd(HWND hWndParent);
+	bool UpdateMoveToGroups(HWND hWndParent);
+	bool UpdateOptionsSheet(HWND hWndParent);
+	bool UpdateOptionCopyBuffers(HWND hWndParent);
+	bool UpdateGlobalHotKeys(HWND hWndParent);
+	bool UpdateDeleteClipData(HWND hWndParent);
 
 	CString GetGlobalHotKeyString(CString csID, CString csDefault);
 	CString GetDeleteClipDataString(CString csID, CString csDefault);
@@ -72,7 +72,7 @@ public:
 	CString GetLangCode() { return m_csLangCode;	}
 
 	void	SetOnlyGetHeader(bool bVal)	{ m_bOnlyGetHeader = true;	}
-	static CMenu* GetMenuPos(CMenu *pMenu, const CString &csLookingForMenuText, int &nMenuPos, bool returnChildIfOne = FALSE);
+	static HMENU GetMenuPos(HMENU hMenu, const CString &csLookingForMenuText, int &nMenuPos, bool returnChildIfOne = FALSE);
 
 	CString m_csLastError;
 
@@ -109,8 +109,8 @@ protected:
 	bool LoadSection(TiXmlNode &doc, LANGUAGE_ARRAY &Array, CString csSection);
 	bool LoadStringTableSection(TiXmlNode &doc, LANGUAGE_MAP &Map, CString csSection);
 
-	bool UpdateMenuToLanguage(CMenu *pMenu, LANGUAGE_ARRAY &Array);
-	bool UpdateWindowToLanguage(CWnd *pParent, LANGUAGE_ARRAY &Array);
+	bool UpdateMenuToLanguage(HMENU hMenu, LANGUAGE_ARRAY &Array);
+	bool UpdateWindowToLanguage(HWND hWndParent, LANGUAGE_ARRAY &Array);
 
 
 	void ClearArrays();

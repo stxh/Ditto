@@ -16,7 +16,7 @@ public:
 	enum { IDD = IDD_COPY_PROPERTIES };
 
 // Construction
-	CCopyProperties(long lCopyID, HWND hParent = NULL, CClip *pMemoryClip = NULL) : m_lCopyID(lCopyID), m_pMemoryClip(pMemoryClip) {} // standard constructor
+	CCopyProperties(long lCopyID, HWND hParent = NULL, CClip *pMemoryClip = NULL); // standard constructor
 
 // Dialog Data
 	CEdit	m_QuickPasteText;
@@ -56,6 +56,7 @@ protected:
 
 	void LoadDataIntoCClip(CClip &Clip);
 	void LoadDataFromCClip(CClip &Clip);
+	void UpdateSelectedDataMd5();
 	BOOL CheckGlobalHotKey(CClip &clip);
 	BOOL CheckMoveToGroupGlobalHotKey(CClip &clip);
 
@@ -84,8 +85,3 @@ protected:
 	LRESULT OnLbnSelchangeCopyData(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnNcLButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 };
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
-
-#endif // !defined(AFX_COPYPROPERTIES_H__129FE1CD_D305_487A_B88C_BB01CD9C1BB7__INCLUDED_)

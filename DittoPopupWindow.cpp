@@ -13,13 +13,6 @@ CDittoPopupWindow::~CDittoPopupWindow()
 {
 }
 
-BEGIN_MESSAGE_MAP(CDittoPopupWindow, CWndEx)
-	ON_WM_CREATE()
-	ON_WM_SIZE()
-	ON_WM_CTLCOLOR()
-	ON_WM_LBUTTONUP()
-END_MESSAGE_MAP()
-
 int CDittoPopupWindow::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
 	if (CWndEx::OnCreate(lpCreateStruct) == -1)
@@ -30,11 +23,12 @@ int CDittoPopupWindow::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	CWndEx::SetCaptionOn(CAPTION_TOP, false, CGetSetOptions::m_Theme.GetCaptionSize(), CGetSetOptions::m_Theme.GetCaptionFontSize());
 		
 	m_font.CreateFont(-m_DittoWindow.m_dpi.Scale(12), 0, 0, 0, 400, 0, 0, 0, DEFAULT_CHARSET, 3, 2, 1, 34, _T("MS Sans Serif"));
-	m_textLabel.Create(_T("test"), WS_CHILD | WS_VISIBLE, CRect(0, 0, 0, 0), this);
-	m_textLabel.SetFont(&m_font);
+	CRect rcZero(0, 0, 0, 0);
+	m_textLabel.Create(m_hWnd, rcZero, _T("test"), WS_CHILD | WS_VISIBLE, 0, 0xffff);
+	m_textLabel.SetFont(m_font);
 	
 
-	m_progressWnd.Create(WS_CHILD|PBS_SMOOTH, CRect(0, 0, 0, 0), this, 2);
+	m_progressWnd.Create(m_hWnd, rcZero, NULL, WS_CHILD | PBS_SMOOTH | WS_VISIBLE, 0, 2);
 
 	m_progressWnd.SetRange(0, 100);
 
@@ -83,10 +77,10 @@ void CDittoPopupWindow::HideProgressBar()
 	DoSize(size.Width(), size.Height());
 }
 
-void CDittoPopupWindow::OnSize(UINT nType, int cx, int cy)
+LRESULT CDittoPopupWindow::OnSize(UINT nType, CSize size)
 {
-	CWndEx::OnSize(nType, cx, cy);
-	DoSize(cx, cy);	
+	DoSize(size.cx, size.cy);
+	return 0;
 }
 
 void CDittoPopupWindow::DoSize(int cx, int cy)
@@ -108,15 +102,16 @@ void CDittoPopupWindow::DoSize(int cx, int cy)
 	}	
 }
 
-HBRUSH CDittoPopupWindow::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
+LRESULT CDittoPopupWindow::OnCtlColorStatic(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	if (pWnd->GetDlgCtrlID() == 0xffff)
+	if (::GetDlgCtrlID((HWND)lParam) == 0xffff)
 	{
-		pDC->SetBkMode(TRANSPARENT);
-		return reinterpret_cast<HBRUSH>(::GetStockObject(NULL_BRUSH));
+		::SetBkMode((HDC)wParam, TRANSPARENT);
+		return (LRESULT)::GetStockObject(NULL_BRUSH);
 	}
-	else
-		return CWndEx::OnCtlColor(pDC, pWnd, nCtlColor);
+
+	bHandled = FALSE;
+	return 0;
 }
 
 void CDittoPopupWindow::PumpMessages()
@@ -138,10 +133,10 @@ void CDittoPopupWindow::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	if(m_groupId > 0)
 	{
-		CWnd *pParent = this->GetParent();
-		if(pParent)
+		CWindow wndParent = GetParent();
+		if(wndParent.m_hWnd != NULL)
 		{
-			pParent->PostMessageW(WM_SHOW_DITTO_GROUP, m_groupId, 0);
+			wndParent.PostMessage(WM_SHOW_DITTO_GROUP, m_groupId, 0);
 		}
 	}
 }

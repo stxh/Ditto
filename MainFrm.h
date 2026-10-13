@@ -1,6 +1,13 @@
 #pragma once
 
-//#include "SystemTray.h"
+#include <atlbase.h>
+#include <atlapp.h>
+#include <atlwin.h>
+#include <atlcrack.h>
+#include <atlmisc.h>
+#include <atlctrls.h>
+#include <atlctrlx.h>
+
 #include "QuickPaste.h"
 #include "ToolTipEx.h"
 #include "MainFrmThread.h"
@@ -27,34 +34,78 @@
 
 class COptionsSheet;
 
-class CMainFrame: public CFrameWindowImpl<CMainFrame>
+    class CMainFrame : public CFrameWindowImpl<CMainFrame>,
+                       public CUpdateUI<CMainFrame>,
+                       public CMessageFilter,
+                       public CIdleHandler
 {
 public:
     CMainFrame();
-protected:
+
     DECLARE_FRAME_WND_CLASS(NULL, IDR_MAINFRAME)
-    // Attributes
-public:
 
-    // Operations
-public:
+    virtual BOOL PreTranslateMessage(MSG* pMsg);
+    virtual BOOL OnIdle();
 
-    BOOL ResetKillDBTimer();
+    BEGIN_MSG_MAP(CMainFrame)
+        MSG_WM_CREATE(OnCreate)
+        MSG_WM_CLOSE(OnClose)
+        MSG_WM_DESTROY(OnDestroy)
+        MSG_WM_TIMER(OnTimer)
+        MSG_WM_SETTINGCHANGE(OnWinIniChange)
+        MSG_WM_SETFOCUS(OnSetFocus)
+        COMMAND_ID_HANDLER(ID_FIRST_OPTION, OnFirstOption)
+        COMMAND_ID_HANDLER(ID_FIRST_EXIT, OnFirstExit)
+        COMMAND_ID_HANDLER(ID_FIRST_SHOWQUICKPASTE, OnFirstShowquickpaste)
+        COMMAND_ID_HANDLER(ID_FIRST_TOGGLECONNECTCV, OnFirstToggleConnectCV)
+        COMMAND_ID_HANDLER(ID_FIRST_IMPORT, OnFirstImport)
+        COMMAND_ID_HANDLER(ID_FIRST_NEWCLIP, OnFirstNewclip)
+        COMMAND_ID_HANDLER(ID_FIRST_GLOBALHOTKEYS, OnFirstGlobalhotkeys)
+        COMMAND_ID_HANDLER(ID_FIRST_DELETECLIPDATA, OnFirstDeleteclipdata)
+        COMMAND_ID_HANDLER(ID_FIRST_SAVECURRENTCLIPBOARD, OnFirstSavecurrentclipboard)
+        COMMAND_ID_HANDLER(ID_FIRST_FIXUPSTICKYCLIPORDER, OnFirstFixupstickycliporder)
+        COMMAND_ID_HANDLER(ID_FIRST_SHOWSTARTUPMESSAGE, OnFirstShowstartupmessage)
+        COMMAND_ID_HANDLER(ID_FIRST_BACKUPDATABASE, OnFirstBackupdatabase)
+        COMMAND_ID_HANDLER(ID_FIRST_RESTOREDATABASE, OnFirstRestoredatabase)
+        COMMAND_ID_HANDLER(ID_FIRST_DELETEALLNONUSEDCLIPS, OnFirstDeleteallnonusedclips)
+        COMMAND_ID_HANDLER(ID_FIRST_HELP, OnFirstHelp)
+        MESSAGE_HANDLER(WM_HOTKEY, OnHotKey)
+        MESSAGE_HANDLER(WM_SHOW_TRAY_ICON, OnShowTrayIcon)
+        MESSAGE_HANDLER(WM_CLIPBOARD_COPIED, OnClipboardCopied)
+        MESSAGE_HANDLER(WM_ADD_TO_DATABASE_FROM_SOCKET, OnAddToDatabaseFromSocket)
+        MESSAGE_HANDLER(WM_SEND_RECIEVE_ERROR, OnErrorOnSendRecieve)
+        MESSAGE_HANDLER(WM_SHOW_ERROR_MSG, OnErrorMsg)
+        MESSAGE_HANDLER(WM_SET_CONNECTED, OnSetConnected)
+        MESSAGE_HANDLER(WM_OPEN_CLOSE_WINDOW, OnOpenCloseWindow)
+        MESSAGE_HANDLER(WM_LOAD_ClIP_ON_CLIPBOARD, OnLoadClipOnClipboard)
+        MESSAGE_HANDLER(WM_GLOBAL_CLIPS_CLOSED, OnGlobalClipsClosed)
+        MESSAGE_HANDLER(WM_OPTIONS_CLOSED, OnOptionsClosed)
+        MESSAGE_HANDLER(WM_SHOW_OPTIONS, OnShowOptions)
+        MESSAGE_HANDLER(WM_DELETE_CLIPS_CLOSED, OnDeleteClipDataClosed)
+        MESSAGE_HANDLER(WM_SAVE_CLIPBOARD, OnSaveClipboardMessage)
+        MESSAGE_HANDLER(WM_READD_TASKBAR_ICON, OnReAddTaskBarIcon)
+        MESSAGE_HANDLER(WM_REOPEN_DATABASE, OnReOpenDatabase)
+        MESSAGE_HANDLER(WM_SHOW_MSG_WINDOW, OnShowMsgWindow)
+        MESSAGE_HANDLER(WM_SHOW_DITTO_GROUP, OnShowDittoGroup)
+        MESSAGE_HANDLER(WM_DISPLAYCHANGE, OnResolutionChange)
+        MESSAGE_HANDLER(WM_TRAYNOTIFY, OnTrayNotification)
+        MESSAGE_HANDLER(WM_PLAIN_TEXT_PASTE, OnPlainTextPaste)
+        MESSAGE_HANDLER(WM_BACKUP_DB, OnBackupDb)
+        MESSAGE_HANDLER(WM_RESTORE_DB, OnRestoreDb)
+        MESSAGE_HANDLER(WM_PASTE_CLIP, OnPasteClip)
+        MESSAGE_HANDLER(WM_EDIT_CLIP, OnEditClip)
+        CHAIN_MSG_MAP(CFrameWindowImpl<CMainFrame>)
+        CHAIN_MSG_MAP(CUpdateUI<CMainFrame>)
+    END_MSG_MAP()
 
-// Overrides
-public:
-    virtual BOOL PreCreateWindow(CREATESTRUCT &cs);
-    // Implementation
-public:
-    virtual ~CMainFrame();
-    #ifdef _DEBUG
-        virtual void AssertValid()const;
-        virtual void Dump(CDumpContext &dc)const;
-    #endif 
+    BEGIN_UPDATE_UI_MAP(CMainFrame)
+        UPDATE_ELEMENT(ID_FIRST_TOGGLECONNECTCV)
+        UPDATE_ELEMENT(ID_FIRST_SHOWSTARTUPMESSAGE)
+    END_UPDATE_UI_MAP()
 
+public:
     CQuickPaste m_quickPaste;
-    //CSystemTray m_TrayIcon;
-	CTrayNotifyIcon m_trayIcon;
+    CTrayNotifyIcon m_trayIcon;
     ULONG m_ulCopyGap;
     CString m_csKeyboardPaste;
     CAlphaBlend m_Transparency;
@@ -64,110 +115,75 @@ public:
     short m_keyModifiersTimerCount;
     HWND m_tempFocusWnd;
     CMainFrmThread m_thread;
-	CDialog *m_pGlobalClips;
-	CDialog *m_pDeleteClips;
-	COptionsSheet *m_pOptions;
-	int m_doubleClickGroupId;
-	DWORD m_doubleClickGroupStartTime;
-	CPowerManager m_PowerManager;
-	int m_startupScreenWidth;
-	int m_startupScreenHeight;
+    HWND m_pGlobalClips;
+    HWND m_pDeleteClips;
+    HWND m_pOptions;
+    int m_doubleClickGroupId;
+    DWORD m_doubleClickGroupStartTime;
+    CPowerManager m_PowerManager;
+    int m_startupScreenWidth;
+    int m_startupScreenHeight;
     CRichEditCtrlEx m_richEditTextConverter;
 
+    BOOL ResetKillDBTimer();
     void DoDittoCopyBufferPaste(int nCopyBuffer);
     void DoFirstTenPositionsPaste(int nPos);
-	void PasteOrShowGroup(int dbId, BOOL updateClipTime, BOOL activeTarget, BOOL sendPaste, bool pastedFromGroup);
-
-	void StartKeyModifierTimer();
-
-	bool PasteQuickPasteEntry(CString csQuickPaste);
-    bool SaveQuickPasteEntry(CString csQuickPaste, CClipList *pClipList);
+    void PasteOrShowGroup(int dbId, BOOL updateClipTime, BOOL activeTarget, BOOL sendPaste, bool pastedFromGroup);
+    void StartKeyModifierTimer();
+    bool PasteQuickPasteEntry(CString csQuickPaste);
+    bool SaveQuickPasteEntry(CString csQuickPaste, CClipList* pClipList);
     void ShowErrorMessage(CString csTitle, CString csMessage);
     bool CloseAllOpenDialogs();
-	void DoTextOnlyPaste();
-	void RefreshShowInTaskBar();
+    void DoTextOnlyPaste();
+    void RefreshShowInTaskBar();
+    void ShowEditWnd(CClipIDs& Ids);
+    void ShowQPasteWithActiveWindowCheck();
 
-    void ShowEditWnd(CClipIDs &Ids);
+    LRESULT OnHotKey(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT OnShowTrayIcon(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT OnClipboardCopied(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT OnAddToDatabaseFromSocket(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT OnErrorOnSendRecieve(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT OnErrorMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT OnSetConnected(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT OnOpenCloseWindow(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT OnLoadClipOnClipboard(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT OnGlobalClipsClosed(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT OnDeleteClipDataClosed(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT OnOptionsClosed(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT OnShowOptions(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT OnSaveClipboardMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT OnReAddTaskBarIcon(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT OnReOpenDatabase(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT OnShowMsgWindow(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT OnShowDittoGroup(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT OnResolutionChange(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT OnTrayNotification(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT OnPlainTextPaste(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT OnWinIniChange(UINT nFlags, LPCTSTR lpszSection);
+    LRESULT OnRestoreDb(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT OnBackupDb(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT OnPasteClip(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT OnEditClip(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 
-
-    // Generated message map functions
-protected:
-    //{{AFX_MSG(CMainFrame)
-    afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
-void OnFirstOption();
-    void OnFirstExit();
-    void OnChangeCbChain(HWND hWndRemove, HWND hWndAfter);
-    void OnDrawClipboard();
-    void OnTimer(UINT_PTR nIDEvent);
-    void OnFirstShowquickpaste();
-    void OnFirstToggleConnectCV();
-    void OnUpdateFirstToggleConnectCV(CCmdUI *pCmdUI);
-    void OnFirstHelp();
-    // End of message declarations
-    LRESULT OnHotKey(WPARAM wParam, LPARAM lParam);	void ShowQPasteWithActiveWindowCheck();
-LRESULT OnShowTrayIcon(WPARAM wParam, LPARAM lParam);
-    LRESULT OnClipboardCopied(WPARAM wParam, LPARAM lParam);
-    LRESULT OnAddToDatabaseFromSocket(WPARAM wParam, LPARAM lParam);
-    LRESULT OnErrorOnSendRecieve(WPARAM wParam, LPARAM lParam);
- 	LRESULT OnErrorMsg(WPARAM wParam, LPARAM lParam);
-    LRESULT OnSetConnected(WPARAM wParam, LPARAM lParam);
- 	LRESULT OnOpenCloseWindow(WPARAM wParam, LPARAM lParam);
- 	LRESULT OnLoadClipOnClipboard(WPARAM wParam, LPARAM lParam);
- 	LRESULT OnGlobalClipsClosed(WPARAM wParam, LPARAM lParam);
- 	LRESULT OnDeleteClipDataClosed(WPARAM wParam, LPARAM lParam);
- 	LRESULT OnOptionsClosed(WPARAM wParam, LPARAM lParam);
- 	LRESULT OnShowOptions(WPARAM wParam, LPARAM lParam);
- 	LRESULT OnSaveClipboardMessage(WPARAM wParam, LPARAM lParam);
- 	LRESULT OnReAddTaskBarIcon(WPARAM wParam, LPARAM lParam);
-    
-    // WTL Message Map
-    BEGIN_MSG_MAP(CMainFrame)
-        MSG_WM_CREATE(OnCreate)
-        MSG_WM_CLOSE(OnClose)
-        MSG_WM_DESTROY(OnDestroy)
-        MSG_WM_TIMER(OnTimer)
-        MESSAGE_HANDLER(WM_HOTKEY, OnHotKey)
-        MESSAGE_HANDLER(WM_SHOWTRAYICON, OnShowTrayIcon)
-        MESSAGE_HANDLER(WM_CLIPBOARDCOPIED, OnClipboardCopied)
-        MESSAGE_HANDLER(WM_ADDTODATABASEFROMSOCKET, OnAddToDatabaseFromSocket)
-        MESSAGE_HANDLER(WM_ERRORONSENDRECIEVE, OnErrorOnSendRecieve)
-        MESSAGE_HANDLER(WM_ERRORMSG, OnErrorMsg)
-        MESSAGE_HANDLER(WM_SETCONNECTED, OnSetConnected)
-        MESSAGE_HANDLER(WM_OPENCLOSEWINDOW, OnOpenCloseWindow)
-        MESSAGE_HANDLER(WM_LOADCLIPONCLIPBOARD, OnLoadClipOnClipboard)
-        MESSAGE_HANDLER(WM_GLOBALCLIPSCLOSED, OnGlobalClipsClosed)
-        MESSAGE_HANDLER(WM_DELETECLIPDATACLOSED, OnDeleteClipDataClosed)
-        MESSAGE_HANDLER(WM_OPTIONSCLOSED, OnOptionsClosed)
-        MESSAGE_HANDLER(WM_SHOWOPTIONS, OnShowOptions)
-        MESSAGE_HANDLER(WM_SAVECLIPBOARDMESSAGE, OnSaveClipboardMessage)
-        MESSAGE_HANDLER(WM_READDTASKBARICON, OnReAddTaskBarIcon)
-        CHAIN_MSG_MAP(CFrameWindowImpl<CMainFrame>)
-    END_MSG_MAP()
-    
-public:
-    virtual BOOL PreTranslateMessage(MSG *pMsg);
+    int OnCreate(LPCREATESTRUCT lpCreateStruct);
     void OnClose();
-    void OnFirstImport();
     void OnDestroy();
-    void OnFirstNewclip();
- 	void OnFirstGlobalhotkeys();
- 	void OnFirstDeleteclipdata();
- 	void OnFirstSavecurrentclipboard();
- 	LRESULT OnReOpenDatabase(WPARAM wParam, LPARAM lParam);
- 	LRESULT OnShowMsgWindow(WPARAM wParam, LPARAM lParam);
- 	LRESULT OnShowDittoGroup(WPARAM wParam, LPARAM lParam);
- 	void OnFirstFixupstickycliporder();
- 	LRESULT OnResolutionChange(WPARAM wParam, LPARAM lParam);
- 	LRESULT OnTrayNotification(WPARAM wParam, LPARAM lParam);	afx_msg LRESULT OnPlainTextPaste(WPARAM wParam, LPARAM lParam);
-	afx_msg void OnWinIniChange(LPCTSTR lpszSection);
-	afx_msg void OnFirstShowstartupmessage();
-	afx_msg void OnUpdateFirstShowstartupmessage(CCmdUI *pCmdUI);
-	afx_msg void OnFirstBackupdatabase();
-	afx_msg void OnFirstRestoredatabase();
-	afx_msg LRESULT OnRestoreDb(WPARAM wParam, LPARAM lParam);
-	afx_msg LRESULT OnBackupDb(WPARAM wParam, LPARAM lParam);
-	afx_msg void OnFirstDeleteallnonusedclips();
-    afx_msg LRESULT OnPasteClip(WPARAM wParam, LPARAM lParam);
-    afx_msg LRESULT OnEditClip(WPARAM wParam, LPARAM lParam);
-    afx_msg void OnSetFocus(CWnd* pOldWnd);
+    void OnTimer(UINT_PTR nIDEvent);
+    void OnSetFocus(HWND hWndOldFocus);
+    LRESULT OnFirstOption(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnFirstExit(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnFirstShowquickpaste(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnFirstToggleConnectCV(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnFirstImport(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnFirstNewclip(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnFirstGlobalhotkeys(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnFirstDeleteclipdata(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnFirstSavecurrentclipboard(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnFirstFixupstickycliporder(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnFirstShowstartupmessage(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnFirstBackupdatabase(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnFirstRestoredatabase(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnFirstDeleteallnonusedclips(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnFirstHelp(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 };

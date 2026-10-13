@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Resource.h"
 #include "RichEditCtrlEx.h"
 #include "WndEx.h"
 #include "DittoWindow.h"
@@ -10,9 +11,8 @@
 #include "SnapWindow.h"
 #include "SimpleBrowser.h"
 
-class CToolTipEx : public CWnd
+class CToolTipEx : public ATL::CWindow
 {
-// Construction
 public:
 	CToolTipEx();
 
@@ -22,14 +22,14 @@ public:
 // Operations
 public:
 	BOOL OnMsg(MSG* pMsg);
-	BOOL Create(CWnd* pParentWnd);
+	BOOL Create(WTL::CWindow* pParentWnd);
 	BOOL Show(CPoint point);
 	BOOL Hide();
 	void SetToolTipText(const CString &csText);
 	void SetRTFText(const CStringA &rtf);
 	void SetHtmlText(const CString &html);
 	void SetGdiplusBitmap(Gdiplus::Bitmap *gdiplusBitmap);
-	void SetNotifyWnd(CWnd *pNotify)		{ m_pNotifyWnd = pNotify;	}
+	void SetNotifyWnd(WTL::CWindow *pNotify)		{ m_pNotifyWnd = pNotify;	}
 	void HideWindowInXMilliSeconds(long lms);
 	CRect GetBoundsRect();
 
@@ -45,7 +45,7 @@ public:
 	void SetFolderPath(CString path) { m_folderPath = path; }
 
 	bool GetShowPersistant() { return m_showPersistant; }
-	void ToggleShowPersistant() { OnFirstAlwaysontop(); }
+	void ToggleShowPersistant();
 	bool ToggleWordWrap();
 	void SetTooltipActions(CAccels *pToolTipActions) { m_pToolTipActions = pToolTipActions; }
 
@@ -60,12 +60,9 @@ public:
 
 
 // Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CToolTipEx)
-	protected:
-	virtual void PostNcDestroy();
-	virtual BOOL PreTranslateMessage(MSG* pMsg);
-	//}}AFX_VIRTUAL
+protected:
+	void PostNcDestroy();
+	BOOL PreTranslateMessage(MSG* pMsg);
 
 // Implementation
 public:
@@ -81,7 +78,7 @@ protected:
 	CString m_html;
 	CRichEditCtrlEx m_RichEdit;
 	SimpleBrowser m_browser;
-	CWnd *m_pNotifyWnd;
+	WTL::CWindow *m_pNotifyWnd;
 	CGdipButton m_optionsButton;
 	int m_clipId;
 	CString m_searchText;
@@ -115,45 +112,98 @@ protected:
 	void SaveWindowSize();
 	CString m_mouseDownOnLink;
 
-	// Generated message map functions
-protected:
-	//{{AFX_MSG(CToolTipEx)	
-	afx_msg void OnSize(UINT nType, int cx, int cy);
-	afx_msg HITTEST_RET OnNcHitTest(CPoint point);
-	afx_msg void OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized);
-	afx_msg void OnNcMouseMove(UINT nHitTest, CPoint point);
-	afx_msg void OnNcLButtonUp(UINT nHitTest, CPoint point); 
-	afx_msg void OnNcLButtonDown(UINT nHitTest, CPoint point); 
-	afx_msg void OnNcCalcSize(BOOL bCalcValidRects, NCCALCSIZE_PARAMS FAR* lpncsp); 
-	afx_msg void OnNcPaint();
-	afx_msg void OnOptions();
-	afx_msg void OnWindowPosChanging(WINDOWPOS* lpwndpos);
-	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP()
-public:
-	afx_msg void OnTimer(UINT_PTR nIDEvent);
-	afx_msg void OnRememberwindowposition();
-	afx_msg void OnSizewindowtocontent();
-	afx_msg void OnScaleimagestofitwindow();
-	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
-	afx_msg void OnSetFocus(CWnd* pOldWnd);
-	afx_msg void OnPaint();	
-	afx_msg void OnFirstHidedescriptionwindowonm();
-	afx_msg void OnFirstWraptext();
-	afx_msg void OnNcLButtonDblClk(UINT nHitTest, CPoint point);
-	afx_msg void OnFirstAlwaysontop();
-	virtual BOOL OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult);
-	void OnEnMsgfilterRichedit21(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg LRESULT OnDpiChanged(WPARAM wParam, LPARAM lParam);
-	afx_msg void OnMoving(UINT fwSide, LPRECT pRect);
-	afx_msg void OnEnterSizeMove();
-	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
-	afx_msg LRESULT OnRefreshFooter(WPARAM wParam, LPARAM lParam);
-	afx_msg void OnFirstViewtext();
-	afx_msg void OnFirstViewrtf();
-	afx_msg void OnFirstViewhtml();
-	afx_msg void OnFirstViewImage();
-	afx_msg void OnUpdateFirstViewtext(CCmdUI* pCmdUI);
-	afx_msg void OnUpdateFirstViewrtf(CCmdUI* pCmdUI);
-	afx_msg void OnUpdateFirstViewhtml(CCmdUI* pCmdUI);
+// Message handlers (simplified - implement in cpp)
+	LRESULT OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnNcHitTest(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnActivate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnNcMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnNcLButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnNcLButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnNcCalcSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnNcPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnOptions(WORD wID, WORD wNotifyCode, HWND hWnd, BOOL& bHandled);
+	LRESULT OnWindowPosChanging(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnEraseBkgnd(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnTimer(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnRememberwindowposition(WORD wID, WORD wNotifyCode, HWND hWnd, BOOL& bHandled);
+	LRESULT OnSizewindowtocontent(WORD wID, WORD wNotifyCode, HWND hWnd, BOOL& bHandled);
+	LRESULT OnScaleimagestofitwindow(WORD wID, WORD wNotifyCode, HWND hWnd, BOOL& bHandled);
+	LRESULT OnRButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnSetFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnFirstHidedescriptionwindowonm(WORD wID, WORD wNotifyCode, HWND hWnd, BOOL& bHandled);
+	LRESULT OnFirstWraptext(WORD wID, WORD wNotifyCode, HWND hWnd, BOOL& bHandled);
+	LRESULT OnNcLButtonDblClk(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnFirstAlwaysontop(WORD wID, WORD wNotifyCode, HWND hWnd, BOOL& bHandled);
+	LRESULT OnEnMsgfilterRichedit21(int idCtrl, LPNMHDR pNMHDR, BOOL& bHandled);
+	LRESULT OnDpiChanged(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnMoving(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnEnterSizeMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnHScroll(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnRefreshFooter(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnFirstViewtext(WORD wID, WORD wNotifyCode, HWND hWnd, BOOL& bHandled);
+	LRESULT OnFirstViewrtf(WORD wID, WORD wNotifyCode, HWND hWnd, BOOL& bHandled);
+	LRESULT OnFirstViewhtml(WORD wID, WORD wNotifyCode, HWND hWnd, BOOL& bHandled);
+	LRESULT OnFirstViewImage(WORD wID, WORD wNotifyCode, HWND hWnd, BOOL& bHandled);
+	LRESULT OnEnLink(int idCtrl, LPNMHDR pNMHDR, BOOL& bHandled);
+	LRESULT OnBrowserBeforeNavigate2(int idCtrl, LPNMHDR pNMHDR, BOOL& bHandled);
+
+	// Command handlers (implemented as message handlers)
+	LRESULT OnCommand(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+	{
+		return OnDefault(uMsg, wParam, lParam, bHandled);
+	}
+
+	// Notification handlers
+	LRESULT OnNotify(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+	{
+		return OnDefault(uMsg, wParam, lParam, bHandled);
+	}
+
+	LRESULT OnDefault(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+	{
+		bHandled = FALSE;
+		return 0;
+	}
+
+	BEGIN_MSG_MAP_EX(CToolTipEx)
+		MESSAGE_HANDLER(WM_PAINT, OnPaint)
+		MESSAGE_HANDLER(WM_SIZE, OnSize)
+		MESSAGE_HANDLER(WM_NCHITTEST, OnNcHitTest)
+		MESSAGE_HANDLER(WM_ACTIVATE, OnActivate)
+		MESSAGE_HANDLER(WM_TIMER, OnTimer)
+		MESSAGE_HANDLER(WM_NCLBUTTONDBLCLK, OnNcLButtonDblClk)
+		MESSAGE_HANDLER(WM_NCPAINT, OnNcPaint)
+		MESSAGE_HANDLER(WM_NCCALCSIZE, OnNcCalcSize)
+		MESSAGE_HANDLER(WM_NCLBUTTONDOWN, OnNcLButtonDown)
+		MESSAGE_HANDLER(WM_NCMOUSEMOVE, OnNcMouseMove)
+		MESSAGE_HANDLER(WM_NCLBUTTONUP, OnNcLButtonUp)
+		MESSAGE_HANDLER(WM_ERASEBKGND, OnEraseBkgnd)
+		MESSAGE_HANDLER(WM_RBUTTONDOWN, OnRButtonDown)
+		MESSAGE_HANDLER(WM_SETFOCUS, OnSetFocus)
+		MESSAGE_HANDLER(WM_WINDOWPOSCHANGING, OnWindowPosChanging)
+		MESSAGE_HANDLER(WM_MOVING, OnMoving)
+		MESSAGE_HANDLER(WM_ENTERSIZEMOVE, OnEnterSizeMove)
+		MESSAGE_HANDLER(WM_HSCROLL, OnHScroll)
+		MESSAGE_HANDLER(WM_COMMAND, OnCommand)
+		MESSAGE_HANDLER(WM_NOTIFY, OnNotify)
+		COMMAND_ID_HANDLER(ID_FIRST_REMEMBERWINDOWPOSITION, OnRememberwindowposition)
+		COMMAND_ID_HANDLER(ID_FIRST_SIZEWINDOWTOCONTENT, OnSizewindowtocontent)
+		COMMAND_ID_HANDLER(ID_FIRST_SCALEIMAGESTOFITWINDOW, OnScaleimagestofitwindow)
+		COMMAND_ID_HANDLER(2, OnOptions)
+		COMMAND_ID_HANDLER(ID_FIRST_HIDEDESCRIPTIONWINDOWONM, OnFirstHidedescriptionwindowonm)
+		COMMAND_ID_HANDLER(ID_FIRST_WRAPTEXT, OnFirstWraptext)
+		COMMAND_ID_HANDLER(ID_FIRST_ALWAYSONTOP, OnFirstAlwaysontop)
+		COMMAND_ID_HANDLER(ID_FIRST_VIEWTEXT, OnFirstViewtext)
+		COMMAND_ID_HANDLER(ID_FIRST_VIEWRTF, OnFirstViewrtf)
+		COMMAND_ID_HANDLER(ID_FIRST_VIEWHTML, OnFirstViewhtml)
+		COMMAND_ID_HANDLER(ID_FIRST_VIEWASIMAGE, OnFirstViewImage)
+		NOTIFY_CODE_HANDLER(EN_MSGFILTER, OnEnMsgfilterRichedit21)
+		NOTIFY_CODE_HANDLER(EN_LINK, OnEnLink)
+		NOTIFY_CODE_HANDLER(SimpleBrowser::NotificationType::BeforeNavigate2, OnBrowserBeforeNavigate2)
+		MESSAGE_HANDLER(WM_DPICHANGED, OnDpiChanged)
+		MESSAGE_HANDLER(WM_REFRESH_FOOTER, OnRefreshFooter)
+		REFLECT_NOTIFICATIONS_MSG_FILTERED(WM_DRAWITEM)
+		REFLECT_NOTIFICATIONS_MSG_FILTERED(WM_CTLCOLORSTATIC)
+	END_MSG_MAP()
 };

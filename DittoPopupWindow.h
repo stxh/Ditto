@@ -1,5 +1,6 @@
 #pragma once
 #include "WndEx.h"
+#include <atltypes.h>
 
 class CDittoPopupWindow : public CWndEx
 {
@@ -14,20 +15,26 @@ public:
 	void SetCopyToGroupId(int groupId) { m_groupId = groupId; }
 	
 protected:
-	DECLARE_MESSAGE_MAP()
-	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
-	afx_msg void OnSize(UINT nType, int cx, int cy);
-	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
-	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
+	BEGIN_MSG_MAP_EX(CDittoPopupWindow)
+		MSG_WM_CREATE(OnCreate)
+		MSG_WM_SIZE(OnSize)
+		MESSAGE_HANDLER(WM_CTLCOLORSTATIC, OnCtlColorStatic)
+		MSG_WM_LBUTTONUP(OnLButtonUp)
+		CHAIN_MSG_MAP(CWndEx)
+	END_MSG_MAP()
+
+	int OnCreate(LPCREATESTRUCT lpCreateStruct);
+	LRESULT OnSize(UINT nType, CSize size);
+	LRESULT OnCtlColorStatic(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	void OnLButtonUp(UINT nFlags, CPoint pt);
 
 
-	CStatic m_textLabel;
-	CProgressCtrl m_progressWnd;
-	CFont m_font;
+	WTL::CStatic m_textLabel;
+	WTL::CProgressBarCtrl m_progressWnd;
+	WTL::CFont m_font;
 	int m_groupId;
 
 	void PumpMessages();
 
 	void DoSize(int cx, int cy);
 };
-

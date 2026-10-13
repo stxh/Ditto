@@ -6,7 +6,7 @@
 #include <Mmsystem.h>
 #include "Path.h"
 #include "DimWnd.h"
-#include "HyperLink.h"
+#include <atlctrlx.h>
 
 using namespace nsPath;
 
@@ -115,7 +115,7 @@ LRESULT COptionsGeneral::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 		m_popupPositionCombo.SetCurSel(cursorPos);
 	}
 
-	theApp.m_Language.UpdateOptionGeneral(this);
+	theApp.m_Language.UpdateOptionGeneral(m_hWnd);
 
 	CString csPath = CGetSetOptions::GetDBPath(false);
 	m_ePath.SetWindowText(csPath);
@@ -340,7 +340,7 @@ LRESULT COptionsGeneral::OnGetPath(WORD, WORD, HWND, BOOL&)
 
 LRESULT COptionsGeneral::OnButtonAbout(WORD, WORD, HWND, BOOL&)
 {
-	CDimWnd dim(this->GetParent());
+	CDimWnd dim(this->GetParent().m_hWnd);
 
 	CMultiLanguage Lang;
 
@@ -389,7 +389,7 @@ LRESULT COptionsGeneral::OnCtlColor(UINT, WPARAM wParam, LPARAM, BOOL&)
 
 LRESULT COptionsGeneral::OnBnClickedButtonTheme(WORD, WORD, HWND, BOOL&)
 {
-	CDimWnd dim(this->GetParent());
+	CDimWnd dim(this->GetParent().m_hWnd);
 	CTheme theme;
 
 	CString csTheme;

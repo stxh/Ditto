@@ -87,7 +87,7 @@ void CRegExFilterHelper::Add(int pos, CRegExFilterData &data)
 {
 	if (pos >= 0 && pos < MAX_REGEX_FILTERS)
 	{
-		ATL::CCritSecLock csLock(m_critSection.m_sect);
+		ATL::CCritSecLock csLock(m_critSection);
 		m_filters[pos] = data;
 	}
 }
@@ -96,7 +96,7 @@ void CRegExFilterHelper::SetRegEx(int pos, std::wstring regEx)
 {
 	if (pos >= 0 && pos < MAX_REGEX_FILTERS)
 	{
-		ATL::CCritSecLock csLock(m_critSection.m_sect);
+		ATL::CCritSecLock csLock(m_critSection);
 		m_filters[pos].m_regEx = regEx;
 	}
 }
@@ -105,7 +105,7 @@ void CRegExFilterHelper::SetProcessFilter(int pos, CString processName)
 {
 	if (pos >= 0 && pos < MAX_REGEX_FILTERS)
 	{
-		ATL::CCritSecLock csLock(m_critSection.m_sect);
+		ATL::CCritSecLock csLock(m_critSection);
 		m_filters[pos].m_processFilters = processName;
 		m_filters[pos].ParseFilters();
 	}
@@ -113,7 +113,7 @@ void CRegExFilterHelper::SetProcessFilter(int pos, CString processName)
 
 bool CRegExFilterHelper::TextMatchFilters(CString &activeApp, std::wstring &copiedText)
 {
-	ATL::CCritSecLock csLock(m_critSection.m_sect);
+	ATL::CCritSecLock csLock(m_critSection);
 
 	for (int i = 0; i < MAX_REGEX_FILTERS; i++)
 	{

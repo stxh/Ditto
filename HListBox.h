@@ -7,10 +7,12 @@
 // HListBox.h : header file
 //
 
+#include <atlctrls.h>
+
 /////////////////////////////////////////////////////////////////////////////
 // CHListBox window
 
-class CHListBox : public CListBox
+class CHListBox : public WTL::CListBox
 {
 // Construction
 public:
@@ -37,13 +39,11 @@ public:
 
 	// Generated message map functions
 protected:
-        void updateWidth(LPCTSTR s);
+    void updateWidth(LPCTSTR s);
 	int width;
 	//{{AFX_MSG(CHListBox)
 		// NOTE - the ClassWizard will add and remove member functions here.
 	//}}AFX_MSG
-
-	DECLARE_MESSAGE_MAP()
 };
 
 /////////////////////////////////////////////////////////////////////////////

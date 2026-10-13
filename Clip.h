@@ -19,7 +19,16 @@ class CCopyThread;
 
 typedef CArray<CLIPFORMAT, CLIPFORMAT> CClipTypes;
 
-/*----------------------------------------------------------------------------*\\\n\tCOleDataObjectEx\n\\*----------------------------------------------------------------------------*/\nclass COleDataObjectEx\n{\npublic:\n\t// creates global from IStream if necessary\n\tHGLOBAL GetGlobalData(CLIPFORMAT cfFormat, LPFORMATETC lpFormatEtc = NULL);\n\tstd::shared_ptr<CClipTypes> GetAvailableTypes();\n};
+/*----------------------------------------------------------------------------*\
+	COleDataObjectEx
+\*----------------------------------------------------------------------------*/
+class COleDataObjectEx : public COleDataObject
+{
+public:
+	// creates global from IStream if necessary
+	HGLOBAL GetGlobalData(CLIPFORMAT cfFormat, LPFORMATETC lpFormatEtc = NULL);
+	std::shared_ptr<CClipTypes> GetAvailableTypes();
+};
 
 /*----------------------------------------------------------------------------*\
 	CClipFormat - holds the data of one clip format.
@@ -85,7 +94,46 @@ public:
 	Gdiplus::Bitmap *CreateGdiplusBitmap();
 };
 
-/*----------------------------------------------------------------------------*\\n\tCClipFormats - holds an array of CClipFormat\n\\*----------------------------------------------------------------------------*/\nclass CClipFormats : public IClipFormats\n{\npublic:\n\tstd::vector<CClipFormat> m_Formats;\n\n\t// returns a pointer to the CClipFormat in this array which matches the given type\n\t//  or NULL if that type doesn't exist in this array.\n\tCClipFormat* FindFormat(UINT cfType); \n\n\tvirtual int Size() { return (int)m_Formats.size(); }\n\tvirtual IClipFormat *GetAt(int nPos) { return &m_Formats[nPos]; }\n\tvirtual void DeleteAt(int nPos) { m_Formats.erase(m_Formats.begin() + nPos); }\n\tvirtual void DeleteAll() { m_Formats.clear(); }\n\tvirtual INT_PTR AddNew(CLIPFORMAT type, HGLOBAL data) {CClipFormat ft(type, data, -1); ft.m_autoDeleteData = false; m_Formats.push_back(ft); return m_Formats.size() - 1; }\n\tvirtual IClipFormat *FindFormatEx(CLIPFORMAT type)	{ return FindFormat((UINT)type); }\n\tvirtual bool RemoveFormat(CLIPFORMAT type);\n};
+/*----------------------------------------------------------------------------*\
+\tCClipFormats - holds an array of CClipFormat
+\\*----------------------------------------------------------------------------*/
+class CClipFormats : public IClipFormats
+{
+public:
+	std::vector<CClipFormat> m_Formats;
+	
+	// returns a pointer to the CClipFormat in this array which matches the given type
+	//  or NULL if that type doesn't exist in this array.
+	CClipFormat* FindFormat(UINT cfType); 
+	
+	virtual int Size() { return (int)m_Formats.size(); }
+	virtual IClipFormat *GetAt(int nPos) { return &m_Formats[nPos]; }
+	virtual void DeleteAt(int nPos) { m_Formats.erase(m_Formats.begin() + nPos); }
+	virtual void DeleteAll() { m_Formats.clear(); }
+	virtual INT_PTR AddNew(CLIPFORMAT type, HGLOBAL data) {CClipFormat ft(type, data, -1); ft.m_autoDeleteData = false; m_Formats.push_back(ft); return m_Formats.size() - 1; }
+	INT_PTR Add(const CClipFormat &f) { m_Formats.push_back(f); return (INT_PTR)m_Formats.size() - 1; }
+	virtual IClipFormat *FindFormatEx(CLIPFORMAT type)	{ return FindFormat((UINT)type); }
+	virtual bool RemoveFormat(CLIPFORMAT type);
+
+	INT_PTR GetSize() const { return (INT_PTR)m_Formats.size(); }
+	INT_PTR GetCount() const { return GetSize(); }
+	CClipFormat& ElementAt(INT_PTR nIndex) { return m_Formats[(size_t)nIndex]; }
+	const CClipFormat& ElementAt(INT_PTR nIndex) const { return m_Formats[(size_t)nIndex]; }
+	CClipFormat& operator[](INT_PTR nIndex) { return m_Formats[(size_t)nIndex]; }
+	const CClipFormat& operator[](INT_PTR nIndex) const { return m_Formats[(size_t)nIndex]; }
+	CClipFormat* GetData() { return m_Formats.empty() ? NULL : m_Formats.data(); }
+	const CClipFormat* GetData() const { return m_Formats.empty() ? NULL : m_Formats.data(); }
+	void RemoveAt(INT_PTR nIndex, INT_PTR nCount = 1)
+	{
+		if (nIndex < 0 || nIndex >= (INT_PTR)m_Formats.size())
+			return;
+		size_t last = (size_t)nIndex + (size_t)nCount;
+		if (last > m_Formats.size())
+			last = m_Formats.size();
+		m_Formats.erase(m_Formats.begin() + nIndex, m_Formats.begin() + last);
+	}
+	void RemoveAll() { m_Formats.clear(); }
+};
 
 
 /*----------------------------------------------------------------------------*\
@@ -126,7 +174,7 @@ public:
 
 	virtual CString Description() { return m_Desc; }
 	virtual void Description(CString csValue) { m_Desc = csValue; }
-	virtual time_t PasteTime() { return m_Time; }
+	virtual CTime PasteTime() { return CTime(m_Time); }
 	virtual int ID() { return m_id; }
 	virtual int Parent() { return m_parentId; }
 	virtual void Parent(int nParent) { m_parentId = nParent; }
@@ -199,6 +247,56 @@ protected:
 };
 
 
-/*----------------------------------------------------------------------------*\\\n\tCClipList\n\\*----------------------------------------------------------------------------*/\n\nclass CClipList\n{\npublic:\n\tstd::vector<CClip*> m_ClipList;\n\t\n\t~CClipList();\n\t// returns the number of clips actually saved\n\t// while this does empty the Format Data, it does not delete the Clips.\n\tint AddToDB( bool bLatestOrder = false);\n\n\tconst CClipList& operator=(const CClipList &cliplist);\n\t\n\tvoid AddTail(CClip* pClip) { m_ClipList.push_back(pClip); }\n\tCClip* RemoveHead() { if (m_ClipList.empty()) return nullptr; CClip* pClip = m_ClipList.front(); m_ClipList.erase(m_ClipList.begin()); return pClip; }\n\tBOOL IsEmpty() const { return m_ClipList.empty(); }\n\tINT_PTR GetCount() const { return m_ClipList.size(); }\n\tvoid RemoveAll() { m_ClipList.clear(); }\n\tCClip*& GetHead() { return m_ClipList.front(); }\n\tCClip*& GetTail() { return m_ClipList.back(); }\n};
+/*----------------------------------------------------------------------------*\\
+\tCClipList
+\\*----------------------------------------------------------------------------*/
+
+class CClipList
+{
+public:
+	std::vector<CClip*> m_ClipList;
+	
+	~CClipList();
+	// returns the number of clips actually saved
+	// while this does empty the Format Data, it does not delete the Clips.
+	int AddToDB( bool bLatestOrder = false);
+	
+	const CClipList& operator=(const CClipList &cliplist);
+	
+	void AddTail(CClip* pClip) { m_ClipList.push_back(pClip); }
+	CClip* RemoveHead() { if (m_ClipList.empty()) return nullptr; CClip* pClip = m_ClipList.front(); m_ClipList.erase(m_ClipList.begin()); return pClip; }
+	void RemoveTail() { if (!m_ClipList.empty()) m_ClipList.pop_back(); }
+	BOOL IsEmpty() const { return (BOOL)m_ClipList.empty(); }
+	INT_PTR GetCount() const { return (INT_PTR)m_ClipList.size(); }
+	void RemoveAll() { m_ClipList.clear(); }
+	CClip* GetHead() { return m_ClipList.empty() ? nullptr : m_ClipList.front(); }
+	CClip* GetTail() { return m_ClipList.empty() ? nullptr : m_ClipList.back(); }
+
+	// MFC style iteration, POSITION is a one based index, 0 means end
+	POSITION GetHeadPosition() const { return m_ClipList.empty() ? 0 : 1; }
+	POSITION GetTailPosition() const { return (POSITION)m_ClipList.size(); }
+	CClip* GetNext(POSITION& rPosition) const
+	{
+		if (rPosition < 1 || rPosition > (INT_PTR)m_ClipList.size())
+		{
+			rPosition = 0;
+			return nullptr;
+		}
+		CClip* pClip = m_ClipList[(size_t)rPosition - 1];
+		rPosition = (rPosition < (INT_PTR)m_ClipList.size()) ? rPosition + 1 : 0;
+		return pClip;
+	}
+	CClip* GetPrev(POSITION& rPosition) const
+	{
+		if (rPosition < 1 || rPosition > (INT_PTR)m_ClipList.size())
+		{
+			rPosition = 0;
+			return nullptr;
+		}
+		CClip* pClip = m_ClipList[(size_t)rPosition - 1];
+		rPosition = (rPosition > 1) ? rPosition - 1 : 0;
+		return pClip;
+	}
+};
 
 #endif // !defined(AFX_PROCESSCOPY_H__185CBB6F_4B63_4397_8FF9_E18D777DA506__INCLUDED_)

@@ -15,7 +15,7 @@ public:
 
 	bool Loaded()	{ return m_Addins.size() > 0; }
 
-	bool AddPrePasteAddinsToMenu(CMenu *pMenu);
+	bool AddPrePasteAddinsToMenu(CMenuHandle *pMenu);
 	bool CallPrePasteFunction(int Id, IClip *pClip);
 	void AboutScreenText(CStringArray &arr);
 

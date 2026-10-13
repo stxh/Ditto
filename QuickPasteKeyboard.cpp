@@ -4,7 +4,7 @@
 #include "ActionEnums.h"
 #include "HotKeys.h"
 
-BOOL bDummy = FALSE;
+static BOOL bDummy = FALSE;
 
 CQuickPasteKeyboard::CQuickPasteKeyboard()
 {
@@ -52,7 +52,7 @@ LRESULT CQuickPasteKeyboard::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 	m_mouseType1.SetCurSel(0);
 	m_mouseType2.SetCurSel(0);
 
-	theApp.m_Language.UpdateOptionQuickPasteKeyboard(this);
+	theApp.m_Language.UpdateOptionQuickPasteKeyboard(m_hWnd);
 
 	return 0;
 }

@@ -11,7 +11,7 @@ LRESULT CFriendDetails::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 	::SetDlgItemText(m_hWnd, IDC_EDIT_DESCRIPTION, m_csDescription);
 	::SetDlgItemText(m_hWnd, IDC_EDIT_IP, m_csIP);
 
-	theApp.m_Language.UpdateOptionFriendsDetail(this);
+	theApp.m_Language.UpdateOptionFriendsDetail(m_hWnd);
 
 	return TRUE;
 }

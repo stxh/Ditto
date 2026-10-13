@@ -9,7 +9,6 @@
 
 // CDittoDropTarget
 
-IMPLEMENT_DYNAMIC(CDittoDropTarget, COleDropTarget)
 CDittoDropTarget::CDittoDropTarget()
 {
 	m_pTarget = NULL;

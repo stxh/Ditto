@@ -872,7 +872,6 @@ const CClipList& CClipList::operator=(const CClipList &cliplist)
 CClipboardViewer
 \*----------------------------------------------------------------------------*/
 
-IMPLEMENT_DYNAMIC(CClipboardViewer, CWnd)
 
 BEGIN_MESSAGE_MAP(CClipboardViewer, CWnd)
 //{{AFX_MSG_MAP(CClipboardViewer)
@@ -1113,7 +1112,6 @@ CCopyConfig
 CCopyThread
 \*----------------------------------------------------------------------------*/
 
-IMPLEMENT_DYNCREATE(CCopyThread, WTL::CWinThread)
 
 CCopyThread::CCopyThread()
 {

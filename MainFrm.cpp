@@ -8,7 +8,7 @@
 #include "CopyProperties.h"
 #include "InternetUpdate.h"
 #include ".\mainfrm.h"
-#include "HyperLink.h"
+#include <atlctrlx.h>
 #include "tinyxml\tinyxml.h"
 #include "Path.h"
 #include "DittoCopyBuffer.h"
@@ -17,62 +17,11 @@
 #include "OptionsSheet.h"
 #include "DeleteClipData.h"
 #include "DatabaseUtilities.h"
-#define WM_ICON_NOTIFY			WM_APP+10
-#define MYWM_NOTIFYICON (WM_USER+1)
-#define WM_TRAYNOTIFY WM_USER + 100
-	
-BEGIN_MSG_MAP(CMainFrame)
-	MESSAGE_HANDLER(WM_CREATE, OnCreate)
-	COMMAND_ID_HANDLER(ID_FIRST_OPTION, OnFirstOption)
-	COMMAND_ID_HANDLER(ID_FIRST_EXIT, OnFirstExit)
-	MESSAGE_HANDLER(WM_TIMER, OnTimer)
-	COMMAND_ID_HANDLER(ID_FIRST_SHOWQUICKPASTE, OnFirstShowquickpaste)
-	COMMAND_ID_HANDLER(ID_FIRST_TOGGLECONNECTCV, OnFirstToggleConnectCV)
-	COMMAND_ID_HANDLER(ID_FIRST_HELP, OnFirstHelp)
-	MESSAGE_HANDLER(WM_HOTKEY, OnHotKey)
-	MESSAGE_HANDLER(WM_SHOW_TRAY_ICON, OnShowTrayIcon)
-	MESSAGE_HANDLER(WM_CLIPBOARD_COPIED, OnClipboardCopied)
-	MESSAGE_HANDLER(WM_CLOSE, OnClose)
-	MESSAGE_HANDLER(WM_ADD_TO_DATABASE_FROM_SOCKET, OnAddToDatabaseFromSocket)
-	MESSAGE_HANDLER(WM_SEND_RECIEVE_ERROR, OnErrorOnSendRecieve)
-	MESSAGE_HANDLER(WM_SHOW_ERROR_MSG, OnErrorMsg)
-	COMMAND_ID_HANDLER(ID_FIRST_IMPORT, OnFirstImport)
-	MESSAGE_HANDLER(WM_DESTROY, OnDestroy)
-	COMMAND_ID_HANDLER(ID_FIRST_NEWCLIP, OnFirstNewclip)
-	MESSAGE_HANDLER(WM_SET_CONNECTED, OnSetConnected)
-	MESSAGE_HANDLER(WM_OPEN_CLOSE_WINDOW, OnOpenCloseWindow)
-	MESSAGE_HANDLER(WM_LOAD_ClIP_ON_CLIPBOARD, OnLoadClipOnClipboard)
-	COMMAND_ID_HANDLER(ID_FIRST_GLOBALHOTKEYS, OnFirstGlobalhotkeys)
-	MESSAGE_HANDLER(WM_GLOBAL_CLIPS_CLOSED, OnGlobalClipsClosed)
-	MESSAGE_HANDLER(WM_OPTIONS_CLOSED, OnOptionsClosed)
-	MESSAGE_HANDLER(WM_SHOW_OPTIONS, OnShowOptions)
-	COMMAND_ID_HANDLER(ID_FIRST_DELETECLIPDATA, OnFirstDeleteclipdata)
-	MESSAGE_HANDLER(WM_DELETE_CLIPS_CLOSED, OnDeleteClipDataClosed)
-	COMMAND_ID_HANDLER(ID_FIRST_SAVECURRENTCLIPBOARD, OnFirstSavecurrentclipboard)
-	MESSAGE_HANDLER(WM_SAVE_CLIPBOARD, OnSaveClipboardMessage)
-	MESSAGE_HANDLER(WM_READD_TASKBAR_ICON, OnReAddTaskBarIcon)
-	MESSAGE_HANDLER(WM_REOPEN_DATABASE, OnReOpenDatabase)
-	MESSAGE_HANDLER(WM_SHOW_MSG_WINDOW, OnShowMsgWindow)
-	MESSAGE_HANDLER(WM_SHOW_DITTO_GROUP, OnShowDittoGroup)
-	COMMAND_ID_HANDLER(ID_FIRST_FIXUPSTICKYCLIPORDER, OnFirstFixupstickycliporder)
-	MESSAGE_HANDLER(WM_DISPLAYCHANGE, OnResolutionChange)
-	MESSAGE_HANDLER(WM_TRAYNOTIFY, OnTrayNotification)
-	MESSAGE_HANDLER(WM_PLAIN_TEXT_PASTE, OnPlainTextPaste)
-	MESSAGE_HANDLER(WM_WININICHANGE, OnWinIniChange)
-	COMMAND_ID_HANDLER(ID_FIRST_SHOWSTARTUPMESSAGE, OnFirstShowstartupmessage)
-	COMMAND_ID_HANDLER(ID_FIRST_BACKUPDATABASE, OnFirstBackupdatabase)
-	COMMAND_ID_HANDLER(ID_FIRST_RESTOREDATABASE, OnFirstRestoredatabase)
-	MESSAGE_HANDLER(WM_BACKUP_DB, OnBackupDb)
-	MESSAGE_HANDLER(WM_RESTORE_DB, OnRestoreDb)
-	COMMAND_ID_HANDLER(ID_FIRST_DELETEALLNONUSEDCLIPS, OnFirstDeleteallnonusedclips)
-	MESSAGE_HANDLER(WM_PASTE_CLIP, OnPasteClip)
-	MESSAGE_HANDLER(WM_EDIT_CLIP, OnEditClip)
-	MESSAGE_HANDLER(WM_SETFOCUS, OnSetFocus)
-END_MSG_MAP()
-	static UINT indicators[] = 
+
+static UINT indicators[] =
 {
-	ID_SEPARATOR,  // status line indicator
-	ID_INDICATOR_CAPS, ID_INDICATOR_NUM, ID_INDICATOR_SCRL, 
+    ID_SEPARATOR,
+    ID_INDICATOR_CAPS, ID_INDICATOR_NUM, ID_INDICATOR_SCRL,
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -96,100 +45,88 @@ CMainFrame::~CMainFrame()
     CGetSetOptions::SetMainHWND(0);
 }
 
-LRESULT CMainFrame::OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
-    LPCREATESTRUCT lpCreateStruct = (LPCREATESTRUCT)lParam;
-    if(CFrameWindowImpl<CMainFrame>::OnCreate(uMsg, wParam, lParam, bHandled) ==  - 1)
+    if(CFrameWindowImpl<CMainFrame>::OnCreate(lpCreateStruct) == -1)
     {
-        return  - 1;
+        return -1;
     }
-	m_PowerManager.Start(m_hWnd);
 
-    ////Center the main window so message boxes are in the center
+    CMessageLoop* pLoop = _Module.GetMessageLoop();
+    ATLASSERT(pLoop != NULL);
+    pLoop->AddMessageFilter(this);
+    pLoop->AddIdleHandler(this);
+
+    m_PowerManager.Start(m_hWnd);
+
     CRect rcScreen = DefaultMonitorRect();
     CPoint cpCenter = rcScreen.CenterPoint();
-    MoveWindow(cpCenter.x, cpCenter.x,  1,  1);
+    MoveWindow(cpCenter.x, cpCenter.x, 1, 1);
 
-	m_startupScreenWidth = GetScreenWidth();
-	m_startupScreenHeight = GetScreenHeight();
-
-    //Then set the main window to transparent so it's never shown
-    //if it is shown then only the task tray icon
-    //m_Transparency.SetTransparent(m_hWnd, 0, true);
+    m_startupScreenWidth = GetScreenWidth();
+    m_startupScreenHeight = GetScreenHeight();
 
     SetWindowText(_T(""));
 
     Log(_T("Setting polling timer to track focus"));
     SetTimer(ACTIVE_WINDOW_TIMER, CGetSetOptions::FocusWndTimerTimeout(), 0);
-
-	SetTimer(READ_RANDOM_DB_FILE, CGetSetOptions::ReadRandomFileInterval() * 1000, 0);
-
+    SetTimer(READ_RANDOM_DB_FILE, CGetSetOptions::ReadRandomFileInterval() * 1000, 0);
     SetWindowText(_T("Ditto"));
-	
-	m_trayIcon.Create(this, IDR_MENU, _T("Ditto"), CTrayNotifyIcon::LoadIcon(IDR_MAINFRAME), WM_TRAYNOTIFY, 0, 1);
-	m_trayIcon.SetDefaultMenuItem(ID_FIRST_SHOWQUICKPASTE, FALSE);	    
+    
+    m_trayIcon.Create(this, IDR_MENU, _T("Ditto"), CTrayNotifyIcon::LoadIcon(IDR_MAINFRAME), WM_TRAYNOTIFY, 0, 1);
+    m_trayIcon.SetDefaultMenuItem(ID_FIRST_SHOWQUICKPASTE, FALSE);
 
-	//removed to keep Ditto from taking focus on start
-    //m_trayIcon.MinimiseToTray(this);
+    if(CGetSetOptions::GetShowStartupMessage())
+    {
+        CString msg = theApp.m_Language.GetString(_T("StartupMsg"), _T("Ditto is running minimized, Ditto can be opened by hot keys or by clicking the task tray icon"));
+        m_trayIcon.SetBalloonDetails(msg, _T("Ditto"), CTrayNotifyIcon::BalloonStyle::Info, CGetSetOptions::GetBalloonTimeout());
+    }
 
-	if (CGetSetOptions::GetShowStartupMessage())
-	{
-		CString msg = theApp.m_Language.GetString(_T("StartupMsg"), _T("Ditto is running minimized, Ditto can be opened by hot keys or by clicking the task tray icon"));
-		m_trayIcon.SetBalloonDetails(msg, _T("Ditto"), CTrayNotifyIcon::BalloonStyle::Info, CGetSetOptions::GetBalloonTimeout());
-	}
+    theApp.m_Language.UpdateTrayIconRightClickMenu(&m_trayIcon.GetMenu());
 
-	theApp.m_Language.UpdateTrayIconRightClickMenu(&m_trayIcon.GetMenu());
-	
-    //Only if in release
-    #ifndef _DEBUG
-        {
-            //If not showing the icon show it for 40 seconds so they can get to the option
-            //in case they can't remember the hot keys or something like that
-            if(!(CGetSetOptions::GetShowIconInSysTray()))
-            {
-                SetTimer(HIDE_ICON_TIMER, 40000, 0);
-            }
-        }
-    #endif 
+#ifndef _DEBUG
+    if(!(CGetSetOptions::GetShowIconInSysTray()))
+    {
+        SetTimer(HIDE_ICON_TIMER, 40000, 0);
+    }
+#endif
 
-    //SetTimer(CLOSE_WINDOW_TIMER, ONE_HOUR*24, 0);
-	SetTimer(REMOVE_OLD_TEMP_FILES, ONE_HOUR * 6, 0);
-    SetTimer(REMOVE_OLD_ENTRIES_TIMER, ONE_MINUTE*15, 0);
-	SetTimer(CLOSE_NO_DB_WINDOW_TIMER, 10000, 0);
+    SetTimer(REMOVE_OLD_TEMP_FILES, ONE_HOUR * 6, 0);
+    SetTimer(REMOVE_OLD_ENTRIES_TIMER, ONE_MINUTE * 15, 0);
+    SetTimer(CLOSE_NO_DB_WINDOW_TIMER, 10000, 0);
 
-	//found on some computers GetTickCount gettickcount returns a smaller value than other, can't explain
-	//check here to see if we need to make an adjustment
-	IdleSeconds();
-
+    IdleSeconds();
     m_ulCopyGap = CGetSetOptions::GetCopyGap();
 
     theApp.AfterMainCreate();
-
     m_thread.Start(this);
 
-bHandled = TRUE;
     return 0;
+}
+
+BOOL CMainFrame::OnIdle()
+{
+    return FALSE;
 }
 LRESULT CMainFrame::OnPlainTextPaste(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	DoTextOnlyPaste();
-	return 0;
+    DoTextOnlyPaste();
+    return 0;
 }
 LRESULT CMainFrame::OnTrayNotification(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	if (WM_MOUSEFIRST <= LOWORD(lParam) && LOWORD(lParam) <= WM_MOUSELAST)
-	{
-		theApp.m_activeWnd.TrackActiveWnd(true);
-	}
+    if(WM_MOUSEFIRST <= LOWORD(lParam) && LOWORD(lParam) <= WM_MOUSELAST)
+    {
+        theApp.m_activeWnd.TrackActiveWnd(true);
+    }
 
-	//click on balloon
-	if (lParam == 0x405)
-	{
-		SetTimer(DELAYED_SHOW_DITTO_TIMER, 100, NULL);		
-	}
-	
-	m_trayIcon.OnTrayNotification(wParam, lParam);
-	return 0;
+    if(lParam == 0x405)
+    {
+        SetTimer(DELAYED_SHOW_DITTO_TIMER, 100, NULL);
+    }
+
+    m_trayIcon.OnTrayNotification(wParam, lParam);
+    return 0;
 }
 BOOL CMainFrame::PreCreateWindow(CREATESTRUCT &cs)
 {
@@ -684,42 +621,35 @@ void CMainFrame::DoDittoCopyBufferPaste(int nCopyBuffer)
     CATCH_SQLITE_EXCEPTION
 }
 
-LRESULT CMainFrame::OnTimer(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 {
-    UINT_PTR nIDEvent = (UINT_PTR)wParam;
     switch(nIDEvent)
-    {        case HIDE_ICON_TIMER:
-            {
-				m_trayIcon.Hide();
-                KillTimer(nIDEvent);
-            }
-			break;
-
-        case CLOSE_WINDOW_TIMER:
-            {
-                //m_quickPaste.CloseQPasteWnd();
-            }
-			break;
+    {
+        case HIDE_ICON_TIMER:
+        {
+            m_trayIcon.Hide();
+            KillTimer(nIDEvent);
+        }
+        break;
 
         case REMOVE_OLD_ENTRIES_TIMER:
-			{
-                m_thread.FireDeleteEntries();
-            }
-			break;
+        {
+            m_thread.FireDeleteEntries();
+        }
+        break;
 
-		case REMOVE_OLD_TEMP_FILES:
-			{
-            	m_thread.FireRemoveTempFiles();
-			}
-			break;
+        case REMOVE_OLD_TEMP_FILES:
+        {
+            m_thread.FireRemoveTempFiles();
+        }
+        break;
 
         case KEY_STATE_MODIFIERS:
             m_keyModifiersTimerCount++;
             if(m_keyStateModifiers != 0)
             {
                 BYTE keyState = CAccels::GetKeyStateModifiers();
-                //Have they release the key state modifiers yet(ctrl, shift, alt)
-                if((m_keyStateModifiers &keyState) == 0)
+                if((m_keyStateModifiers & keyState) == 0)
                 {
                     KillTimer(KEY_STATE_MODIFIERS);
                     long waitTime = (long)(GetTickCount() - m_startKeyStateTime);
@@ -747,92 +677,89 @@ LRESULT CMainFrame::OnTimer(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHand
             break;
 
         case ACTIVE_WINDOW_TIMER:
-			{
-				if(theApp.m_bShowingQuickPaste)
-				{
-					theApp.m_activeWnd.TrackActiveWnd(false);
-				}
-			}
-			break;
+        {
+            if(theApp.m_bShowingQuickPaste)
+            {
+                theApp.m_activeWnd.TrackActiveWnd(false);
+            }
+        }
+        break;
 
-		case READ_RANDOM_DB_FILE:
-			{
-				m_thread.FireReadDbFile();
-			}
-			break;
+        case READ_RANDOM_DB_FILE:
+        {
+            m_thread.FireReadDbFile();
+        }
+        break;
 
-		case GROUP_DOUBLE_CLICK:
-			{
-				KillTimer(GROUP_DOUBLE_CLICK);			
+        case GROUP_DOUBLE_CLICK:
+        {
+            KillTimer(GROUP_DOUBLE_CLICK);
 
-				Log(StrF(_T("Processing single click of groupId %d in timer, opening ditto to this group"), m_doubleClickGroupId));
+            Log(StrF(_T("Processing single click of groupId %d in timer, opening ditto to this group"), m_doubleClickGroupId));
 
-				DWORD maxDiff = (DWORD)(CGetSetOptions::GetGroupDoubleClickTimeMS() * 1.5);
-				DWORD diff = GetTickCount() - m_doubleClickGroupStartTime;					
+            DWORD maxDiff = (DWORD)(CGetSetOptions::GetGroupDoubleClickTimeMS() * 1.5);
+            DWORD diff = GetTickCount() - m_doubleClickGroupStartTime;
 
-				if(diff < maxDiff)
-				{					
-					if(m_doubleClickGroupId > -1)
-					{
-						if (theApp.EnterGroupID(m_doubleClickGroupId, FALSE, TRUE))
-						{
-							theApp.m_activeWnd.TrackActiveWnd(true);
-							StartKeyModifierTimer();
-							m_quickPaste.ShowQPasteWnd(this, false, true, FALSE);
-						}
-					}
-				}
-				else
-				{	
-					Log(StrF(_T("Something happened and we didn't process the group timer in time, Id: %d, Diff ms: %d, maxDiff: %d"), m_doubleClickGroupId, diff, maxDiff));
-				}
+            if(diff < maxDiff)
+            {
+                if(m_doubleClickGroupId > -1)
+                {
+                    if(theApp.EnterGroupID(m_doubleClickGroupId, FALSE, TRUE))
+                    {
+                        theApp.m_activeWnd.TrackActiveWnd(true);
+                        StartKeyModifierTimer();
+                        m_quickPaste.ShowQPasteWnd(this, false, true, FALSE);
+                    }
+                }
+            }
+            else
+            {
+                Log(StrF(_T("Something happened and we didn't process the group timer in time, Id: %d, Diff ms: %d, maxDiff: %d"), m_doubleClickGroupId, diff, maxDiff));
+            }
 
-				m_doubleClickGroupId = -1;
-				m_doubleClickGroupStartTime = 0;
-			}
-			break;
+            m_doubleClickGroupId = -1;
+            m_doubleClickGroupStartTime = 0;
+        }
+        break;
 
-		case SCREEN_RESOLUTION_CHANGED:
-			{
-				KillTimer(SCREEN_RESOLUTION_CHANGED);
-				m_quickPaste.OnScreenResolutionChange();
-			}
-			break;
-		case DELAYED_SHOW_DITTO_TIMER:
-		{
-			KillTimer(DELAYED_SHOW_DITTO_TIMER);
-			m_quickPaste.ShowQPasteWnd(this, false, false, FALSE);
-		}
-		break;
+        case SCREEN_RESOLUTION_CHANGED:
+        {
+            KillTimer(SCREEN_RESOLUTION_CHANGED);
+            m_quickPaste.OnScreenResolutionChange();
+        }
+        break;
 
-		case SET_WINDOWS_THEME_TIMER:
-		{
-			KillTimer(SET_WINDOWS_THEME_TIMER);
-			auto theme = CGetSetOptions::GetTheme();
-			if (theme == _T(""))
-			{
-				CGetSetOptions::m_Theme.Load(theme);
+        case DELAYED_SHOW_DITTO_TIMER:
+        {
+            KillTimer(DELAYED_SHOW_DITTO_TIMER);
+            m_quickPaste.ShowQPasteWnd(this, false, false, FALSE);
+        }
+        break;
 
-				auto visible = m_quickPaste.IsWindowVisibleEx();
-				m_quickPaste.CloseQPasteWnd();
+        case SET_WINDOWS_THEME_TIMER:
+        {
+            KillTimer(SET_WINDOWS_THEME_TIMER);
+            CString theme = CGetSetOptions::GetTheme();
+            if(theme != _T(""))
+            {
+                CGetSetOptions::m_Theme.Load(theme);
 
-				if (visible)
-				{
-					m_quickPaste.ShowQPasteWnd(this, true, false, true);
-				}
-			}
-		}
-		break;
+                bool visible = m_quickPaste.IsWindowVisibleEx() != FALSE;
+                m_quickPaste.CloseQPasteWnd();
 
-		case CLOSE_NO_DB_WINDOW_TIMER:
-			KillTimer(CLOSE_NO_DB_WINDOW_TIMER);
-			theApp.CloseNoDbWindow();
-			break;
+                if(visible)
+                {
+                    m_quickPaste.ShowQPasteWnd(this, true, false, TRUE);
+                }
+            }
+        }
+        break;
 
-}
-
-    bHandled = FALSE;
-    return 0;
+        case CLOSE_NO_DB_WINDOW_TIMER:
+            KillTimer(CLOSE_NO_DB_WINDOW_TIMER);
+            theApp.CloseNoDbWindow();
+            break;
+    }
 }
 LRESULT CMainFrame::OnShowTrayIcon(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
@@ -847,7 +774,7 @@ LRESULT CMainFrame::OnShowTrayIcon(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL
 
     if(wParam)
     {
-		m_trayIcon.Show();
+        m_trayIcon.Show();
     }
     else
     {
@@ -866,24 +793,17 @@ LRESULT CMainFrame::OnFirstToggleConnectCV(WORD wNotifyCode, WORD wID, HWND hWnd
     theApp.ToggleConnectCV();
     return 0;
 }
-LRESULT CMainFrame::OnUpdateFirstToggleConnectCV(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
-{
-    // Command UI update handling would need to be implemented differently in WTL
-    // For now, we'll leave this as a placeholder
-    bHandled = FALSE;
-    return 0;
-}
 LRESULT CMainFrame::OnClipboardCopied(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	Log(_T("Start of function OnClipboardCopied, adding clip to thread for processing"));
+    Log(_T("Start of function OnClipboardCopied, adding clip to thread for processing"));
 
-	CClip *pClip = (CClip*)wParam;
-	if(pClip != NULL)
-	{
-		m_thread.AddClipToSave(pClip);
-	} 
-    
-    Log(_T("End of function OnClipboardCopied"));	
+    CClip* pClip = (CClip*)wParam;
+    if(pClip != NULL)
+    {
+        m_thread.AddClipToSave(pClip);
+    }
+
+    Log(_T("End of function OnClipboardCopied"));
     return 0;
 }
 BOOL CMainFrame::PreTranslateMessage(MSG *pMsg)
@@ -913,7 +833,7 @@ BOOL CMainFrame::PreTranslateMessage(MSG *pMsg)
 
     return CFrameWindowImpl<CMainFrame>::PreTranslateMessage(pMsg);
 }
-LRESULT CMainFrame::OnClose(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+void CMainFrame::OnClose()
 {
     CloseAllOpenDialogs();
 
@@ -922,11 +842,9 @@ LRESULT CMainFrame::OnClose(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHand
     Log(_T("OnClose - after stop MainFrm thread"));
 
     theApp.BeforeMainClose();
+    m_PowerManager.Close();
 
-	m_PowerManager.Close();
-
-    bHandled = FALSE;
-    return 0;
+    DestroyWindow();
 }
 bool CMainFrame::CloseAllOpenDialogs()
 {
@@ -970,7 +888,7 @@ bool CMainFrame::CloseAllOpenDialogs()
 }
 LRESULT CMainFrame::OnLoadClipOnClipboard(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	CClip *pClip = (CClip*)wParam;
+    CClip* pClip = (CClip*)wParam;
     if(pClip == NULL)
     {
         LogSendRecieveInfo("---------ERROR OnLoadClipOnClipboard pClip == NULL");
@@ -979,32 +897,32 @@ LRESULT CMainFrame::OnLoadClipOnClipboard(UINT uMsg, WPARAM wParam, LPARAM lPara
 
     if(pClip)
     {
-		CProcessPaste paste;
-		paste.m_bSendPaste = false;
-		paste.m_bActivateTarget = false;
-		paste.m_pasteOptions.m_delayRenderLockout = GetTickCount();
+        CProcessPaste paste;
+        paste.m_bSendPaste = false;
+        paste.m_bActivateTarget = false;
+        paste.m_pasteOptions.m_delayRenderLockout = GetTickCount();
 
-		LogSendRecieveInfo("---------OnLoadClipOnClipboard - Before PutFormats on clipboard");
+        LogSendRecieveInfo("---------OnLoadClipOnClipboard - Before PutFormats on clipboard");
 
-		paste.m_pOle->PutFormatOnClipboard(&pClip->m_Formats);
-		paste.m_pOle->CacheGlobalData(theApp.m_cfIgnoreClipboard, NewGlobalP("Ignore", sizeof("Ignore")));
+        paste.m_pOle->PutFormatOnClipboard(&pClip->m_Formats);
+        paste.m_pOle->CacheGlobalData(theApp.m_cfIgnoreClipboard, NewGlobalP("Ignore", sizeof("Ignore")));
 
-		LogSendRecieveInfo("---------OnLoadClipOnClipboard - After PutFormats on clipboard");
+        LogSendRecieveInfo("---------OnLoadClipOnClipboard - After PutFormats on clipboard");
 
-		LogSendRecieveInfo(StrF(_T("---------OnLoadClipOnClipboard - Setting clip id: %d on ole clipboard"), pClip->m_id));
-		paste.GetClipIDs().Add(pClip->m_id);
-		paste.DoPaste();
+        LogSendRecieveInfo(StrF(_T("---------OnLoadClipOnClipboard - Setting clip id: %d on ole clipboard"), pClip->m_id));
+        paste.GetClipIDs().Add(pClip->m_id);
+        paste.DoPaste();
 
-		LogSendRecieveInfo(StrF(_T("---------OnLoadClipOnClipboard - After paste clip id: %d on ole clipboard"), pClip->m_id));
-	}
+        LogSendRecieveInfo(StrF(_T("---------OnLoadClipOnClipboard - After paste clip id: %d on ole clipboard"), pClip->m_id));
+    }
 
-	delete pClip;
+    delete pClip;
 
-	return 0;
+    return 0;
 }
 LRESULT CMainFrame::OnAddToDatabaseFromSocket(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-    CClipList *pClipList = (CClipList*)wParam;
+    CClipList* pClipList = (CClipList*)wParam;
     if(pClipList == NULL)
     {
         LogSendRecieveInfo("---------OnAddToDatabaseFromSocket - ERROR pClipList == NULL");
@@ -1014,45 +932,41 @@ LRESULT CMainFrame::OnAddToDatabaseFromSocket(UINT uMsg, WPARAM wParam, LPARAM l
     DWORD flags = (DWORD)lParam;
     if(flags & REMOTE_CLIP_ADD_TO_CLIPBOARD)
     {
-        CClip *pClip = pClipList->GetTail();
+        CClip* pClip = pClipList->GetTail();
         if(pClip)
         {
-			LogSendRecieveInfo("OnAddToDatabaseFromSocket - Adding clip from socket setting clip to be put on clipboard");
-			pClip->m_param1 |= REMOTE_CLIP_ADD_TO_CLIPBOARD;
-		}
+            LogSendRecieveInfo("OnAddToDatabaseFromSocket - Adding clip from socket setting clip to be put on clipboard");
+            pClip->m_param1 |= REMOTE_CLIP_ADD_TO_CLIPBOARD;
+        }
     }
 
-	if (flags & REMOTE_CLIP_MANUAL_SEND)
-	{
-		CClip *pClip = pClipList->GetTail();
-		if (pClip)
-		{
-			LogSendRecieveInfo("OnAddToDatabaseFromSocket - Adding clip from socket setting clip was a manual send from other side");
-			pClip->m_param1 |= REMOTE_CLIP_MANUAL_SEND;
-		}
-	}
+    if(flags & REMOTE_CLIP_MANUAL_SEND)
+    {
+        CClip* pClip = pClipList->GetTail();
+        if(pClip)
+        {
+            LogSendRecieveInfo("OnAddToDatabaseFromSocket - Adding clip from socket setting clip was a manual send from other side");
+            pClip->m_param1 |= REMOTE_CLIP_MANUAL_SEND;
+        }
+    }
 
-	m_thread.AddRemoteClipToSave(pClipList);
-
-	delete pClipList;
+    m_thread.AddRemoteClipToSave(pClipList);
+    delete pClipList;
 
     return 0;
 }
 LRESULT CMainFrame::OnErrorOnSendRecieve(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
     CString csNewText = (TCHAR*)wParam;
-
     ShowErrorMessage(_T("Ditto - Send/Receive Error"), csNewText);
-
     return 0;
 }
+
 LRESULT CMainFrame::OnErrorMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	CString csNewText = (TCHAR*)wParam;
-
-	ShowErrorMessage(_T("Ditto"), csNewText);
-
-	return 0;
+    CString csNewText = (TCHAR*)wParam;
+    ShowErrorMessage(_T("Ditto"), csNewText);
+    return 0;
 }
 CString WndName(HWND hParent)
 {
@@ -1085,7 +999,7 @@ CString WndName(HWND hParent)
 
 LRESULT CMainFrame::OnFirstHelp(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
-    CHyperLink::GotoURL(_T("https://github.com/sabrogden/Ditto/wiki"), SW_SHOW);
+    ::ShellExecute(NULL, _T("open"), _T("https://github.com/sabrogden/Ditto/wiki"), NULL, NULL, SW_SHOWNORMAL);
     return 0;
 }
 void CMainFrame::ShowErrorMessage(CString csTitle, CString csMessage)
@@ -1103,33 +1017,38 @@ LRESULT CMainFrame::OnSetConnected(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL
 {
     if(wParam)
     {
-        theApp.SetConnectCV(true);		
+        theApp.SetConnectCV(true);
     }
     else if(lParam)
     {
-        theApp.SetConnectCV(false);		
+        theApp.SetConnectCV(false);
     }
 
     return 0;
 }
+
 LRESULT CMainFrame::OnOpenCloseWindow(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	if(wParam)
-	{
-		StartKeyModifierTimer();
-		ShowQPasteWithActiveWindowCheck();
-	}
-	else if(lParam)
-	{
-		m_quickPaste.HideQPasteWnd();
-	}
+    if(wParam)
+    {
+        StartKeyModifierTimer();
+        ShowQPasteWithActiveWindowCheck();
+    }
+    else if(lParam)
+    {
+        m_quickPaste.HideQPasteWnd();
+    }
 
-	return 0;
-}
-LRESULT CMainFrame::OnDestroy(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
-{
-    bHandled = FALSE;
     return 0;
+}
+void CMainFrame::OnDestroy()
+{
+    CMessageLoop* pLoop = _Module.GetMessageLoop();
+    ATLASSERT(pLoop != NULL);
+    pLoop->RemoveMessageFilter(this);
+    pLoop->RemoveIdleHandler(this);
+
+    PostQuitMessage(0);
 }
 LRESULT CMainFrame::OnFirstNewclip(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
@@ -1140,99 +1059,116 @@ LRESULT CMainFrame::OnFirstNewclip(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOO
 }
 LRESULT CMainFrame::OnFirstOption(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
-	if(m_pOptions != NULL)
-	{
-		::SetForegroundWindow(m_pOptions->m_hWnd);
-	}
-	else
-	{
-		m_pOptions = new COptionsSheet(_T(""));
-
-		if(m_pOptions != NULL)
-		{
-			m_pOptions->SetNotifyWnd(m_hWnd);
-			m_pOptions->Create();
-			m_pOptions->ShowWindow(SW_SHOW);
-		}
-	}
-	return 0;
+    if(m_pOptions != NULL)
+    {
+        ::SetForegroundWindow(m_pOptions);
+    }
+    else
+    {
+        COptionsSheet* pOptions = new COptionsSheet(_T(""));
+        if(pOptions != NULL)
+        {
+            pOptions->SetNotifyWnd(m_hWnd);
+            pOptions->Create();
+            pOptions->ShowWindow(SW_SHOW);
+            m_pOptions = pOptions->m_hWnd;
+        }
+    }
+    return 0;
 }
 LRESULT CMainFrame::OnFirstGlobalhotkeys(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
-	if(m_pGlobalClips != NULL)
-	{
-		::SetForegroundWindow(m_pGlobalClips->m_hWnd);
-	}
-	else
-	{
-		m_pGlobalClips = new GlobalClips();
-
-		CAlphaBlend tran;
-		tran.SetTransparent(m_hWnd, 0, 1);
-
-		if(m_pGlobalClips != NULL)
-		{
-			((GlobalClips*)m_pGlobalClips)->SetNotifyWnd(m_hWnd);
-			m_pGlobalClips->Create(IDD_GLOBAL_CLIPS, NULL);
-			m_pGlobalClips->ShowWindow(SW_SHOW);
-		}
-	}
-	return 0;
+    if(m_pGlobalClips != NULL)
+    {
+        ::SetForegroundWindow(m_pGlobalClips);
+    }
+    else
+    {
+        GlobalClips* pGlobalClips = new GlobalClips();
+        if(pGlobalClips != NULL)
+        {
+            CAlphaBlend tran;
+            tran.SetTransparent(m_hWnd, 0, 1);
+            pGlobalClips->SetNotifyWnd(m_hWnd);
+            pGlobalClips->Create(IDD_GLOBAL_CLIPS, NULL);
+            pGlobalClips->ShowWindow(SW_SHOW);
+            m_pGlobalClips = pGlobalClips->m_hWnd;
+        }
+    }
+    return 0;
 }
 LRESULT CMainFrame::OnShowOptions(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	OnFirstOption();
-	return 0;
+    if(m_pOptions != NULL)
+    {
+        ::SetForegroundWindow(m_pOptions);
+    }
+    else
+    {
+        COptionsSheet* pOptions = new COptionsSheet(_T(""));
+        if(pOptions != NULL)
+        {
+            pOptions->SetNotifyWnd(m_hWnd);
+            pOptions->Create();
+            pOptions->ShowWindow(SW_SHOW);
+            m_pOptions = pOptions->m_hWnd;
+        }
+    }
+    return 0;
 }
 LRESULT CMainFrame::OnOptionsClosed(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	BOOL themeChanged = (BOOL)wParam;
-	m_trayIcon.MinimiseToTray(this);
-	CAlphaBlend tran;
-	tran.SetTransparent(m_hWnd, 255, 0);
+    BOOL themeChanged = (BOOL)wParam;
+    m_trayIcon.MinimiseToTray(m_hWnd);
+    CAlphaBlend tran;
+    tran.SetTransparent(m_hWnd, 255, 0);
 
-	delete m_pOptions;
-	m_pOptions = NULL;
+    if(m_pOptions != NULL)
+    {
+        ::DestroyWindow(m_pOptions);
+    }
+    m_pOptions = NULL;
 
-	if (themeChanged)
-	{
-		CGetSetOptions::m_Theme.Load(CGetSetOptions::GetTheme());
+    if(themeChanged)
+    {
+        CGetSetOptions::m_Theme.Load(CGetSetOptions::GetTheme());
+        m_quickPaste.CloseQPasteWnd();
+    }
+    else
+    {
+        if(m_quickPaste.m_pwndPaste != NULL)
+        {
+            m_quickPaste.m_pwndPaste->PostMessage(NM_POST_OPTIONS_WINDOW);
+        }
+    }
 
-		m_quickPaste.CloseQPasteWnd();
-	}
-	else
-	{
-		if (m_quickPaste.m_pwndPaste != NULL)
-		{
-			m_quickPaste.m_pwndPaste->PostMessage(NM_POST_OPTIONS_WINDOW);
-		}
-	}
+    m_trayIcon.SetMenu(NULL, IDR_MENU);
+    theApp.m_Language.UpdateTrayIconRightClickMenu(&m_trayIcon.GetMenu());
 
-	m_trayIcon.SetMenu(NULL, IDR_MENU);
-	theApp.m_Language.UpdateTrayIconRightClickMenu(&m_trayIcon.GetMenu());
+    if(CGetSetOptions::GetShowIconInSysTray())
+    {
+        m_trayIcon.Show();
+    }
+    else
+    {
+        m_trayIcon.Hide();
+    }
 
-	if (CGetSetOptions::GetShowIconInSysTray())
-	{
-		m_trayIcon.Show();
-	}
-	else
-	{
-		m_trayIcon.Hide();
-	}
-	
-
-	return 0;
+    return 0;
 }
 LRESULT CMainFrame::OnGlobalClipsClosed(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	m_trayIcon.MinimiseToTray(this);
-	CAlphaBlend tran;
-	tran.SetTransparent(m_hWnd, 255, 0);
+    m_trayIcon.MinimiseToTray(m_hWnd);
+    CAlphaBlend tran;
+    tran.SetTransparent(m_hWnd, 255, 0);
 
-	delete m_pGlobalClips;
-	m_pGlobalClips = NULL;
+    if(m_pGlobalClips != NULL)
+    {
+        ::DestroyWindow(m_pGlobalClips);
+    }
+    m_pGlobalClips = NULL;
 
-	return 0;
+    return 0;
 }
 void CMainFrame::RefreshShowInTaskBar()
 {
@@ -1248,42 +1184,67 @@ void CMainFrame::RefreshShowInTaskBar()
 
 LRESULT CMainFrame::OnDeleteClipDataClosed(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	m_trayIcon.MinimiseToTray(this);
-	CAlphaBlend tran;
-	tran.SetTransparent(m_hWnd, 255, 0);
+    m_trayIcon.MinimiseToTray(m_hWnd);
+    CAlphaBlend tran;
+    tran.SetTransparent(m_hWnd, 255, 0);
 
-	delete m_pDeleteClips;
-	m_pDeleteClips = NULL;
+    if(m_pDeleteClips != NULL)
+    {
+        ::DestroyWindow(m_pDeleteClips);
+    }
+    m_pDeleteClips = NULL;
 
-	return 0;
+    return 0;
 }
 LRESULT CMainFrame::OnFirstDeleteclipdata(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
-	//this->ShowWindow(SW_HIDE);
-	if (m_pDeleteClips != NULL)
-	{
-		::SetForegroundWindow(m_pDeleteClips->m_hWnd);
-	}
-	else
-	{
-		m_pDeleteClips = new CDeleteClipData();
-
-		CAlphaBlend tran;
-		tran.SetTransparent(m_hWnd, 0, 1);
-
-		if (m_pDeleteClips != NULL)
-		{
-			((CDeleteClipData*) m_pDeleteClips)->SetNotifyWnd(m_hWnd);
-			m_pDeleteClips->Create(IDD_DELETE_CLIP_DATA, NULL);
-			m_pDeleteClips->ShowWindow(SW_SHOW);
-		}
-	}
-	return 0;
+    if(m_pDeleteClips != NULL)
+    {
+        ::SetForegroundWindow(m_pDeleteClips);
+    }
+    else
+    {
+        CDeleteClipData* pDeleteClips = new CDeleteClipData();
+        if(pDeleteClips != NULL)
+        {
+            CAlphaBlend tran;
+            tran.SetTransparent(m_hWnd, 0, 1);
+            pDeleteClips->SetNotifyWnd(m_hWnd);
+            pDeleteClips->Create(IDD_DELETE_CLIP_DATA, NULL);
+            pDeleteClips->ShowWindow(SW_SHOW);
+            m_pDeleteClips = pDeleteClips->m_hWnd;
+        }
+    }
+    return 0;
 }
 LRESULT CMainFrame::OnSaveClipboardMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	OnFirstSavecurrentclipboard();
-	return 0;
+    Log(_T("Start Saving the current clipboard to the database"));
+    CClip* pClip = new CClip;
+    if(pClip)
+    {
+        CClipTypes* pTypes = theApp.LoadTypesFromDB();
+        if(pTypes)
+        {
+            if(pClip->LoadFromClipboard(pTypes, false, _T("")))
+            {
+                Log(_T("Loaded clips from the clipboard, sending message to save to the db"));
+                ::PostMessage(m_hWnd, WM_CLIPBOARD_COPIED, (WPARAM)pClip, 0);
+            }
+            else
+            {
+                Log(_T("Failed to load clips from the clipboard, not saving to db"));
+                delete pClip;
+                pClip = NULL;
+            }
+        }
+        else
+        {
+            Log(_T("Failed to load supported types from the db, not saving to the db"));
+        }
+    }
+    Log(_T("End Saving the current clipboard to the database"));
+    return 0;
 }
 LRESULT CMainFrame::OnFirstSavecurrentclipboard(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
@@ -1316,99 +1277,92 @@ LRESULT CMainFrame::OnFirstSavecurrentclipboard(WORD wNotifyCode, WORD wID, HWND
 }
 LRESULT CMainFrame::OnReAddTaskBarIcon(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	if(CGetSetOptions::GetShowIconInSysTray())
-	{
-		m_trayIcon.SetIcon(CTrayNotifyIcon::LoadIcon(IDR_MAINFRAME));
-	}
-	return 0;
+    if(CGetSetOptions::GetShowIconInSysTray())
+    {
+        m_trayIcon.SetIcon(CTrayNotifyIcon::LoadIcon(IDR_MAINFRAME));
+    }
+    return 0;
 }
+
 LRESULT CMainFrame::OnReOpenDatabase(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	Log(StrF(_T("OnReOpenDatabase, Start closing and reopening database Delay: %d"), CGetSetOptions::GetWindowsResumeDelayReOpenDbMS()));
+    Log(StrF(_T("OnReOpenDatabase, Start closing and reopening database Delay: %d"), CGetSetOptions::GetWindowsResumeDelayReOpenDbMS()));
 
-	try 
-	{
-		Sleep(CGetSetOptions::GetWindowsResumeDelayReOpenDbMS());
-		m_quickPaste.CloseQPasteWnd();
-		theApp.m_db.close();
-		OpenDatabase(CGetSetOptions::GetDBPath());
-	}
-	CATCH_SQLITE_EXCEPTION
+    try
+    {
+        Sleep(CGetSetOptions::GetWindowsResumeDelayReOpenDbMS());
+        m_quickPaste.CloseQPasteWnd();
+        theApp.m_db.close();
+        OpenDatabase(CGetSetOptions::GetDBPath());
+    }
+    CATCH_SQLITE_EXCEPTION
 
-	Log(StrF(_T("OnReOpenDatabase, End closing and reopening database Delay: %d"), CGetSetOptions::GetWindowsResumeDelayReOpenDbMS()));
+    Log(StrF(_T("OnReOpenDatabase, End closing and reopening database Delay: %d"), CGetSetOptions::GetWindowsResumeDelayReOpenDbMS()));
 
-	return 0;
+    return 0;
 }
+
 LRESULT CMainFrame::OnShowMsgWindow(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	CString *pMsg = (CString*)wParam;
-	int clipId = (int)lParam;
+    CString* pMsg = (CString*)wParam;
+    int clipId = (int)lParam;
 
-	m_trayIcon.SetBalloonDetails(pMsg->GetBuffer(), _T("Ditto"), CTrayNotifyIcon::BalloonStyle::Info, CGetSetOptions::GetBalloonTimeout());
+    m_trayIcon.SetBalloonDetails(pMsg->GetBuffer(), _T("Ditto"), CTrayNotifyIcon::BalloonStyle::Info, CGetSetOptions::GetBalloonTimeout());
 
-	delete pMsg;
-	return 0;
+    delete pMsg;
+    return 0;
 }
+
 LRESULT CMainFrame::OnShowDittoGroup(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	int groupId = (int)wParam;
-	CppSQLite3Query q = theApp.m_db.execQueryEx(_T("SELECT bIsGroup FROM Main WHERE lID = %d"), groupId);
-	if(q.eof() == false)
-	{
-		if(q.getIntField(_T("bIsGroup")) > 0)
-		{
-			PasteOrShowGroup(groupId, FALSE, FALSE, FALSE, false);
-		}
-	}
+    int groupId = (int)wParam;
+    CppSQLite3Query q = theApp.m_db.execQueryEx(_T("SELECT bIsGroup FROM Main WHERE lID = %d"), groupId);
+    if(q.eof() == false)
+    {
+        if(q.getIntField(_T("bIsGroup")) > 0)
+        {
+            PasteOrShowGroup(groupId, FALSE, FALSE, FALSE, false);
+        }
+    }
 
-	return 0;
+    return 0;
 }
+
 LRESULT CMainFrame::OnFirstFixupstickycliporder(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
-	ReOrderStickyClips(-1, theApp.m_db);
-	return 0;
+    ReOrderStickyClips(-1, theApp.m_db);
+    return 0;
 }
+
 LRESULT CMainFrame::OnResolutionChange(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	if (m_startupScreenWidth != GetScreenWidth() ||
-		m_startupScreenHeight != GetScreenHeight())
-	{
-		m_startupScreenWidth = GetScreenWidth();
-		m_startupScreenHeight = GetScreenHeight();
+    if(m_startupScreenWidth != GetScreenWidth() ||
+        m_startupScreenHeight != GetScreenHeight())
+    {
+        m_startupScreenWidth = GetScreenWidth();
+        m_startupScreenHeight = GetScreenHeight();
 
-		SetTimer(SCREEN_RESOLUTION_CHANGED, 1000, NULL);
-	}
+        SetTimer(SCREEN_RESOLUTION_CHANGED, 1000, NULL);
+    }
 
-	return 0;
+    return 0;
 }
-LRESULT CMainFrame::OnWinIniChange(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+LRESULT CMainFrame::OnWinIniChange(UINT nFlags, LPCTSTR lpszSection)
 {
-	LPCTSTR lpszSection = (LPCTSTR)lParam;
+    if(lpszSection != NULL && wcscmp(lpszSection, L"ImmersiveColorSet") == 0)
+    {
+        Log(StrF(_T("OnWinIniChange %s, setting timer to 1000ms to change theme"), lpszSection));
+        KillTimer(SET_WINDOWS_THEME_TIMER);
+        SetTimer(SET_WINDOWS_THEME_TIMER, 1000, NULL);
+    }
 
-	if (lpszSection != NULL &&
-		wcscmp(lpszSection, L"ImmersiveColorSet") == 0)
-	{
-		Log(StrF(_T("OnWinIniChange %s, setting timer to 1000ms to change theme"), lpszSection));
-		KillTimer(SET_WINDOWS_THEME_TIMER);
-		SetTimer(SET_WINDOWS_THEME_TIMER, 1000, NULL);
-	}
-
-	bHandled = FALSE;
-	return 0;
+    return 0;
 }
 
 LRESULT CMainFrame::OnFirstShowstartupmessage(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
-	BOOL existing = CGetSetOptions::GetShowStartupMessage();
-	CGetSetOptions::SetShowStartupMessage(!existing);
-	return 0;
-}
-
-LRESULT CMainFrame::OnUpdateFirstShowstartupmessage(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
-{
-    // Command UI update handling would need to be implemented differently in WTL
-    // For now, we'll leave this as a placeholder
-    bHandled = FALSE;
+    BOOL existing = CGetSetOptions::GetShowStartupMessage();
+    CGetSetOptions::SetShowStartupMessage(!existing);
     return 0;
 }
 
@@ -1424,48 +1378,49 @@ LRESULT CMainFrame::OnFirstRestoredatabase(WORD wNotifyCode, WORD wID, HWND hWnd
 }
 LRESULT CMainFrame::OnBackupDb(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	OnFirstBackupdatabase();
-	return 0;
+    OnFirstBackupdatabase(0, 0, NULL, bHandled);
+    return 0;
 }
+
 LRESULT CMainFrame::OnRestoreDb(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	OnFirstRestoredatabase();
-	return 0;
+    OnFirstRestoredatabase(0, 0, NULL, bHandled);
+    return 0;
 }
+
 LRESULT CMainFrame::OnFirstDeleteallnonusedclips(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
-	int nRet = MessageBox(theApp.m_Language.GetString("Delete_All_Non_Used_Clips", "Delete all clips that are not groups, in groups, marked as never auto delete, has a shortcut key or marked as sticky.\r\n\r\nThis cannot be undone."), _T("Ditto"), MB_YESNO | MB_TOPMOST);
-	if (nRet == IDNO)
-	{
-		return 0;
-	}
+    int nRet = MessageBox(theApp.m_Language.GetString(_T("Delete_All_Non_Used_Clips"), _T("Delete all clips that are not groups, in groups, marked as never auto delete, has a shortcut key or marked as sticky.\r\n\r\nThis cannot be undone.")), _T("Ditto"), MB_YESNO | MB_TOPMOST);
+    if(nRet == IDNO)
+    {
+        return 0;
+    }
 
-	DeleteNonUsedClips(false);
-
-	theApp.RefreshView();
-	return 0;
+    DeleteNonUsedClips(false);
+    theApp.RefreshView();
+    return 0;
 }
+
 LRESULT CMainFrame::OnPasteClip(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	PasteOrShowGroup(wParam, TRUE, FALSE, TRUE, false);
-	return 0;
+    PasteOrShowGroup((int)wParam, TRUE, FALSE, TRUE, false);
+    return 0;
 }
+
 LRESULT CMainFrame::OnEditClip(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	CClipIDs IDs;
-	IDs.Add(wParam);
+    CClipIDs IDs;
+    IDs.Add((int)wParam);
 
-	bool textOnly = false;
-	if (GetKeyState(VK_SHIFT) & 0x8000)
-	{
-		textOnly = true;
-	}
+    bool textOnly = false;
+    if(GetKeyState(VK_SHIFT) & 0x8000)
+    {
+        textOnly = true;
+    }
 
-	theApp.EditItems(IDs, true, textOnly);
-	return 0;
+    theApp.EditItems(IDs, true, textOnly);
+    return 0;
 }
-LRESULT CMainFrame::OnSetFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+void CMainFrame::OnSetFocus(HWND hWndOldFocus)
 {
-	bHandled = FALSE;
-	return 0;
-}
+}

@@ -91,7 +91,7 @@ BOOL COptionsSheet::OnInitDialog(HWND hWndFocus, LPARAM lParam)
 
 	SetWindowText(_T("Options"));
 
-	theApp.m_Language.UpdateOptionsSheet(this);
+	theApp.m_Language.UpdateOptionsSheet(m_hWnd);
 
 	::ShowWindow(GetDlgItem(ID_APPLY_NOW), SW_HIDE);
 

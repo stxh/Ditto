@@ -8,7 +8,6 @@
 
 class CGroupWnd : public CMagneticWnd
 {
-	DECLARE_DYNAMIC(CGroupWnd)
 
 public:
 	CGroupWnd();

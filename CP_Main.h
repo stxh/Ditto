@@ -106,7 +106,7 @@ public:
 	bool GetConnectCV() { return m_CopyThread.GetConnectCV(); }
 	void SetConnectCV(bool bConnect);
 	bool ToggleConnectCV();
-	void UpdateMenuConnectCV(CMenu* pMenu, UINT nMenuID);
+	void UpdateMenuConnectCV(CMenuHandle* pMenu, UINT nMenuID);
 	bool ImportClips(HWND hWnd);
 	void LoadGlobalClips();
 

@@ -59,7 +59,7 @@ void CClipEditThread::StartWatchingFolderForChanges()
 
 void CClipEditThread::WatchFile(CString filePath)
 {
-	ATL::CCritSecLock csLock(m_fileEditsLock.m_sect);
+	ATL::CCritSecLock csLock(m_fileEditsLock);
 
 	nsPath::CPath path(filePath);
 
@@ -160,7 +160,7 @@ void CClipEditThread::OnFileChanged()
 			bool addToChanges = true;			
 
 			{
-				ATL::CCritSecLock csLock(m_fileEditsLock.m_sect);
+				ATL::CCritSecLock csLock(m_fileEditsLock);
 				auto exists = m_fileEditStarts.find(fileName);
 				if (exists != m_fileEditStarts.end())
 				{

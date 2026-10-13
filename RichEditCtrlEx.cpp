@@ -1,6 +1,3 @@
-// AutoRichEditCtrl.cpp : implementation file
-//
-
 #include "stdafx.h"
 #include "RichEditCtrlEx.h"
 #include "shared/TextConvert.h"
@@ -12,30 +9,22 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 /////////////////////////////////////////////////////////////////////////////
-// CAutoRichEditCtrl
+// CRichEditCtrlEx
 
-_AFX_RICHEDITEX_STATE _afxRichEditStateEx ;
+_AFX_RICHEDITEX_STATE _afxRichEditStateEx;
 
 BOOL PASCAL AfxInitRichEditEx()
 {
-    if( ! ::AfxInitRichEdit() )
-    {
-        return FALSE ;
-    }
-
-    _AFX_RICHEDITEX_STATE* l_pState = &_afxRichEditStateEx ;
-
-    if( l_pState->m_hInstRichEdit20 == NULL )
+    if(_afxRichEditStateEx.m_hInstRichEdit20 == NULL)
     {
 #ifdef _UNICODE 
-        l_pState->m_hInstRichEdit20 = LoadLibraryW(_T("MSFTEDIT.DLL"));
+        _afxRichEditStateEx.m_hInstRichEdit20 = LoadLibraryW(_T("MSFTEDIT.DLL"));
 #else
-		l_pState->m_hInstRichEdit20 = LoadLibraryA(_T("RICHED20.DLL"));
+        _afxRichEditStateEx.m_hInstRichEdit20 = LoadLibraryA(_T("RICHED20.DLL"));
 #endif
-
     }
 
-    return l_pState->m_hInstRichEdit20 != NULL ;
+    return _afxRichEditStateEx.m_hInstRichEdit20 != NULL;
 }
 
 
@@ -47,12 +36,25 @@ CRichEditCtrlEx::~CRichEditCtrlEx()
 {
 }
 
+BOOL CRichEditCtrlEx::Create(HWND hWndParent, UINT nID, DWORD dwStyle, DWORD dwExStyle, LPRECT lpRect)
+{
+    RECT rc;
+    if(lpRect == NULL)
+    {
+        rc = {0, 0, 0, 0};
+    }
+    else
+    {
+        rc = *lpRect;
+    }
+    return CRichEditCtrl::Create(_T("RichEdit50W"), NULL, dwStyle, dwExStyle, 
+        (HMENU)UIntToPtr(nID), hWndParent, &rc) != NULL;
+}
 
-BEGIN_MESSAGE_MAP(CRichEditCtrlEx, CRichEditCtrl)
-	//{{AFX_MSG_MAP(CRichEditCtrlEx)
-	ON_WM_CREATE()
-	//}}AFX_MSG_MAP
-END_MESSAGE_MAP()
+int CRichEditCtrlEx::OnCreate(LPCREATESTRUCT lpCreateStruct) 
+{
+    return 0;
+}
 
 /////////////////////////////////////////////////////////////////////////////
 // CRichEditCtrlEx message handlers
@@ -530,10 +532,4 @@ int CRichEditCtrlEx::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	// TODO: Add your specialized creation code here
 	
 	return 0;
-}
-
-BOOL CRichEditCtrlEx::Create(LPCTSTR lpszClassName, LPCTSTR lpszWindowName, DWORD dwStyle, const RECT& rect, CWnd* pParentWnd, UINT nID, CCreateContext* pContext) 
-{
-	return CWnd::Create(_T("RichEdit50W"), lpszWindowName, dwStyle, rect, pParentWnd, nID, pContext);
-
 }

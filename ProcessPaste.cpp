@@ -175,8 +175,8 @@ UINT CProcessPaste::MarkAsPastedThread(LPVOID pParam)
 {
 	DWORD startTick = GetTickCount();
 
-	static CEvent UpdateTimeEvent(TRUE, TRUE, _T("Ditto_Update_Clip_Time"), NULL);
-	UpdateTimeEvent.ResetEvent();
+	static CEvent UpdateTimeEvent(NULL, TRUE, TRUE, _T("Ditto_Update_Clip_Time"));
+	UpdateTimeEvent.Reset();
 
 	Log(_T("Start of MarkAsPastedThread"));
 
@@ -269,6 +269,6 @@ UINT CProcessPaste::MarkAsPastedThread(LPVOID pParam)
 	if((endTick-startTick) > 350)
 		Log(StrF(_T("Paste Timing MarkAsPastedThread: %d, ClipId: %d"), endTick-startTick, clipId));
 
-	UpdateTimeEvent.SetEvent();
+	UpdateTimeEvent.Set();
 	return bRet;
 }

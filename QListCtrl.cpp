@@ -1,4 +1,4 @@
-﻿// QListCtrl.cpp : implementation file
+// QListCtrl.cpp : implementation file
 //
 
 #include "stdafx.h"
@@ -90,35 +90,17 @@ int CQListCtrl::GetFirstTenNum(int index)
 	return firstTenNum;
 }
 
-BEGIN_MESSAGE_MAP(CQListCtrl, CListCtrl)
-	//{{AFX_MSG_MAP(CQListCtrl)
-	ON_NOTIFY_REFLECT(LVN_KEYDOWN, OnKeydown)
-	ON_NOTIFY_REFLECT(NM_CUSTOMDRAW, OnCustomdrawList)
-	ON_WM_MOUSEMOVE()
-	ON_WM_SYSKEYDOWN()
-	ON_WM_ERASEBKGND()
-	ON_WM_CREATE()
-	ON_WM_HSCROLL()
-	ON_WM_TIMER()
-	ON_NOTIFY_REFLECT(LVN_ITEMCHANGED, OnSelectionChange)
-	ON_WM_VSCROLL()
-	ON_WM_WINDOWPOSCHANGED()
-	//}}AFX_MSG_MAP
-	ON_NOTIFY_EX_RANGE(TTN_NEEDTEXTW, 0, 0xFFFF, OnToolTipText)
-	ON_NOTIFY_EX_RANGE(TTN_NEEDTEXTA, 0, 0xFFFF, OnToolTipText)
-	ON_WM_KILLFOCUS()
-	ON_WM_MEASUREITEM_REFLECT()
-	ON_WM_MOUSEHWHEEL()
-END_MESSAGE_MAP()
+
 
 /////////////////////////////////////////////////////////////////////////////
 // CQListCtrl message handlers
 
-void CQListCtrl::OnKeydown(NMHDR* pNMHDR, LRESULT* pResult)
+LRESULT CQListCtrl::OnKeydown(int, LPNMHDR pNMHDR, BOOL& bHandled)
 {
 	LV_KEYDOWN* pLVKeyDown = (LV_KEYDOWN*)pNMHDR;
 
-	*pResult = 0;
+	bHandled = TRUE;
+	return 0;
 }
 
 DROPEFFECT CQListCtrl::OnDragOver(COleDataObject* pDataObject, DWORD dwKeyState, CPoint point)
@@ -263,18 +245,217 @@ void CQListCtrl::MeasureItem(LPMEASUREITEMSTRUCT lpMeasureItemStruct)
 	::ReleaseDC(NULL, hDC);
 }
 
-void CQListCtrl::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
+LRESULT CQListCtrl::OnCustomdrawList(int, LPNMHDR pNMHDR, BOOL& bHandled)
 {
 	NMLVCUSTOMDRAW* pLVCD = reinterpret_cast<NMLVCUSTOMDRAW*>(pNMHDR);
 
-	*pResult = 0;
+	bHandled = TRUE;
 
-	// Request item-specific notifications if this is the
-	// beginning of the paint cycle.
 	if (CDDS_PREPAINT == pLVCD->nmcd.dwDrawStage)
 	{
-		*pResult = CDRF_NOTIFYITEMDRAW;
+		return CDRF_NOTIFYITEMDRAW;
 	}
+	else if (CDDS_ITEMPREPAINT == pLVCD->nmcd.dwDrawStage)
+	{
+		LVITEM   rItem;
+		int      nItem = static_cast<int>(pLVCD->nmcd.dwItemSpec);
+		CDCHandle hDC(pLVCD->nmcd.hdc);
+		COLORREF crBkgnd;
+		BOOL     bListHasFocus;
+		CRect    rcItem;
+
+		bListHasFocus = (m_hWnd == ::GetFocus());
+
+		ZeroMemory(&rItem, sizeof(LVITEM));
+		rItem.mask = LVIF_STATE;
+		rItem.iItem = nItem;
+		rItem.stateMask = LVIS_SELECTED | LVIS_FOCUSED;
+		GetItem(&rItem);
+
+		GetItemRect(nItem, rcItem, LVIR_SELECTBOUNDS);
+
+		COLORREF OldColor = -1;
+		int nOldBKMode = -1;
+
+		CString csText;
+		LPTSTR lpszText = csText.GetBufferSetLength(CGetSetOptions::m_bDescTextSize);
+		GetItemText(nItem, 0, lpszText, CGetSetOptions::m_bDescTextSize);
+		csText.ReleaseBuffer();
+
+		CString strSymbols;
+		int nSymEnd = csText.Find('|');
+		if (nSymEnd >= 0)
+		{
+			strSymbols = csText.Left(nSymEnd);
+			csText = csText.Mid(nSymEnd + 1);
+		}
+
+		if (rItem.state & LVIS_SELECTED)
+		{
+			if (bListHasFocus)
+			{
+				crBkgnd = CGetSetOptions::m_Theme.ListBoxSelectedBG();
+				OldColor = hDC.SetTextColor(CGetSetOptions::m_Theme.ListBoxSelectedText());
+			}
+			else
+			{
+				crBkgnd = CGetSetOptions::m_Theme.ListBoxSelectedNoFocusBG();
+				OldColor = hDC.SetTextColor(CGetSetOptions::m_Theme.ListBoxSelectedNoFocusText());
+			}
+		}
+		else
+		{
+			if ((nItem % 2) == 0)
+			{
+				crBkgnd = CGetSetOptions::m_Theme.ListBoxOddRowsBG();
+				OldColor = hDC.SetTextColor(CGetSetOptions::m_Theme.ListBoxOddRowsText());
+			}
+			else
+			{
+				crBkgnd = CGetSetOptions::m_Theme.ListBoxEvenRowsBG();
+				OldColor = hDC.SetTextColor(CGetSetOptions::m_Theme.ListBoxEvenRowsText());
+			}
+		}
+
+		hDC.FillSolidRect(rcItem, crBkgnd);
+		nOldBKMode = hDC.SetBkMode(TRANSPARENT);
+
+		CRect rcText = rcItem;
+		rcText.left += m_windowDpi->Scale(ROW_LEFT_BORDER);
+		rcText.top += m_windowDpi->Scale(1);
+		rcText.bottom -= m_windowDpi->Scale(1);
+
+		if (m_showIfClipWasPasted &&
+			strSymbols.GetLength() > 0 &&
+			strSymbols.Find(_T("<pasted>")) >= 0)
+		{
+			CRect pastedRect(rcItem);
+			pastedRect.left++;
+			pastedRect.right = pastedRect.left + m_windowDpi->Scale(2);
+
+			hDC.FillSolidRect(pastedRect, CGetSetOptions::m_Theme.ClipPastedColor());
+		}
+
+		int firstTenNum = GetFirstTenNum(nItem);
+
+		if (m_bShowTextForFirstTenHotKeys && firstTenNum >= 0)
+		{
+			rcText.left += m_windowDpi->Scale(12);
+		}
+		else
+		{
+			rcText.left += m_windowDpi->Scale(3);
+		}
+
+		bool drawInGroupIcon = true;
+		if (theApp.m_GroupID > 0)
+		{
+			int nFlag = strSymbols.Find(_T("<ingroup>"));
+			if (nFlag >= 0)
+				drawInGroupIcon = false;
+		}
+
+		DrawCopiedColorCode(csText, rcText, &hDC);
+
+		DrawBitMap(nItem, rcText, &hDC, csText);
+
+		if (strSymbols.GetLength() > 0)
+		{
+			if (strSymbols.Find(_T("<group>")) >= 0)
+			{
+				m_groupFolder.Draw(&hDC, *m_windowDpi, m_hWnd, rcText.left, rcText.top, false, false);
+				rcText.left += m_groupFolder.ImageWidth() + m_windowDpi->Scale(2);
+			}
+			if (strSymbols.Find(_T("<noautodelete>")) >= 0)
+			{
+				m_dontDeleteImage.Draw(&hDC, *m_windowDpi, m_hWnd, rcText.left, rcText.top, false, false);
+				rcText.left += m_dontDeleteImage.ImageWidth() + m_windowDpi->Scale(2);
+			}
+			if (strSymbols.Find(_T("<shortcut>")) >= 0)
+			{
+				m_shortCutImage.Draw(&hDC, *m_windowDpi, m_hWnd, rcText.left, rcText.top, false, false);
+				rcText.left += m_shortCutImage.ImageWidth() + m_windowDpi->Scale(2);
+			}
+			if (drawInGroupIcon &&
+				strSymbols.Find(_T("<ingroup>")) >= 0)
+			{
+				m_inFolderImage.Draw(&hDC, *m_windowDpi, m_hWnd, rcText.left, rcText.top, false, false);
+				rcText.left += m_inFolderImage.ImageWidth() + m_windowDpi->Scale(2);
+			}
+			if (strSymbols.Find(_T("<qpastetext>")) >= 0)
+			{
+			}
+			if (strSymbols.Find(_T("<sticky>")) >= 0)
+			{
+				m_stickyImage.Draw(&hDC, *m_windowDpi, m_hWnd, rcText.left, rcText.top, false, false);
+				rcText.left += m_stickyImage.ImageWidth() + m_windowDpi->Scale(2);
+			}
+		}
+
+		if (DrawRtfText(nItem, rcText, &hDC) == FALSE)
+		{
+			auto highlightColor = CGetSetOptions::m_Theme.SearchTextHighlight();
+			if (m_searchText.GetLength() > 0 &&
+				FindNoCaseAndInsert(csText, m_searchText, StrF(_T("\x01\x04 color='#%02x%02x%02x'\x02"), GetRValue(highlightColor), GetGValue(highlightColor), GetBValue(highlightColor)), _T("\x01\x03\x04\x02"), m_linesPerRow) > 0)
+			{
+				DrawHTML(hDC, csText, csText.GetLength(), rcText, DT_VCENTER | DT_EXPANDTABS | DT_NOPREFIX);
+			}
+			else
+			{
+				hDC.DrawText(csText, rcText, DT_VCENTER | DT_EXPANDTABS | DT_NOPREFIX);
+			}
+		}
+
+		if (m_bShowTextForFirstTenHotKeys && firstTenNum >= 0)
+		{
+			CString cs;
+			if (firstTenNum == 10)
+				cs = "0";
+			else
+				cs.Format(_T("%d"), firstTenNum);
+
+			CRect crClient;
+
+			GetWindowRect(crClient);
+			ScreenToClient(crClient);
+
+			CRect crHotKey = rcItem;
+
+			int extraFromClipWasPasted = 0;
+			if (m_showIfClipWasPasted)
+				extraFromClipWasPasted = 3;
+
+			crHotKey.right = crHotKey.left + m_windowDpi->Scale(11);
+			crHotKey.left += m_windowDpi->Scale(1 + extraFromClipWasPasted);
+			crHotKey.top += m_windowDpi->Scale(1 + extraFromClipWasPasted);
+
+			HFONT hOldFont = (HFONT)hDC.SelectObject(m_SmallFont);
+			COLORREF localOldTextColor = hDC.SetTextColor(CGetSetOptions::m_Theme.ListSmallQuickPasteIndexColor());
+
+			CPen pen(PS_SOLID, 0, CGetSetOptions::m_Theme.ListSmallQuickPasteIndexColor());
+			CPen* pOldPen = hDC.SelectObject(&pen);
+
+			hDC.DrawText(cs, crHotKey, DT_BOTTOM);
+
+			hDC.MoveTo(CPoint(rcItem.left + m_windowDpi->Scale(8 + extraFromClipWasPasted), rcItem.top));
+			hDC.LineTo(CPoint(rcItem.left + m_windowDpi->Scale(8 + extraFromClipWasPasted), rcItem.bottom));
+
+			hDC.SelectObject(hOldFont);
+			hDC.SetTextColor(localOldTextColor);
+			hDC.SelectObject(pOldPen);
+		}
+
+		if (OldColor > -1)
+			hDC.SetTextColor(OldColor);
+
+		if (nOldBKMode > -1)
+			hDC.SetBkMode(nOldBKMode);
+
+		return CDRF_SKIPDEFAULT;
+	}
+
+	return 0;
+}
 	else if (CDDS_ITEMPREPAINT == pLVCD->nmcd.dwDrawStage)
 	{
 		LVITEM   rItem;
@@ -604,12 +785,12 @@ BOOL CQListCtrl::DrawBitMap(int nItem, CRect &crRect, CDC *pDC, const CString &c
 	CClipFormatQListCtrl *format = GetItem_CF_DIB_ClipFormat(nItem);
 	if (format != NULL)
 	{
-		HGLOBAL smallImage = format->GetDibFittingToHeight(pDC, crRect.Height());
+		HGLOBAL smallImage = format->GetDibFittingToHeight(pDC->m_hDC, crRect.Height());
 		if (smallImage != NULL)
 		{
 			//Will return the width of the bitmap in nWidth
 			int nWidth = 0;
-			if (CBitmapHelper::DrawDIB(pDC, smallImage, crRect.left, crRect.top, nWidth))
+			if (CBitmapHelper::DrawDIB(pDC->m_hDC, smallImage, crRect.left, crRect.top, nWidth))
 			{
 				// adjust the rect so other information can be drawn next to the thumbnail
 				crRect.left += nWidth + 3;
@@ -636,12 +817,12 @@ void CQListCtrl::RefreshRow(int row)
 	RedrawItems(row, row);
 }
 
-void CQListCtrl::OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
+LRESULT CQListCtrl::OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags, BOOL& bHandled)
 {
 	CListCtrl::OnSysKeyDown(nChar, nRepCnt, nFlags);
 }
 
-BOOL CQListCtrl::OnEraseBkgnd(CDC* pDC)
+BOOL CQListCtrl::OnEraseBkgnd(CDCHandle dc)
 {
 
 	CRect rect;
@@ -668,17 +849,19 @@ BOOL CQListCtrl::OnEraseBkgnd(CDC* pDC)
 	//return CListCtrl::OnEraseBkgnd(pDC);
 }
 
-BOOL CQListCtrl::OnToolTipText(UINT id, NMHDR * pNMHDR, LRESULT * pResult)
+LRESULT CQListCtrl::OnToolTipText(int id, LPNMHDR pNMHDR, BOOL& bHandled)
 {
-	// need to handle both ANSI and UNICODE versions of the message
 	TOOLTIPTEXTA* pTTTA = (TOOLTIPTEXTA*)pNMHDR;
 	TOOLTIPTEXTW* pTTTW = (TOOLTIPTEXTW*)pNMHDR;
 	CString strTipText;
 
 	UINT_PTR nID = pNMHDR->idFrom;
 
-	if (nID == 0)	  	// Notification in NT from automatically
-		return FALSE;   	// created tooltip
+	if (nID == 0)
+	{
+		bHandled = FALSE;
+		return 0;
+	}
 
 	::SendMessage(pNMHDR->hwndFrom, TTM_SETMAXTIPWIDTH, 0, 500);
 
@@ -774,7 +957,7 @@ INT_PTR CQListCtrl::OnToolHitTest(CPoint point, TOOLINFO * pTI) const
 	return -1;
 }
 
-int CQListCtrl::OnCreate(LPCREATESTRUCT lpCreateStruct)
+LRESULT CQListCtrl::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
 	if (CListCtrl::OnCreate(lpCreateStruct) == -1)
 		return -1;
@@ -1270,7 +1453,7 @@ CClipFormatQListCtrl* CQListCtrl::GetItem_CF_RTF_ClipFormat(int nItem)
 	return format;
 }
 
-void CQListCtrl::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
+void CQListCtrl::OnHScroll(int nSBCode, short nPos, CScrollBar pScrollBar)
 {
 	CListCtrl::OnHScroll(nSBCode, nPos, pScrollBar);
 }
@@ -1317,7 +1500,7 @@ void CQListCtrl::LoadDittoCopyBufferHotkeys()
 	}
 }
 
-void CQListCtrl::OnKillFocus(CWnd* pNewWnd)
+LRESULT CQListCtrl::OnKillFocus(CWnd* pNewWnd)
 {
 	CListCtrl::OnKillFocus(pNewWnd);
 
@@ -1338,9 +1521,10 @@ BOOL CQListCtrl::SetItemCountEx(int iCount, DWORD dwFlags /* = 0 */)
 	return CListCtrl::SetItemCountEx(iCount, dwFlags);
 }
 
-void CQListCtrl::OnSelectionChange(NMHDR* pNMHDR, LRESULT* pResult)
+LRESULT CQListCtrl::OnSelectionChange(int, LPNMHDR pNMHDR, BOOL& bHandled)
 {
 	NMLISTVIEW *pnmv = (NMLISTVIEW *)pNMHDR;
+	bHandled = FALSE;
 
 	if ((pnmv->uNewState == 3) ||
 		(pnmv->uNewState == 1))
@@ -1462,7 +1646,7 @@ void CQListCtrl::SetLogFont(LOGFONT &font)
 	SetFont(&m_Font);
 }
 
-void CQListCtrl::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
+void CQListCtrl::OnVScroll(int nSBCode, short nPos, CScrollBar pScrollBar)
 {
 	CListCtrl::OnVScroll(nSBCode, nPos, pScrollBar);
 }
@@ -1495,7 +1679,7 @@ BOOL CQListCtrl::OnItemDeleted(long lID)
 	return (bRet2);
 }
 
-void CQListCtrl::OnMouseMove(UINT nFlags, CPoint point)
+LRESULT CQListCtrl::OnMouseMove(UINT nFlags, CPoint point)
 {
 	if (CGetSetOptions::m_showScrollBar == FALSE)
 	{
@@ -1694,7 +1878,7 @@ void CQListCtrl::CreateSmallFont()
 	m_SmallFont = ::CreateFontIndirect(&lf);
 }
 
-void CQListCtrl::OnMouseHWheel(UINT nFlags, short zDelta, CPoint pt)
+LRESULT CQListCtrl::OnMouseHWheel(UINT nFlags, short zDelta, CPoint pt)
 {
 	if (zDelta < 0)
 	{

@@ -10,17 +10,14 @@
 #define TIMER_DRAW_CLIPBOARD			7
 #define TIMER_PING						8
 
-class CClipboardViewer : public CWnd
+class CClipboardViewer : public CWindowImpl<CClipboardViewer>
 {
+	DECLARE_WND_CLASS(_T("Ditto_ClipboardViewer"))
+
 // Construction
 public:
 	CClipboardViewer(CCopyThread* pHandler);
 	virtual ~CClipboardViewer();
-
-// Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CClipboardViewer)
-	//}}AFX_VIRTUAL
 
 // Implementation
 public:
@@ -50,23 +47,26 @@ public:
 
 	DWORD m_dwLastCopy;
 
-	// Generated message map functions
+	BEGIN_MSG_MAP(CClipboardViewer)
+		MSG_WM_CREATE(OnCreate)
+		MSG_WM_DESTROY(OnDestroy)
+		MSG_WM_CHANGECBCHAIN(OnChangeCbChain)
+		MSG_WM_DRAWCLIPBOARD(OnDrawClipboard)
+		MSG_WM_TIMER(OnTimer)
+		MESSAGE_HANDLER(WM_SETCONNECT, OnSetConnect)
+		MESSAGE_HANDLER(WM_CLIPBOARDUPDATE, OnClipboardChange)
+	END_MSG_MAP()
+
 protected:
-	//{{AFX_MSG(CClipboardViewer)
-	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
-	afx_msg void OnDestroy();
-	afx_msg void OnChangeCbChain(HWND hWndRemove, HWND hWndAfter);
-	afx_msg void OnDrawClipboard();
-	afx_msg void OnTimer(UINT_PTR nIDEvent);
-	//}}AFX_MSG
-	afx_msg LRESULT OnSetConnect(WPARAM wParam, LPARAM lParam);
-	afx_msg LRESULT CClipboardViewer::OnClipboardChange(WPARAM wParam, LPARAM lPara);
-	DECLARE_MESSAGE_MAP()
+	int OnCreate(LPCREATESTRUCT lpCreateStruct);
+	void OnDestroy();
+	void OnChangeCbChain(HWND hWndRemove, HWND hWndAfter);
+	void OnDrawClipboard();
+	void OnTimer(UINT_PTR nIDEvent);
+	LRESULT OnSetConnect(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnClipboardChange(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 };
 
 /////////////////////////////////////////////////////////////////////////////
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 
 #endif // !defined(AFX_CLIPBOARDVIEWER_H__67418FB6_6048_48FA_86D4_F412CACC41B1__INCLUDED_)

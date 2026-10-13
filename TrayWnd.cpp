@@ -10,8 +10,6 @@
 
 UINT WM_TASKBARCREATED = RegisterWindowMessage(_T("TaskbarCreated"));
 
-IMPLEMENT_DYNAMIC(CTrayWnd, CWnd)
-
 CTrayWnd::CTrayWnd()
 {
 }
@@ -20,12 +18,7 @@ CTrayWnd::~CTrayWnd()
 {
 }
 
-
-BEGIN_MESSAGE_MAP(CTrayWnd, CWnd)
-	ON_REGISTERED_MESSAGE(WM_TASKBARCREATED, OnTaskBarCreated)
-END_MESSAGE_MAP()
-
-LRESULT CTrayWnd::OnTaskBarCreated(WPARAM wParam, LPARAM lParam)
+LRESULT CTrayWnd::OnTaskBarCreated(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	if(theApp.m_pMainFrame != NULL)
 	{

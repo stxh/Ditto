@@ -41,7 +41,6 @@ public:
 
 class CCopyThread : public WTL::CWinThread
 {
-	DECLARE_DYNCREATE(CCopyThread)
 public:
 	CCopyThread();
 	virtual ~CCopyThread();

@@ -15,17 +15,6 @@ public:
 		pIStream->Release();
 		return gdipImage;
 	};
-	static std::shared_ptr<CImage> CImageFromHGLOBAL(HGLOBAL hGlobal) {
-		IStream* pIStream = StreamFromHGLOBAL(hGlobal);
-		if (!pIStream)
-			return NULL;
-
-		std::shared_ptr<CImage> cImage = std::make_shared<CImage>();
-		cImage->Load(pIStream);
-		pIStream->Release();
-
-		return cImage;
-	};
 	static IStream* StreamFromHGLOBAL(HGLOBAL hGlobal) {
 		if (!hGlobal)
 			return NULL;

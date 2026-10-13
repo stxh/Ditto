@@ -23,7 +23,7 @@ void CAutoSendToClientThread::FireSendToClient(CClipList *pClipList)
 {
 	Start();
 
-	ATL::CCritSecLock csLock(m_cs.m_sect);
+	ATL::CCritSecLock csLock(m_cs);
 	if(m_threadRunning)
 	{
 		Log(_T("Adding clip to send to client in thread"));
@@ -67,7 +67,7 @@ void CAutoSendToClientThread::OnSendToClient()
 
 	//Save the clips locally
 	{
-		ATL::CCritSecLock csLock(m_cs.m_sect);
+		ATL::CCritSecLock csLock(m_cs);
 
 		POSITION pos;
 		CClip* pClip;

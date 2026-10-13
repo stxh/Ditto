@@ -39,7 +39,7 @@ void CEventThread::AddEvent(int eventId)
 	HANDLE handle = CreateEvent(NULL, FALSE, FALSE, _T(""));
 
 	{
-		ATL::CCritSecLock csLock(m_lock.m_sect);
+		ATL::CCritSecLock csLock(m_lock);
 		m_eventMap[handle] = eventId;
 	}
 
@@ -52,7 +52,7 @@ void CEventThread::AddEvent(int eventId)
 void CEventThread::AddEvent(int eventId, HANDLE handle)
 {
 	{
-		ATL::CCritSecLock csLock(m_lock.m_sect);
+		ATL::CCritSecLock csLock(m_lock);
 		m_eventMap[handle] = eventId;
 	}
 
@@ -78,7 +78,7 @@ void CEventThread::AddEvent(int eventId, CString name)
 	HANDLE handle = CreateEvent(&sa, FALSE, FALSE, name);
 
 	{
-		ATL::CCritSecLock csLock(m_lock.m_sect);
+		ATL::CCritSecLock csLock(m_lock);
 		m_eventMap[handle] = eventId;
 	}
 
@@ -114,7 +114,7 @@ bool CEventThread::UndoFireEvent(int eventId)
 
 HANDLE CEventThread::GetHandle(int eventId)
 {	
-	ATL::CCritSecLock csLock(m_lock.m_sect);
+	ATL::CCritSecLock csLock(m_lock);
 	for (auto it = m_eventMap.begin(); it != m_eventMap.end(); it++)
 	{
 		if (it->second == eventId)
@@ -128,7 +128,7 @@ HANDLE CEventThread::GetHandle(int eventId)
 
 bool CEventThread::RemoveEvent(int eventId)
 {
-	ATL::CCritSecLock csLock(m_lock.m_sect);
+	ATL::CCritSecLock csLock(m_lock);
 	for (auto it = m_eventMap.begin(); it != m_eventMap.end(); it++)
 	{
 		if (it->second == eventId)
@@ -197,7 +197,7 @@ void CEventThread::Stop(int waitTime)
 
 void CEventThread::GetHandleVector(std::vector<HANDLE> &handles)
 {
-	ATL::CCritSecLock csLock(m_lock.m_sect);
+	ATL::CCritSecLock csLock(m_lock);
 	handles.clear();
 	for (auto it = m_eventMap.begin(); it != m_eventMap.end(); it++)
 	{
@@ -210,7 +210,7 @@ void CEventThread::GetHandleVector(std::vector<HANDLE> &handles)
 
 void CEventThread::CheckForRebuildHandleVector(std::vector<HANDLE>& handles)
 {
-	ATL::CCritSecLock csLock(m_lock.m_sect);
+	ATL::CCritSecLock csLock(m_lock);
 	for (auto it = m_eventMap.begin(); it != m_eventMap.end(); it++)
 	{
 		if (it->second == REBUILD_EVENTS)

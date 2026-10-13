@@ -5,16 +5,22 @@
 
 BOOL CConvertRTFToText::Create()
 {
-	// Get the class name and create the window
-	CString szClassName = AfxRegisterWndClass(CS_CLASSDC | CS_SAVEBITS, LoadCursor(NULL, IDC_ARROW));
+	// Register window class using raw Win32 API
+	WNDCLASSEX wcex = {0};
+	wcex.cbSize = sizeof(WNDCLASSEX);
+	wcex.style = CS_CLASSDC | CS_SAVEBITS;
+	wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
+	wcex.lpfnWndProc = DefWindowProc;
+	wcex.hInstance = GetModuleHandle(NULL);
+	wcex.lpszClassName = _T("ConvertRTFToText");
+	RegisterClassEx(&wcex);
 
 	// Create the window - just don't show it yet.
-	if (!CWnd::CreateEx(WS_EX_NOACTIVATE, szClassName, _T(""), WS_POPUP,0, 0, 0, 0, NULL, 0, NULL))
-	{
+	m_hWnd = CreateWindow(_T("ConvertRTFToText"), _T(""), WS_POPUP, 0, 0, 0, 0, NULL, NULL, GetModuleHandle(NULL), NULL);
+	if (!m_hWnd)
 		return FALSE;
-	}
 
-	m_richEditTextConverter.Create(_T(""), _T(""), WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_HSCROLL | ES_MULTILINE | ES_AUTOVSCROLL | ES_NOHIDESEL | ES_AUTOHSCROLL, CRect(10, 10, 100, 200), this, 1);
+	m_richEditTextConverter.Create(m_hWnd, 1, WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_HSCROLL | ES_MULTILINE | ES_AUTOVSCROLL | ES_NOHIDESEL | ES_AUTOHSCROLL);
 
 	return TRUE;
 }

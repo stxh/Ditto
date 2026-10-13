@@ -13,65 +13,11 @@
 
 namespace WTL {
 
-// Forward declaration
-class CWinThread;
-
-// Thread function prototype
-typedef UINT (AFXAPI *AFX_THREADPROC)(LPVOID);
-
-// WTL-compatible runtime class structure (simplified)
-struct CRuntimeClass
-{
-    LPCSTR m_lpszClassName;
-    int m_nObjectSize;
-    UINT m_wSchema;
-    CObject* (PASCAL* m_pfnCreateObject)();
-    CRuntimeClass* m_pBaseClass;
-    CRuntimeClass* m_pNextClass;
-    
-    static CRuntimeClass* PASCAL Load();
-    CObject* CreateObject();
-};
-
-// Simplified dynamic creation macros for WTL compatibility
-#define DECLARE_DYNAMIC(class_name) \
-public: \
-    static CRuntimeClass class##class_name; \
-    virtual CRuntimeClass* GetRuntimeClass() const;
-
-#define DECLARE_DYNCREATE(class_name) \
-    DECLARE_DYNAMIC(class_name) \
-    static CObject* PASCAL CreateObject();
-
-#define IMPLEMENT_DYNAMIC(class_name, base_class) \
-    CRuntimeClass class_name::class##class_name = { \
-        #class_name, sizeof(class_name), 0xFFFF, \
-        class_name::CreateObject, RUNTIME_CLASS(base_class), NULL }; \
-    CRuntimeClass* class_name::GetRuntimeClass() const \
-        { return &class_name::class##class_name; }
-
-#define IMPLEMENT_DYNCREATE(class_name, base_class) \
-    CObject* PASCAL class_name::CreateObject() \
-        { return new class_name; } \
-    IMPLEMENT_DYNAMIC(class_name, base_class)
-
-#define RUNTIME_CLASS(class_name) (&class_name::class##class_name)
-
-// Base class for dynamic creation (simplified)
-class CObject
+// WTL Thread class - replacement for MFC's CWinThread:
+// a worker thread that optionally runs a message pump.
+class CWinThread
 {
 public:
-    virtual ~CObject() {}
-    virtual CRuntimeClass* GetRuntimeClass() const { return NULL; }
-    static CRuntimeClass classCObject;
-    static CObject* PASCAL CreateObject();
-};
-
-// WTL Thread class - replacement for MFC's CWinThread
-class CWinThread : public CObject
-{
-public:
-    DECLARE_DYNAMIC(CWinThread)
 
     // Construction
     CWinThread();
@@ -99,11 +45,6 @@ public:
     BOOL SetThreadPriority(int nPriority);
     int GetThreadPriority();
     DWORD Resume();
-
-    // Static thread creation
-    static CWinThread* BeginThread(AFX_THREADPROC pfnThreadProc, LPVOID pParam,
-        int nPriority = THREAD_PRIORITY_NORMAL, UINT nStackSize = 0,
-        DWORD dwCreateFlags = 0, LPSECURITY_ATTRIBUTES lpSecurityAttrs = NULL);
 
 protected:
     // Internal thread function

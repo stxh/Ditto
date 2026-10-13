@@ -3,7 +3,7 @@
 #include "stdafx.h"
 #include "CP_Main.h"
 #include "OptionsSheet.h"
-#include "HyperLink.h"
+#include <atlctrlx.h>
 #include <atlbase.h>
 #include <atlwin.h>
 #include <atldlgs.h>

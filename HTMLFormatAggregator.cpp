@@ -6,13 +6,6 @@
 CHTMLFormatAggregator::CHTMLFormatAggregator(CStringA csSepator) :
 	m_csSeparator(csSepator)
 {
-	//Remove the first line feed
-//	if(m_csSeparator.GetLength() > 1 && m_csSeparator[0] == '\r' && m_csSeparator[1] == '\n')
-//	{
-//		m_csSeparator.Delete(0);
-//		m_csSeparator.Delete(0);
-//	}
-
 	m_csSeparator.Replace("\r\n", "<br>");
 }
 
@@ -150,7 +143,7 @@ bool CHTMFormatStruct::Serialize(CStringA &csHTMLFormat)
 	CStringA csStartFragmentMarkerText("<!--StartFragment-->");
 	CStringA csEndFragmentMarkerText("<!--EndFragment-->");
 	CStringA csStartHTML("<html><body>");
-	CStringA csEndHTML("</body>\r\n</html>");
+CStringA csEndHTML("</body>\r\n</html>");
 	long lNumberCharacters = 8;
 
 	//+2 is for the line feeds
@@ -176,7 +169,7 @@ bool CHTMFormatStruct::Serialize(CStringA &csHTMLFormat)
 	m_lEndHTML = lCurrentPos;
 
 
-	csHTMLFormat = csVersionText + m_csVersion + "\r\n";
+csHTMLFormat = csVersionText + m_csVersion + "\r\n";
 
 	CStringA csFormat;
 	csFormat.Format("%s%08d\r\n", csStartHTMLText, m_lStartHTML);
@@ -185,10 +178,10 @@ bool CHTMFormatStruct::Serialize(CStringA &csHTMLFormat)
 	csFormat.Format("%s%08d\r\n", csEndHTMLText, m_lEndHTML);
 	csHTMLFormat += csFormat;
 
-	csFormat.Format("%s%08d\r\n", csStartFragmentText, m_lStartFragment);
+csFormat.Format("%s%08d\r\n", csStartFragmentText, m_lStartFragment);
 	csHTMLFormat += csFormat;
 
-	csFormat.Format("%s%08d\r\n", csEndFragmentText, m_lEndFragment);
+csFormat.Format("%s%08d\r\n", csEndFragmentText, m_lEndFragment);
 	csHTMLFormat += csFormat;
 
 	csFormat.Format("%s%s\r\n", csSourceURLText, m_csSourceURL);

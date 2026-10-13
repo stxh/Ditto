@@ -29,7 +29,11 @@ bool CImageFormatAggregator::AddClip(LPVOID lpData, int nDataSize, int nPos, int
 HGLOBAL CImageFormatAggregator::GetHGlobal()
 {
 	CBitmap bitmap;
-	if (CBitmapHelper::GetCBitmap(m_images, CDC::FromHandle(GetDC(GetActiveWindow())), &bitmap, m_horizontally) == FALSE)
+	HWND hWndDC = GetActiveWindow();
+	HDC hdc = GetDC(hWndDC);
+	BOOL bDrawn = CBitmapHelper::GetCBitmap(m_images, hdc, &bitmap, m_horizontally);
+	ReleaseDC(hWndDC, hdc);
+	if (bDrawn == FALSE)
 	{
 		bitmap.DeleteObject();
 		return NULL;

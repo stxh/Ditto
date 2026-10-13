@@ -12,6 +12,6 @@ public:
 	bool m_convertedToSmallImage;
 	INT64 m_counter;
 
-	HGLOBAL GetDibFittingToHeight(CDC *pDc, int height);
+	HGLOBAL GetDibFittingToHeight(HDC hdc, int height);
 };
 

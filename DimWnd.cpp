@@ -1,23 +1,23 @@
 #include "stdafx.h"
 #include "DimWnd.h"
 
-CDimWnd::CDimWnd(CWnd* pParent)
+CDimWnd::CDimWnd(HWND hWndParent)
 {
 	m_ParentWnd = NULL;
 
-	if (pParent != NULL)
+	if (hWndParent != NULL)
 	{
 		CRect rc;
-		pParent->GetWindowRect(&rc);
+		::GetWindowRect(hWndParent, &rc);
 
-		Create(pParent->m_hWnd, rc, TEXT(""),
+		Create(hWndParent, rc, TEXT(""),
 			WS_POPUP | WS_VISIBLE | WS_DISABLED,
 			WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_TOOLWINDOW);
 
-		SetLayeredWindowAttributes(RGB(0, 0, 0), 64, LWA_ALPHA);
+		::SetLayeredWindowAttributes(m_hWnd, RGB(0, 0, 0), 64, LWA_ALPHA);
 		BringWindowToTop();
 		ShowWindow(SW_SHOW);
-		m_ParentWnd = pParent->m_hWnd;
+		m_ParentWnd = hWndParent;
 	}
 }
 
@@ -28,13 +28,14 @@ CDimWnd::~CDimWnd()
 LRESULT CDimWnd::OnEraseBkgnd(UINT, WPARAM wParam, LPARAM, BOOL&)
 {
 	HDC hdc = (HDC)wParam;
-	CBrush backBrush(CreateSolidBrush(RGB(0, 0, 0)));
-	HBRUSH oldBrush = SelectBrush(hdc, backBrush);
+	HBRUSH hBlackBrush = CreateSolidBrush(RGB(0, 0, 0));
+	HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, hBlackBrush);
 
 	CRect rect;
 	GetClientRect(&rect);
 	PatBlt(hdc, rect.left, rect.top, rect.Width(), rect.Height(), PATCOPY);
 
-	SelectBrush(hdc, oldBrush);
+	SelectObject(hdc, oldBrush);
+	DeleteObject(hBlackBrush);
 	return 1;
 }

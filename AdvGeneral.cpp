@@ -11,7 +11,6 @@
 
 // CAdvGeneral dialog
 
-IMPLEMENT_DYNAMIC(CAdvGeneral, CDialogEx)
 
 CAdvGeneral::CAdvGeneral(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CAdvGeneral::IDD, pParent)
@@ -952,7 +951,7 @@ void CAdvGeneral::OnBnClickedBtCompactAndRepair()
 
 void CAdvGeneral::OnBnClickedButtonCopyScripts()
 {
-	CDimWnd dim(this);
+	CDimWnd dim(m_hWnd);
 
 	CScriptEditor e(this);
 	e.m_title = _T("Copy Scripts");
@@ -965,7 +964,7 @@ void CAdvGeneral::OnBnClickedButtonCopyScripts()
 
 void CAdvGeneral::OnBnClickedButtonPasteScripts2()
 {
-	CDimWnd dim(this);
+	CDimWnd dim(m_hWnd);
 
 	CScriptEditor e(this);
 	e.m_title = _T("Paste Scripts");

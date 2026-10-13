@@ -30,28 +30,20 @@
 #include "Accels.h"
 #include "DPI.h"
 
-// CSymbolEdit
+#define RANGE_START 3000
+#define CLEAR_LIST 3010
+#define LIST_MAX_COUNT 10
+#define MAX_SAVED_SEARCH_LENGTH 50
 
-class CSymbolEdit : public CEdit
+class CSymbolEdit : public CWindowImpl<CSymbolEdit, CEdit>
 {
-	DECLARE_DYNAMIC(CSymbolEdit)
-
-	CFont m_fontPrompt;
-	HICON m_hSymbolIcon;
-	bool m_bInternalIcon;
-	CString m_strPromptText;
-	COLORREF m_colorPromptText;
-
-	CBrush m_brush;
-	COLORREF m_lastBrushColor;
-
-	void DestroyIcon();
-
 public:
-	CSymbolEdit();
-	virtual ~CSymbolEdit();
+	DECLARE_WND_SUPERCLASS(_T("Ditto_SymbolEdit"), _T("Edit"))
 
-	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	CSymbolEdit();
+	~CSymbolEdit();
+
+	BOOL PreTranslateMessage(MSG* pMsg);
 
 	void AddToSearchHistory();
 
@@ -79,11 +71,16 @@ public:
 
 	void OnDpiChanged();
 
-	//void SetWindowTextEx(LPCSTR)
-
 protected:
-	
-	//CGdiImageDrawer m_searchButton;
+	CFont m_fontPrompt;
+	HICON m_hSymbolIcon;
+	bool m_bInternalIcon;
+	CString m_strPromptText;
+	COLORREF m_colorPromptText;
+
+	CBrush m_brush;
+	COLORREF m_lastBrushColor;
+
 	CGdiImageDrawer m_closeButton;
 	CRect m_closeButtonRect;
 	bool m_mouseDownOnClose;
@@ -98,34 +95,50 @@ protected:
 
 	CStringArray m_searches;
 
-	void RecalcLayout();
-	virtual void PreSubclassWindow();
-
 	CDPI *m_windowDpi;
 
 	int m_centerTextDiff;
 	CString m_lastTextOnPaint;
 
-	afx_msg void OnSize(UINT nType, int cx, int cy);
-	afx_msg LRESULT OnSetFont(WPARAM wParam, LPARAM lParam);
-	//afx_msg LRESULT OnMenuExit(WPARAM wParam, LPARAM lParam);
-	afx_msg HBRUSH CtlColor(CDC* pDC, UINT n);
-	afx_msg void OnSetFocus(CWnd* pOldWnd);
-	afx_msg void OnKillFocus(CWnd* pNewWnd);
-	afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);
-	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
-	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
-	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
-	afx_msg void OnSelectSearchString(UINT idIn);
+	void DestroyIcon();
+	void RecalcLayout();
+	virtual void PreSubclassWindow();
 
-	DECLARE_MESSAGE_MAP()
+	int OnCreate(LPCREATESTRUCT lpCreateStruct);
+	LRESULT OnSetFont(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	HBRUSH CtlColor(CDCHandle dc, HWND hwndEdit);
+	LRESULT OnSetFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnKillFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnSetCursor(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnLButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnLButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnSelectSearchString(WORD wNotifyCode, WORD wID, HWND hWndCtrl, BOOL& bHandled);
+	LRESULT OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnEraseBkgnd(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnNcCalcSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnNcPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnTimer(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 
-public:
-	afx_msg void OnPaint();
-	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
-	afx_msg void OnNcCalcSize(BOOL bCalcValidRects, NCCALCSIZE_PARAMS* lpncsp);
-	afx_msg void OnNcPaint();
-	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	BEGIN_MSG_MAP_EX(CSymbolEdit)
+		MSG_WM_CREATE(OnCreate)
+		MESSAGE_HANDLER(WM_PAINT, OnPaint)
+		MESSAGE_HANDLER(WM_SETFONT, OnSetFont)
+		MSG_WM_CTLCOLOREDIT(CtlColor)
+		MESSAGE_HANDLER(WM_SETFOCUS, OnSetFocus)
+		MESSAGE_HANDLER(WM_KILLFOCUS, OnKillFocus)
+		MESSAGE_HANDLER(WM_SETCURSOR, OnSetCursor)
+		MESSAGE_HANDLER(WM_LBUTTONDOWN, OnLButtonDown)
+		MESSAGE_HANDLER(WM_LBUTTONUP, OnLButtonUp)
+		MESSAGE_HANDLER(WM_MOUSEMOVE, OnMouseMove)
+		MESSAGE_HANDLER(WM_SIZE, OnSize)
+		MESSAGE_HANDLER(WM_ERASEBKGND, OnEraseBkgnd)
+		MESSAGE_HANDLER(WM_NCCALCSIZE, OnNcCalcSize)
+		MESSAGE_HANDLER(WM_NCPAINT, OnNcPaint)
+		MESSAGE_HANDLER(WM_TIMER, OnTimer)
+		COMMAND_RANGE_HANDLER(RANGE_START, (RANGE_START + LIST_MAX_COUNT), OnSelectSearchString)
+	END_MSG_MAP()
 };
 
 

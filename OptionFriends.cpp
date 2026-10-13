@@ -54,7 +54,7 @@ LRESULT COptionFriends::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 	SetDlgItemText(IDC_EDIT_PASSWORD, m_csPassword);
 	SetDlgItemText(IDC_EDIT_ADDITIONAL, m_csAdditionalPasswords);
 
-	theApp.m_Language.UpdateOptionFriends(this);
+	theApp.m_Language.UpdateOptionFriends(m_hWnd);
 		
 	return 0;
 }
@@ -186,7 +186,7 @@ LRESULT COptionFriends::OnDblclkList(int, LPNMHDR pnmh, BOOL&)
 
 BOOL COptionFriends::EditItem(int nItem)
 {
-	CDimWnd dim(this->GetParent());
+	CDimWnd dim(this->GetParent().m_hWnd);
 
 	CFriendDetails dlg(this);
 

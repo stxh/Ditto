@@ -4,7 +4,7 @@
 #include "BitmapHelper.h"
 #include "Options.h"
 #include "ActionEnums.h"
-#include "HyperLink.h"
+#include <atlctrlx.h>
 #include <Richedit.h>
 
 #ifdef _DEBUG
@@ -40,68 +40,28 @@ CToolTipEx::~CToolTipEx()
 	m_clipDataFont.DeleteObject();
 }
 
-BEGIN_MESSAGE_MAP(CToolTipEx, CWnd)
-	//{{AFX_MSG_MAP(CToolTipEx)
-	ON_WM_PAINT()
-	ON_WM_SIZE()
-	ON_WM_NCHITTEST()
-	ON_WM_ACTIVATE()
-	ON_WM_TIMER()
-	ON_WM_NCLBUTTONDBLCLK()
-	ON_WM_NCPAINT()
-	ON_WM_NCCALCSIZE()
-	ON_WM_NCLBUTTONDOWN()
-	ON_WM_NCMOUSEMOVE()
-	ON_WM_NCLBUTTONUP()
-	ON_WM_ERASEBKGND()
-	ON_COMMAND(ID_FIRST_REMEMBERWINDOWPOSITION, &CToolTipEx::OnRememberwindowposition)
-	ON_COMMAND(ID_FIRST_SIZEWINDOWTOCONTENT, &CToolTipEx::OnSizewindowtocontent)
-	ON_COMMAND(ID_FIRST_SCALEIMAGESTOFITWINDOW, &CToolTipEx::OnScaleimagestofitwindow)
-	ON_COMMAND(2, OnOptions)
-	ON_WM_RBUTTONDOWN()
-	ON_WM_SETFOCUS()
-	ON_COMMAND(ID_FIRST_HIDEDESCRIPTIONWINDOWONM, &CToolTipEx::OnFirstHidedescriptionwindowonm)
-	ON_COMMAND(ID_FIRST_WRAPTEXT, &CToolTipEx::OnFirstWraptext)
-	ON_WM_WINDOWPOSCHANGING()
-	ON_COMMAND(ID_FIRST_ALWAYSONTOP, &CToolTipEx::OnFirstAlwaysontop)
-	ON_NOTIFY(EN_MSGFILTER, 1, &CToolTipEx::OnEnMsgfilterRichedit21)
-	ON_MESSAGE(WM_DPICHANGED, OnDpiChanged)
-	ON_WM_MOVING()
-	ON_WM_ENTERSIZEMOVE()
-	ON_WM_HSCROLL()
-	ON_MESSAGE(WM_REFRESH_FOOTER, OnRefreshFooter)
-	ON_COMMAND(ID_FIRST_VIEWTEXT, &CToolTipEx::OnFirstViewtext)
-	ON_COMMAND(ID_FIRST_VIEWRTF, &CToolTipEx::OnFirstViewrtf)
-	ON_COMMAND(ID_FIRST_VIEWHTML, &CToolTipEx::OnFirstViewhtml)
-	ON_COMMAND(ID_FIRST_VIEWASIMAGE, &CToolTipEx::OnFirstViewImage)
-	ON_UPDATE_COMMAND_UI(ID_FIRST_VIEWTEXT, &CToolTipEx::OnUpdateFirstViewtext)
-	ON_UPDATE_COMMAND_UI(ID_FIRST_VIEWRTF, &CToolTipEx::OnUpdateFirstViewrtf)
-	ON_UPDATE_COMMAND_UI(ID_FIRST_VIEWHTML, &CToolTipEx::OnUpdateFirstViewhtml)
-END_MESSAGE_MAP()
-
-
 /////////////////////////////////////////////////////////////////////////////
 // CToolTipEx message handlers
 
-BOOL CToolTipEx::Create(CWnd *pParentWnd)
+BOOL CToolTipEx::Create(WTL::CWindow *pParentWnd)
 {
 	m_saveWindowLockout = true;
 
-    // Get the class name and create the window
-    CString szClassName = AfxRegisterWndClass(CS_CLASSDC | CS_SAVEBITS, LoadCursor(NULL, IDC_ARROW));
+    WNDCLASS wc = {0};
+    wc.lpfnWndProc = ::DefWindowProc;
+    wc.hCursor = ::LoadCursor(NULL, IDC_ARROW);
+    wc.lpszClassName = L"DittoToolTipEx";
+    ::RegisterClass(&wc);
 
-    // Create the window - just don't show it yet.
-    if( !CWnd::CreateEx(0, szClassName, _T(""), WS_POPUP,
-       0, 0, 0, 0, pParentWnd->GetSafeHwnd(), 0, NULL))
+    if( !CreateEx(0, L"DittoToolTipEx", L"", WS_POPUP,
+       0, 0, 0, 0, pParentWnd->m_hWnd, (HMENU)0, NULL))
     {
         return FALSE;
     }	
+    
+    HICON hIcon = (HICON)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDR_MAINFRAME), IMAGE_ICON, 64, 64, LR_SHARED);
+    SetIcon(hIcon, TRUE);
 
-	HICON b = (HICON)LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_MAINFRAME), IMAGE_ICON, 64, 64, LR_SHARED);
-	SetIcon(b, TRUE);
-
-	//CString szClassName2 = AfxRegisterWndClass(CS_CLASSDC | CS_SAVEBITS, LoadCursor(NULL, IDC_ARROW));
-	//BOOL b = m_imageViewer.Create(_T(""), szClassName2, WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_HSCROLL, CRect(0, 0, 0, 0), this, 3);
 	m_imageViewer.Create(this);
 	
 	
@@ -125,24 +85,26 @@ BOOL CToolTipEx::Create(CWnd *pParentWnd)
 	
 	ApplyWordWrap();	   
 
-	m_optionsButton.Create(NULL, WS_CHILD | BS_OWNERDRAW | WS_TABSTOP, CRect(0, 0, 0, 0), this, 2);
+	CRect rcBtn(0, 0, 0, 0);
+	m_optionsButton.Create(m_hWnd, rcBtn, NULL, WS_CHILD | BS_OWNERDRAW | WS_TABSTOP, 0, 2);
 	m_optionsButton.LoadStdImageDPI(m_DittoWindow.m_dpi.GetDPI(), IDB_COG_16_16, IDB_COG_20_20, IDB_COG_24_24, cog_28, IDB_COG_32_32, _T("PNG"));
 	m_optionsButton.SetToolTipText(theApp.m_Language.GetString(_T("DescriptionOptionsTooltip"), _T("Description Options")));
 	m_optionsButton.ShowWindow(SW_SHOW);
 
-	m_clipDataStatic.Create(_T("some text"), WS_CHILD | WS_VISIBLE | SS_SIMPLE, CRect(0, 0, 0, 0), this, 3);
-	m_folderPathStatic.Create(_T("some text"), WS_CHILD | WS_VISIBLE | SS_SIMPLE, CRect(0, 0, 0, 0), this, 4);
+	CRect rcZero(0, 0, 0, 0);
+	m_clipDataStatic.Create(m_hWnd, rcZero, _T("some text"), WS_CHILD | WS_VISIBLE | SS_SIMPLE, 0, 3);
+	m_folderPathStatic.Create(m_hWnd, rcZero, _T("some text"), WS_CHILD | WS_VISIBLE | SS_SIMPLE, 0, 4);
 
 	m_clipDataFont.CreateFont(-m_DittoWindow.m_dpi.Scale(11), 0, 0, 0, 400, 0, 0, 0, DEFAULT_CHARSET, 3, 2, 1, 34, _T("Segoe UI"));
 
 	m_Font.CreateFont(-m_DittoWindow.m_dpi.Scale(13), 0, 0, 0, 400, 0, 0, 0, DEFAULT_CHARSET, 3, 2, 1, 34, _T("Segoe UI"));
 	m_fontHeight = -13;
 
-	m_clipDataStatic.SetFont(&m_clipDataFont);
+	m_clipDataStatic.SetFont(m_clipDataFont);
 	m_clipDataStatic.SetBkColor(CGetSetOptions::m_Theme.DescriptionWindowBG());
 	m_clipDataStatic.SetTextColor(RGB(80, 80, 80));
 
-	m_folderPathStatic.SetFont(&m_clipDataFont);
+	m_folderPathStatic.SetFont(m_clipDataFont);
 	m_folderPathStatic.SetBkColor(CGetSetOptions::m_Theme.DescriptionWindowBG());
 	m_folderPathStatic.SetTextColor(RGB(80, 80, 80));
 	
@@ -329,7 +291,7 @@ void CToolTipEx::GetWindowRectEx(LPRECT lpRect)
 		return;
 	}
 
-	CWnd::GetWindowRect(lpRect);
+	WTL::CWindow::GetWindowRect(lpRect);
 }
 
 BOOL CToolTipEx::Hide()
@@ -365,7 +327,7 @@ void CToolTipEx::OnNcLButtonDblClk(UINT nHitTest, CPoint point)
 		OnFirstAlwaysontop();
 	}
 
-	CWnd::OnNcLButtonDblClk(nHitTest, point);
+	WTL::CWindow::OnNcLButtonDblClk(nHitTest, point);
 }
 
 void CToolTipEx::SaveWindowSize()
@@ -393,7 +355,7 @@ void CToolTipEx::SaveWindowSize()
 
 void CToolTipEx::PostNcDestroy()
 {
-	CWnd::PostNcDestroy();
+	WTL::CWindow::PostNcDestroy();
 
 	delete this;
 }
@@ -466,7 +428,7 @@ BOOL CToolTipEx::PreTranslateMessage(MSG *pMsg)
 		}
 	}
 
-    return CWnd::PreTranslateMessage(pMsg);
+    return WTL::CWindow::PreTranslateMessage(pMsg);
 }
 
 BOOL CToolTipEx::OnMsg(MSG *pMsg)
@@ -750,16 +712,19 @@ void CToolTipEx::SetGdiplusBitmap(Gdiplus::Bitmap *gdiplusBitmap)
 	Invalidate();
 }
 
-void CToolTipEx::OnSize(UINT nType, int cx, int cy)
+LRESULT CToolTipEx::OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-    CWnd::OnSize(nType, cx, cy);
+    WTL::CWindow::OnSize(LOWORD(wParam), CSize());
 
-    if(::IsWindow(m_RichEdit.GetSafeHwnd()) == FALSE)
+    if(::IsWindow(m_RichEdit.m_hWnd) == FALSE)
     {
-        return ;
+        bHandled = FALSE;
+        return 0;
     }
 
 	MoveControls();
+	bHandled = FALSE;
+	return 0;
 }
 
 void CToolTipEx::MoveControls()
@@ -1009,21 +974,27 @@ void CToolTipEx::DoSearch()
 	}
 }
 
-void CToolTipEx::OnActivate(UINT nState, CWnd *pWndOther, BOOL bMinimized)
+LRESULT CToolTipEx::OnActivate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-    CWnd::OnActivate(nState, pWndOther, bMinimized);
+    UINT nState = (UINT)wParam;
+    BOOL bMinimized = (BOOL)HIWORD(wParam);
+    
+    WTL::CWindow::OnActivate(nState, bMinimized);
 
 	if (nState == WA_INACTIVE)
 	{		
         if(m_pNotifyWnd)
         {
-            m_pNotifyWnd->PostMessage(NM_INACTIVE_TOOLTIPWND, 0, 0);
+            m_pNotifyWnd->SendMessage(NM_INACTIVE_TOOLTIPWND, 0, 0);
         }
     }
+    bHandled = FALSE;
+    return 0;
 }
 
-void CToolTipEx::OnTimer(UINT_PTR nIDEvent)
+LRESULT CToolTipEx::OnTimer(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
+    UINT_PTR nIDEvent = wParam;
     switch(nIDEvent)
     {
         case HIDE_WINDOW_TIMER:
@@ -1082,42 +1053,60 @@ void CToolTipEx::OnTimer(UINT_PTR nIDEvent)
 
     }
 
-    CWnd::OnTimer(nIDEvent);
+    WTL::CWindow::OnTimer(nIDEvent);
 }
 
+LRESULT CToolTipEx::OnEraseBkgnd(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+{
+	bHandled = TRUE;
+	return TRUE;
+}
 
-void CToolTipEx::OnNcPaint()
+LRESULT CToolTipEx::OnNcPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	m_DittoWindow.DoNcPaint(this);
+	bHandled = TRUE;
+	return 0;
 }
 
-void CToolTipEx::OnNcCalcSize(BOOL bCalcValidRects, NCCALCSIZE_PARAMS FAR* lpncsp) 
+LRESULT CToolTipEx::OnNcCalcSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	CWnd::OnNcCalcSize(bCalcValidRects, lpncsp);
-
+	BOOL bCalcValidRects = (BOOL)wParam;
+	NCCALCSIZE_PARAMS* lpncsp = (NCCALCSIZE_PARAMS*)lParam;
+	
+	WTL::CWindow::OnNcCalcSize(bCalcValidRects, lpncsp);
 	m_DittoWindow.DoNcCalcSize(bCalcValidRects, lpncsp);
+	bHandled = TRUE;
+	return 0;
 }
 
-HITTEST_RET CToolTipEx::OnNcHitTest(CPoint point) 
+LRESULT CToolTipEx::OnNcHitTest(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
+	CPoint point(lParam);
 	UINT Ret = m_DittoWindow.DoNcHitTest(this, point);
 	if(Ret == -1)
-		return CWnd::OnNcHitTest(point);
-
+	{
+		bHandled = FALSE;
+		return 0;
+	}
+	bHandled = TRUE;
 	return Ret;
 }
 
-void CToolTipEx::OnNcLButtonDown(UINT nHitTest, CPoint point) 
+LRESULT CToolTipEx::OnNcLButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
+	UINT nHitTest = (UINT)wParam;
+	CPoint point(lParam);
 	int buttonPressed = m_DittoWindow.DoNcLButtonDown(this, nHitTest, point);
-
 	SetTimer(TIMER_BUTTON_UP, 100, NULL);
-	
-	CWnd::OnNcLButtonDown(nHitTest, point);
+	bHandled = FALSE;
+	return 0;
 }
 
-void CToolTipEx::OnNcLButtonUp(UINT nHitTest, CPoint point) 
+LRESULT CToolTipEx::OnNcLButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
+	UINT nHitTest = (UINT)wParam;
+	CPoint point(lParam);
 	long lRet = m_DittoWindow.DoNcLButtonUp(this, nHitTest, point);
 
 	switch(lRet)
@@ -1127,7 +1116,6 @@ void CToolTipEx::OnNcLButtonUp(UINT nHitTest, CPoint point)
 		break;
 	case BUTTON_CHEVRON:
 		m_DittoWindow.MinMaxWindow(this, SWAP_MIN_MAX);
-		OnNcPaint();
 		break;
 	}
 
@@ -1145,7 +1133,12 @@ void CToolTipEx::OnNcLButtonUp(UINT nHitTest, CPoint point)
 		}
 	}
 
-	CWnd::OnNcLButtonUp(nHitTest, point);
+	bHandled = FALSE;
+	return 0;
+}
+	}
+
+	WTL::CWindow::OnNcLButtonUp(nHitTest, point);
 }
 
 void CToolTipEx::OnNcMouseMove(UINT nHitTest, CPoint point) 
@@ -1162,7 +1155,7 @@ void CToolTipEx::OnNcMouseMove(UINT nHitTest, CPoint point)
 		}
 	}
 
-	CWnd::OnNcMouseMove(nHitTest, point);
+	WTL::CWindow::OnNcMouseMove(nHitTest, point);
 }
 
 void CToolTipEx::OnOptions()
@@ -1288,13 +1281,13 @@ void CToolTipEx::OnRButtonDown(UINT nFlags, CPoint point)
 {
 	OnOptions();
 
-	CWnd::OnRButtonDown(nFlags, point);
+	WTL::CWindow::OnRButtonDown(nFlags, point);
 }
 
 
-void CToolTipEx::OnSetFocus(CWnd* pOldWnd)
+void CToolTipEx::OnSetFocus(HWND hOldWnd)
 {
-	CWnd::OnSetFocus(pOldWnd);
+	CWindow::OnSetFocus(hOldWnd);
 
 	if (m_RichEdit.IsWindowVisible())
 	{
@@ -1302,22 +1295,28 @@ void CToolTipEx::OnSetFocus(CWnd* pOldWnd)
 	}
 }
 
-void CToolTipEx::OnPaint()
+LRESULT CToolTipEx::OnPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	CPaintDC dc(this); // device context for painting
+	HDC hDC = (HDC)wParam;
+	if (!hDC)
+	{
+		hDC = ::BeginPaint(m_hWnd, NULL);
+	}
 
 	CRect rect;
 	GetClientRect(rect);
 	
-	CBrush  Brush, *pOldBrush;
+	CBrush Brush;
 	Brush.CreateSolidBrush(CGetSetOptions::m_Theme.DescriptionWindowBG());
 
-	pOldBrush = dc.SelectObject(&Brush);
+	::FillRect(hDC, &rect, Brush.m_hObject);
 
-	dc.FillRect(&rect, &Brush);
+	if (!wParam)
+	{
+		::EndPaint(m_hWnd, NULL);
+	}
 
-	// Cleanup
-	dc.SelectObject(pOldBrush);
+	return 0;
 }
 
 void CToolTipEx::OnFirstHidedescriptionwindowonm()
@@ -1337,36 +1336,10 @@ bool CToolTipEx::ToggleWordWrap()
 	return didWordWrap;
 }
 
-void CToolTipEx::OnFirstWraptext()
+void CToolTipEx::ToggleShowPersistant()
 {
-	CGetSetOptions::SetWrapDescriptionText(!CGetSetOptions::GetWrapDescriptionText());	
-	ApplyWordWrap();
+	OnFirstAlwaysontop();
 }
-
-void CToolTipEx::ApplyWordWrap()
-{
-	if (CGetSetOptions::GetWrapDescriptionText())
-	{
-		m_RichEdit.SetTargetDevice(NULL, 0);
-	}
-	else
-	{
-		m_RichEdit.SetTargetDevice(NULL, 1);
-	}
-}
-
-void CToolTipEx::HideWindowInXMilliSeconds(long lms) 
-{ 
-	SetTimer(HIDE_WINDOW_TIMER, lms, NULL); 
-}
-
-void CToolTipEx::OnWindowPosChanging(WINDOWPOS* lpwndpos)
-{
-	CWnd::OnWindowPosChanging(lpwndpos);
-
-	//m_DittoWindow.SnapToEdge(this, lpwndpos);
-}
-
 
 void CToolTipEx::OnFirstAlwaysontop()
 {
@@ -1386,73 +1359,62 @@ void CToolTipEx::OnFirstAlwaysontop()
 	::SetWindowPos(m_hWnd, NULL, 0, 0, 0, 0, SWP_DRAWFRAME | SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);	
 }
 
-BOOL CToolTipEx::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
+LRESULT CToolTipEx::OnEnLink(int idCtrl, LPNMHDR pNMHDR, BOOL& bHandled)
 {
-	//CString cs;
-	//cs.Format(_T("On Notify: %d\r\n"), ((LPNMHDR)lParam)->code);
-	//OutputDebugString(cs);
-	switch (((LPNMHDR)lParam)->code)
+	ENLINK *enLinkInfo = (ENLINK *)pNMHDR;
+	if (enLinkInfo->msg == WM_LBUTTONUP)
 	{
-		case EN_LINK:
-		{
-			ENLINK *enLinkInfo = (ENLINK *)lParam; // pointer to a ENLINK structure
-			if (enLinkInfo->msg == WM_LBUTTONUP)
-			{
-				CString s;
-				m_RichEdit.GetTextRange(enLinkInfo->chrg.cpMin, enLinkInfo->chrg.cpMax, s);
+		CString s;
+		m_RichEdit.GetTextRange(enLinkInfo->chrg.cpMin, enLinkInfo->chrg.cpMax, s);
 
-				if (s == m_mouseDownOnLink)
-				{
-					CHyperLink::GotoURL(s, SW_SHOW);
-				}
-
-				m_mouseDownOnLink = _T("");
-			}
-			if (enLinkInfo->msg == WM_LBUTTONDOWN)
-			{
-				m_RichEdit.GetTextRange(enLinkInfo->chrg.cpMin, enLinkInfo->chrg.cpMax, m_mouseDownOnLink);
-			}
-		}
-		break;
-		case SimpleBrowser::NotificationType::BeforeNavigate2:
+		if (s == m_mouseDownOnLink)
 		{
-			SimpleBrowser::Notification * not = (SimpleBrowser::Notification *)lParam;
-			if (not != NULL)
-			{
-				if (not->URL.Find(_T("http")) >= 0)
-				{
-					CHyperLink::GotoURL(not->URL, SW_SHOW);
-					*pResult = TRUE;
-					//return TRUE;
-				}				
-			}
+			::ShellExecute(NULL, _T("open"), s, NULL, NULL, SW_SHOWNORMAL);
 		}
-			break;
-		case 5:
-			int x = 0;
-		break;
+
+		m_mouseDownOnLink = _T("");
+	}
+	if (enLinkInfo->msg == WM_LBUTTONDOWN)
+	{
+		m_RichEdit.GetTextRange(enLinkInfo->chrg.cpMin, enLinkInfo->chrg.cpMax, m_mouseDownOnLink);
 	}
 
-	return CWnd::OnNotify(wParam, lParam, pResult);
+	bHandled = TRUE;
+	return 0;
 }
 
+LRESULT CToolTipEx::OnBrowserBeforeNavigate2(int idCtrl, LPNMHDR pNMHDR, BOOL& bHandled)
+{
+	SimpleBrowser::Notification *not = (SimpleBrowser::Notification *)pNMHDR;
+	if (not != NULL)
+	{
+		if (not->URL.Find(_T("http")) >= 0)
+		{
+			::ShellExecute(NULL, _T("open"), not->URL, NULL, NULL, SW_SHOWNORMAL);
+			bHandled = TRUE;
+			return 1;
+		}
+	}
 
-void CToolTipEx::OnEnMsgfilterRichedit21(NMHDR *pNMHDR, LRESULT *pResult)
+	bHandled = FALSE;
+	return 0;
+}
+
+LRESULT CToolTipEx::OnEnMsgfilterRichedit21(int idCtrl, LPNMHDR pNMHDR, BOOL& bHandled)
 {
 	MSGFILTER *pMsgFilter = reinterpret_cast<MSGFILTER *>(pNMHDR);
+	LRESULT lResult = 0;
 	if (pMsgFilter != NULL)
 	{
 		switch (pMsgFilter->msg)
 		{
-			//handle click on the rich text control when it doesn't have focus
-			//set focus so the first click is handled by the rich text control
 		case WM_MOUSEACTIVATE:
 			m_RichEdit.SetFocus();
 			break;
-		case WM_MOUSEHWHEEL:			
+		case WM_MOUSEHWHEEL:
 			int delta = GET_WHEEL_DELTA_WPARAM(pMsgFilter->wParam);
 			if (delta < 0)
-			{			
+			{
 				m_RichEdit.SendMessage(WM_HSCROLL, SB_LINERIGHT, NULL);
 			}
 			else
@@ -1463,10 +1425,11 @@ void CToolTipEx::OnEnMsgfilterRichedit21(NMHDR *pNMHDR, LRESULT *pResult)
 		}
 	}
 
-	*pResult = 0;
+	bHandled = TRUE;
+	return lResult;
 }
 
-LRESULT CToolTipEx::OnDpiChanged(WPARAM wParam, LPARAM lParam)
+LRESULT CToolTipEx::OnDpiChanged(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	int dpi = HIWORD(wParam);
 	m_DittoWindow.OnDpiChanged(this, dpi);
@@ -1481,17 +1444,20 @@ LRESULT CToolTipEx::OnDpiChanged(WPARAM wParam, LPARAM lParam)
 
 	log(StrF(_T("CQPasteWnd::OnDpiChanged dpi: %d width: %d, height: %d"), dpi, (prcNewWindow->right - prcNewWindow->left), (prcNewWindow->bottom - prcNewWindow->top)));
 
+	return 0;
+}
+
 	m_optionsButton.Reset();
 	m_optionsButton.LoadStdImageDPI(m_DittoWindow.m_dpi.GetDPI(), IDB_COG_16_16, IDB_COG_20_20, IDB_COG_24_24, cog_28, IDB_COG_32_32, _T("PNG"));
 
 	m_clipDataFont.DeleteObject();
 	m_clipDataFont.CreateFont(-m_DittoWindow.m_dpi.Scale(8), 0, 0, 0, 400, 0, 0, 0, DEFAULT_CHARSET, 3, 2, 1, 34, _T("Segoe UI"));
 	
-	m_clipDataStatic.SetFont(&m_clipDataFont);
+	m_clipDataStatic.SetFont(m_clipDataFont);
 	m_clipDataStatic.SetBkColor(CGetSetOptions::m_Theme.DescriptionWindowBG());
 	m_clipDataStatic.SetTextColor(RGB(80, 80, 80));
 
-	m_folderPathStatic.SetFont(&m_clipDataFont);
+	m_folderPathStatic.SetFont(m_clipDataFont);
 	m_folderPathStatic.SetBkColor(CGetSetOptions::m_Theme.DescriptionWindowBG());
 	m_folderPathStatic.SetTextColor(RGB(80, 80, 80));
 
@@ -1514,7 +1480,7 @@ LRESULT CToolTipEx::OnDpiChanged(WPARAM wParam, LPARAM lParam)
 
 void CToolTipEx::OnMoving(UINT fwSide, LPRECT pRect)
 {
-	CWnd::OnMoving(fwSide, pRect); 
+	WTL::CWindow::OnMoving(fwSide, pRect); 
 
 	m_snap.OnSnapMoving(m_hWnd, pRect);
 	// TODO: Add your message handler code here
@@ -1525,7 +1491,7 @@ void CToolTipEx::OnEnterSizeMove()
 {
 	m_snap.OnSnapEnterSizeMove(m_hWnd);
 
-	CWnd::OnEnterSizeMove();
+	WTL::CWindow::OnEnterSizeMove();
 }
 
 
@@ -1535,7 +1501,7 @@ void CToolTipEx::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 	//m_scrollHelper.OnHScroll(nSBCode, nPos, pScrollBar);
 }
 
-LRESULT CToolTipEx::OnRefreshFooter(WPARAM wParam, LPARAM lParam)
+LRESULT CToolTipEx::OnRefreshFooter(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	m_clipData = m_originalClipData;
 	if (m_imageViewer.m_pGdiplusBitmap)
@@ -1549,7 +1515,7 @@ LRESULT CToolTipEx::OnRefreshFooter(WPARAM wParam, LPARAM lParam)
 
 	this->Invalidate();
 
-	return TRUE;
+	return 0;
 }
 
 void CToolTipEx::OnFirstViewtext()

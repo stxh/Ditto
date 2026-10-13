@@ -10,7 +10,6 @@
 // CGroupWnd
 #define ID_TRANPARENCY 100
 
-IMPLEMENT_DYNAMIC(CGroupWnd, CMagneticWnd)
 CGroupWnd::CGroupWnd()
 {
 	m_lSelectedGroup = -1;

@@ -134,7 +134,6 @@ public:
 class CClipboardViewer : public CWnd
 {
 protected: 
-	DECLARE_DYNAMIC(CClipboardViewer)
 
 public:
 // Overrides
@@ -233,7 +232,6 @@ public:
 
 class CCopyThread : public WTL::CWinThread
 {
-	DECLARE_DYNCREATE(CCopyThread)
 
 public:
 //protected:

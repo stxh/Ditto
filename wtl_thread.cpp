@@ -7,38 +7,6 @@
 
 namespace WTL {
 
-// CObject implementation
-CRuntimeClass CObject::classCObject = { 
-    "CObject", sizeof(CObject), 0xFFFF, 
-    CObject::CreateObject, NULL, NULL 
-};
-
-CObject* CObject::CreateObject()
-{
-    return new CObject;
-}
-
-CRuntimeClass* CObject::GetRuntimeClass() const
-{
-    return &classCObject;
-}
-
-// CWinThread implementation
-CRuntimeClass CWinThread::classCWinThread = { 
-    "CWinThread", sizeof(CWinThread), 0xFFFF, 
-    CWinThread::CreateObject, RUNTIME_CLASS(CObject), NULL 
-};
-
-CObject* CWinThread::CreateObject()
-{
-    return new CWinThread;
-}
-
-CRuntimeClass* CWinThread::GetRuntimeClass() const
-{
-    return &classCWinThread;
-}
-
 CWinThread::CWinThread() : m_hThread(NULL), m_nThreadID(0), 
     m_bAutoDelete(TRUE), m_bRunning(FALSE), m_bDone(FALSE)
 {
@@ -178,28 +146,6 @@ int CWinThread::GetThreadPriority()
 DWORD CWinThread::Resume()
 {
     return ResumeThread();
-}
-
-CWinThread* CWinThread::BeginThread(AFX_THREADPROC pfnThreadProc, LPVOID pParam,
-    int nPriority, UINT nStackSize, DWORD dwCreateFlags, 
-    LPSECURITY_ATTRIBUTES lpSecurityAttrs)
-{
-    CWinThread* pThread = new CWinThread();
-    if (pThread == NULL)
-        return NULL;
-    
-    pThread->m_bAutoDelete = TRUE;
-    
-    if (!pThread->CreateThread(dwCreateFlags, nStackSize, lpSecurityAttrs))
-    {
-        delete pThread;
-        return NULL;
-    }
-    
-    if (nPriority != THREAD_PRIORITY_NORMAL)
-        pThread->SetThreadPriority(nPriority);
-    
-    return pThread;
 }
 
 UINT __stdcall CWinThread::ThreadProc(LPVOID pParam)

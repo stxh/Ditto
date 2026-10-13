@@ -84,7 +84,7 @@ BOOL CGdiImageDrawer::LoadStdImageDPI(int dpi, UINT id96, UINT id120, UINT id144
 	return ret;
 }
 
-void CGdiImageDrawer::Draw(CDC* pScreenDC, CDPI &dpi, CWnd *pWnd, CRect rc, bool mouseHover, bool mouseDown)
+void CGdiImageDrawer::Draw(HDC hScreenDC, CDPI &dpi, HWND hWnd, CRect rc, bool mouseHover, bool mouseDown)
 {
 	int width = m_pStdImage->m_pBitmap->GetWidth();
 	int height = m_pStdImage->m_pBitmap->GetHeight();
@@ -92,10 +92,10 @@ void CGdiImageDrawer::Draw(CDC* pScreenDC, CDPI &dpi, CWnd *pWnd, CRect rc, bool
 	int x = rc.left + (rc.Width() / 2) - (width / 2);
 	int y = rc.top + (rc.Height() / 2) - (height / 2);
 
-	Draw(pScreenDC, dpi, pWnd, x, y, mouseHover, mouseDown);
+	Draw(hScreenDC, dpi, hWnd, x, y, mouseHover, mouseDown);
 }
 
-void CGdiImageDrawer::Draw(CDC* pScreenDC, CDPI &dpi, CWnd *pWnd, int posX, int posY, bool mouseHover, bool mouseDown, int forceWidth, int forceHeight)
+void CGdiImageDrawer::Draw(HDC hScreenDC, CDPI &dpi, HWND hWnd, int posX, int posY, bool mouseHover, bool mouseDown, int forceWidth, int forceHeight)
 {
 	int width = m_pStdImage->m_pBitmap->GetWidth();
 	if (forceWidth != INT_MAX)
@@ -108,17 +108,15 @@ void CGdiImageDrawer::Draw(CDC* pScreenDC, CDPI &dpi, CWnd *pWnd, int posX, int 
 	
 	CDC dcBk;
 	CBitmap bmp;
-	CClientDC clDC(pWnd);
+	CClientDC clDC(hWnd);
 		
-	//Copy the background over the entire area
-	dcBk.CreateCompatibleDC(&clDC);
-	bmp.CreateCompatibleBitmap(&clDC, 1, 1);
+	dcBk.CreateCompatibleDC(clDC);
+	bmp.CreateCompatibleBitmap(clDC, 1, 1);
 	dcBk.SelectObject(&bmp);
-	dcBk.BitBlt(0, 0, 1, 1, &clDC, rectWithBorder.left-1, rectWithBorder.top, SRCCOPY);
+	dcBk.BitBlt(0, 0, 1, 1, clDC, rectWithBorder.left-1, rectWithBorder.top, SRCCOPY);
 	
 	bmp.DeleteObject();		
 
-	//Draw the png file
 	if (mouseDown)
 	{
 		int one = dpi.Scale(1);
@@ -126,24 +124,6 @@ void CGdiImageDrawer::Draw(CDC* pScreenDC, CDPI &dpi, CWnd *pWnd, int posX, int 
 		posY += one;
 	}
 
-	//ImageAttributes ia;
-	//
-
-	//ColorMap blackToRed;
-	//blackToRed.oldColor = Color(255, 110, 114, 122);  // black
-	//blackToRed.newColor = Color(255, 255, 0, 0);// red
-	//ia.SetRemapTable(1, &blackToRed);
-
-	Gdiplus::Graphics graphics(pScreenDC->m_hDC);
+	Gdiplus::Graphics graphics(hScreenDC);
 	graphics.DrawImage(*m_pStdImage, posX, posY, width, height);	
-
-	//RectF grect; grect.X = posX, grect.Y = posY; grect.Width = width; grect.Height = height;
-	//graphics.DrawImage(*m_pStdImage, grect, 0, 0, width, height, UnitPixel, &ia);
-
-
-	//If we are hoving over then draw the border
-	//if(mouseHover && mouseDown == false)
-	//{
-	//	pScreenDC->Draw3dRect(rectWithBorder, RGB(255, 255, 255), RGB(255, 255, 255));
-	//}
 }

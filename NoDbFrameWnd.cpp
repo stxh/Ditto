@@ -7,8 +7,6 @@
 #include "CP_Main.h"
 #include "Misc.h"
 
-#define WM_TRAYNOTIFY WM_USER + 100
-
 #define TIMER_OPEN_DB 1
 #define TIMER_ERROR_MSG 2
 

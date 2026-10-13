@@ -5,11 +5,11 @@
 #include "Shared\TextConvert.h"
 #include "DittoChaiScript.h"
 
+static BOOL bDummy = FALSE;
+
 CScriptEditor::CScriptEditor()
 {
 }
-
-BOOL bDummy = FALSE;
 
 LRESULT CScriptEditor::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 {

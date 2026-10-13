@@ -20,6 +20,21 @@
 #include "SymbolEdit.h"
 #include "Popup.h"
 #include "CustomFriendsHelper.h"
+#include "CmdUI.h"
+#include <shlobj.h>
+#include <oleidl.h>
+
+#define ID_LIST_HEADER			0x201
+#define ID_EDIT_SEARCH			0x202
+#define ID_CANCEL				0x203
+#define ID_GROUP_TEXT			0x204
+#define ID_SHOW_GROUPS_BOTTOM	0x205
+#define ID_SHOW_GROUPS_TOP		0x206
+#define ID_BACK_BUTTON			0x207
+#define ID_SEARCH_DESCRIPTION_BUTTON 0x208
+#define ON_TOP_WARNING			0x209
+#define ID_SYSTEM_BUTTON		0x210
+#define ID_NO_SEARCH_RESULTS	0x211
 
 class CMainTable
 {
@@ -99,6 +114,204 @@ class CQPasteWnd: public CWndEx
 {
     // Construction
 public:
+	BEGIN_MSG_MAP(CQPasteWnd)
+		MSG_WM_ERASEBKGND(OnEraseBkgnd)
+		MSG_WM_CREATE(OnCreate)
+		MSG_WM_SIZE(OnSize)
+		MSG_WM_SETFOCUS(OnSetFocus)
+		MSG_WM_KILLFOCUS(OnKillFocus)
+		MSG_WM_ACTIVATE(OnActivate)
+		COMMAND_ID_HANDLER(ID_MENU_LINESPERROW_1, OnMenuLinesperrow1)
+		COMMAND_ID_HANDLER(ID_MENU_LINESPERROW_2, OnMenuLinesperrow2)
+		COMMAND_ID_HANDLER(ID_MENU_LINESPERROW_3, OnMenuLinesperrow3)
+		COMMAND_ID_HANDLER(ID_MENU_LINESPERROW_4, OnMenuLinesperrow4)
+		COMMAND_ID_HANDLER(ID_MENU_LINESPERROW_5, OnMenuLinesperrow5)
+		COMMAND_ID_HANDLER(ID_MENU_TRANSPARENCY_10, OnMenuTransparency10)
+		COMMAND_ID_HANDLER(ID_MENU_TRANSPARENCY_15, OnMenuTransparency15)
+		COMMAND_ID_HANDLER(ID_MENU_TRANSPARENCY_20, OnMenuTransparency20)
+		COMMAND_ID_HANDLER(ID_MENU_TRANSPARENCY_25, OnMenuTransparency25)
+		COMMAND_ID_HANDLER(ID_MENU_TRANSPARENCY_30, OnMenuTransparency30)
+		COMMAND_ID_HANDLER(ID_MENU_TRANSPARENCY_40, OnMenuTransparency40)
+		COMMAND_ID_HANDLER(ID_MENU_TRANSPARENCY_5, OnMenuTransparency5)
+		COMMAND_ID_HANDLER(ID_MENU_TRANSPARENCY_NONE, OnMenuTransparencyNone)
+		COMMAND_ID_HANDLER(ID_MENU_DELETE, OnMenuDelete)
+		COMMAND_ID_HANDLER(ID_MENU_POSITIONING_ATCARET, OnMenuPositioningAtcaret)
+		COMMAND_ID_HANDLER(ID_MENU_POSITIONING_ATCURSOR, OnMenuPositioningAtcursor)
+		COMMAND_ID_HANDLER(ID_MENU_POSITIONING_ATPREVIOUSPOSITION, OnMenuPositioningAtpreviousposition)
+		COMMAND_ID_HANDLER(ID_MENU_OPTIONS, OnMenuOptions)
+		COMMAND_ID_HANDLER(ID_MENU_EXITPROGRAM, OnMenuExitprogram)
+		COMMAND_ID_HANDLER(ID_MENU_TOGGLECONNECTCV, OnMenuToggleConnectCV)
+		COMMAND_ID_HANDLER(ID_MENU_PROPERTIES, OnMenuProperties)
+		MSG_WM_CLOSE(OnClose)
+		NOTIFY_HANDLER(ID_LIST_HEADER, LVN_BEGINDRAG, OnBegindrag)
+		NOTIFY_HANDLER(ID_LIST_HEADER, LVN_GETDISPINFO, GetDispInfo)
+		NOTIFY_HANDLER(ID_LIST_HEADER, LVN_ODFINDITEM, OnFindItem)
+		COMMAND_ID_HANDLER(ID_MENU_FIRSTTENHOTKEYS_USECTRLNUM, OnMenuFirsttenhotkeysUsectrlnum)
+		COMMAND_ID_HANDLER(ID_MENU_FIRSTTENHOTKEYS_SHOWHOTKEYTEXT, OnMenuFirsttenhotkeysShowhotkeytext)
+		COMMAND_ID_HANDLER(ID_MENU_QUICKOPTIONS_ALLWAYSSHOWDESCRIPTION, OnMenuQuickoptionsAllwaysshowdescription)
+		COMMAND_ID_HANDLER(ID_MENU_QUICKOPTIONS_DOUBLECLICKINGONCAPTION_TOGGLESALWAYSONTOP, OnMenuQuickoptionsDoubleclickingoncaptionTogglesalwaysontop)
+		COMMAND_ID_HANDLER(ID_MENU_QUICKOPTIONS_DOUBLECLICKINGONCAPTION_ROLLUPWINDOW, OnMenuQuickoptionsDoubleclickingoncaptionRollupwindow)
+		COMMAND_ID_HANDLER(ID_MENU_QUICKOPTIONS_DOUBLECLICKINGONCAPTION_TOGGLESALWAYSSHOWDESCRIPTION, OnMenuQuickoptionsDoubleclickingoncaptionTogglesshowdescription)
+		COMMAND_ID_HANDLER(ID_MENU_QUICKOPTIONS_PROMPTFORNEWGROUPNAMES, OnMenuQuickoptionsPromptfornewgroupnames)
+		COMMAND_ID_HANDLER(ID_SHOW_GROUPS_BOTTOM, OnShowGroupsBottom)
+		COMMAND_ID_HANDLER(ID_SHOW_GROUPS_TOP, OnShowGroupsTop)
+		COMMAND_ID_HANDLER(ID_MENU_VIEWGROUPS, OnMenuViewgroups)
+		COMMAND_ID_HANDLER(ID_MENU_QUICKPROPERTIES_SETTONEVERAUTODELETE, OnMenuQuickpropertiesSettoneverautodelete)
+		COMMAND_ID_HANDLER(ID_MENU_QUICKPROPERTIES_AUTODELETE, OnMenuQuickpropertiesAutodelete)
+		COMMAND_ID_HANDLER(ID_MENU_QUICKPROPERTIES_REMOVEHOTKEY, OnMenuQuickpropertiesRemovehotkey)
+		COMMAND_ID_HANDLER(ID_MENU_SENTTO_FRIEND_EIGHT, OnMenuSenttoFriendEight)
+		COMMAND_ID_HANDLER(ID_MENU_SENTTO_FRIEND_ELEVEN, OnMenuSenttoFriendEleven)
+		COMMAND_ID_HANDLER(ID_MENU_SENTTO_FRIEND_FIFTEEN, OnMenuSenttoFriendFifteen)
+		COMMAND_ID_HANDLER(ID_MENU_SENTTO_FRIEND_FIVE, OnMenuSenttoFriendFive)
+		COMMAND_ID_HANDLER(ID_MENU_SENTTO_FRIEND_FORE, OnMenuSenttoFriendFore)
+		COMMAND_ID_HANDLER(ID_MENU_SENTTO_FRIEND_FORETEEN, OnMenuSenttoFriendForeteen)
+		COMMAND_ID_HANDLER(ID_MENU_SENTTO_FRIEND_NINE, OnMenuSenttoFriendNine)
+		COMMAND_ID_HANDLER(ID_MENU_SENTTO_FRIEND_SEVEN, OnMenuSenttoFriendSeven)
+		COMMAND_ID_HANDLER(ID_MENU_SENTTO_FRIEND_SIX, OnMenuSenttoFriendSix)
+		COMMAND_ID_HANDLER(ID_MENU_SENTTO_FRIEND_TEN, OnMenuSenttoFriendTen)
+		COMMAND_ID_HANDLER(ID_MENU_SENTTO_FRIEND_THIRTEEN, OnMenuSenttoFriendThirteen)
+		COMMAND_ID_HANDLER(ID_MENU_SENTTO_FRIEND_THREE, OnMenuSenttoFriendThree)
+		COMMAND_ID_HANDLER(ID_MENU_SENTTO_FRIEND_TWELVE, OnMenuSenttoFriendTwelve)
+		COMMAND_ID_HANDLER(ID_MENU_SENTTO_FRIEND_TWO, OnMenuSenttoFriendTwo)
+		COMMAND_ID_HANDLER(ID_MENU_SENTTO_FRIENDONE, OnMenuSenttoFriendone)
+		COMMAND_ID_HANDLER(ID_MENU_SENTTO_PROMPTFORIP, OnMenuSenttoPromptforip)
+		COMMAND_ID_HANDLER(ID_MENU_GROUPS_MOVETOGROUP, OnMenuGroupsMovetogroup)
+		COMMAND_ID_HANDLER(ID_MENU_PASTEPLAINTEXTONLY, OnMenuPasteplaintextonly)
+		COMMAND_ID_HANDLER(ID_MENU_HELP, OnMenuHelp)
+		COMMAND_ID_HANDLER(ID_MENU_QUICKOPTIONS_FONT, OnMenuQuickoptionsFont)
+		COMMAND_ID_HANDLER(ID_MENU_QUICKOPTIONS_SHOWTHUMBNAILS, OnMenuQuickoptionsShowthumbnails)
+		COMMAND_ID_HANDLER(ID_MENU_QUICKOPTIONS_DRAWRTFTEXT, OnMenuQuickoptionsDrawrtftext)
+		COMMAND_ID_HANDLER(ID_MENU_QUICKOPTIONS_PASTECLIPAFTERSELECTION, OnMenuQuickoptionsPasteclipafterselection)
+		COMMAND_ID_HANDLER(ID_EDIT_SEARCH, OnSearchEditChange)
+		COMMAND_ID_HANDLER(ID_MENU_QUICKOPTIONS_FINDASYOUTYPE, OnMenuQuickoptionsFindasyoutype)
+		COMMAND_ID_HANDLER(ID_MENU_QUICKOPTIONS_ENSUREENTIREWINDOWISVISIBLE, OnMenuQuickoptionsEnsureentirewindowisvisible)
+		COMMAND_ID_HANDLER(ID_MENU_QUICKOPTIONS_SHOWCLIPSTHATAREINGROUPSINMAINLIST, OnMenuQuickoptionsShowclipsthatareingroupsinmainlist)
+		COMMAND_ID_HANDLER(ID_QUICKOPTIONS_PROMPTTODELETECLIP, OnPromptToDeleteClip)
+		COMMAND_ID_HANDLER(ID_STICKYCLIPS_MAKETOPSTICKYCLIP, OnMakeTopStickyClip)
+		COMMAND_ID_HANDLER(ID_STICKYCLIPS_MAKELASTSTICKYCLIP, OnMakeLastStickyClip)
+		COMMAND_ID_HANDLER(ID_STICKYCLIPS_REMOVESTICKYSETTING, OnRemoveSticky)
+		COMMAND_ID_HANDLER(ID_QUICKOPTIONS_ELEVATEPREVILEGESTOPASTEINTOELEVATEDAPPS, OnElevateAppToPasteIntoElevatedApp)
+		MSG_WM_DESTROY(OnDestroy)
+		MESSAGE_HANDLER(NM_SEARCH_ENTER_PRESSED, OnSearchEnterKeyPressed)
+		MESSAGE_HANDLER(NM_COPY_CLIP, OnCopyClip)
+		MESSAGE_HANDLER(NM_END, OnListEnd)
+		MESSAGE_HANDLER(CB_SEARCH, OnSearch)
+		MESSAGE_HANDLER(NM_DELETE, OnDelete)
+		NOTIFY_HANDLER(ID_LIST_HEADER, NM_GETTOOLTIPTEXT, OnGetToolTipText)
+		MESSAGE_HANDLER(NM_SELECT_DB_ID, OnListSelect_DB_ID)
+		MESSAGE_HANDLER(WM_REFRESH_VIEW, OnRefreshView)
+		MESSAGE_HANDLER(WM_RELOAD_CLIP_IN_UI, OnReloadClipInUI)
+		MSG_WM_NCLBUTTONDBLCLK(OnNcLButtonDblClk)
+		MSG_WM_WINDOWPOSCHANGING(OnWindowPosChanging)
+		COMMAND_ID_HANDLER(ID_VIEWCAPTIONBARON_RIGHT, OnViewcaptionbaronRight)
+		COMMAND_ID_HANDLER(ID_VIEWCAPTIONBARON_BOTTOM, OnViewcaptionbaronBottom)
+		COMMAND_ID_HANDLER(ID_VIEWCAPTIONBARON_LEFT, OnViewcaptionbaronLeft)
+		COMMAND_ID_HANDLER(ID_VIEWCAPTIONBARON_TOP, OnViewcaptionbaronTop)
+		COMMAND_ID_HANDLER(ID_MENU_AUTOHIDE, OnMenuAutohide)
+		COMMAND_ID_HANDLER(ID_MENU_VIEWFULLDESCRIPTION, OnMenuViewfulldescription)
+		COMMAND_ID_HANDLER(ID_MENU_ALLWAYSONTOP, OnMenuAllwaysontop)
+		COMMAND_ID_HANDLER(ID_MENU_NEWGROUP, OnMenuNewGroup)
+		COMMAND_ID_HANDLER(ID_MENU_NEWGROUPSELECTION, OnMenuNewGroupSelection)
+		MESSAGE_HANDLER(NM_GROUP_TREE_MESSAGE, OnGroupTreeMessage)
+		COMMAND_ID_HANDLER(ID_BACK_BUTTON, OnBackButton)
+		COMMAND_ID_HANDLER(ID_SYSTEM_BUTTON, OnSystemButton)
+		MESSAGE_HANDLER(CB_UPDOWN, OnUpDown)
+		MESSAGE_HANDLER(NM_INACTIVE_TOOLTIPWND, OnToolTipWndInactive)
+		MESSAGE_HANDLER(NM_SET_LIST_COUNT, OnSetListCount)
+		MESSAGE_HANDLER(NM_REFRESH_ROW, OnRefeshRow)
+		MESSAGE_HANDLER(NM_ITEM_DELETED, OnItemDeleted)
+		MSG_WM_TIMER(OnTimer)
+		COMMAND_ID_HANDLER(ID_MENU_EXPORT, OnMenuExport)
+		COMMAND_ID_HANDLER(ID_MENU_IMPORT, OnMenuImport)
+		COMMAND_ID_HANDLER(ID_QUICKPROPERTIES_REMOVEQUICKPASTE, OnQuickpropertiesRemovequickpaste)
+		COMMAND_ID_HANDLER(ID_MENU_EDITITEM, OnMenuEdititem)
+		COMMAND_ID_HANDLER(ID_MENU_NEWCLIP, OnMenuNewclip)
+		COMMAND_RANGE_HANDLER(3000, 4000, OnAddinSelect)
+		MESSAGE_HANDLER(NM_ALL_SELECTED, OnSelectAll)
+		MESSAGE_HANDLER(NM_SHOW_HIDE_SCROLLBARS, OnShowHideScrollBar)
+		MESSAGE_HANDLER(NM_CANCEL_SEARCH, OnCancelFilter)
+		MESSAGE_HANDLER(NM_POST_OPTIONS_WINDOW, OnPostOptions)
+		COMMAND_ID_HANDLER(ID_MENU_SEARCHDESCRIPTION, OnMenuSearchDescription)
+		COMMAND_ID_HANDLER(ID_MENU_SEARCHFULLTEXT, OnMenuSearchFullText)
+		COMMAND_ID_HANDLER(ID_MENU_SEARCHQUICKPASTE, OnMenuSearchQuickPaste)
+		COMMAND_ID_HANDLER(ID_MENU_CONTAINSTEXTSEARCHONLY, OnMenuSimpleTextSearch)
+		COMMAND_ID_HANDLER(ID_QUICKOPTIONS_SHOWINTASKBAR, OnQuickoptionsShowintaskbar)
+		COMMAND_ID_HANDLER(ID_MENU_VIEWASQRCODE, OnMenuViewasqrcode)
+		COMMAND_ID_HANDLER(ID_EXPORT_EXPORTTOTEXTFILE, OnExportExporttotextfile)
+		COMMAND_ID_HANDLER(ID_COMPARE_COMPARE, OnCompareCompare)
+		COMMAND_ID_HANDLER(ID_COMPARE_SELECTLEFTCOMPARE, OnCompareSelectleftcompare)
+		COMMAND_ID_HANDLER(ID_COMPARE_COMPAREAGAINST, OnCompareCompareagainst)
+		MESSAGE_HANDLER(NM_SHOW_PROPERTIES, OnShowProperties)
+		MESSAGE_HANDLER(NM_NEW_GROUP, OnNewGroup)
+		MESSAGE_HANDLER(NM_DELETE_ID, OnDeleteId)
+		COMMAND_ID_HANDLER(ID_MENU_REGULAREXPRESSIONSEARCH, OnMenuRegularexpressionsearch)
+		COMMAND_ID_HANDLER(ID_IMPORT_EXPORTTOGOOGLETRANSLATE, OnImportExporttogoogletranslate)
+		COMMAND_ID_HANDLER(ID_IMPORT_EXPORTCLIP_BITMAP, OnImportExportclipBitmap)
+		COMMAND_ID_HANDLER(ID_MENU_WILDCARDSEARCH, OnMenuWildcardsearch)
+		COMMAND_ID_HANDLER(ID_MENU_SAVECURRENTCLIPBOARD, OnMenuSavecurrentclipboard)
+		MESSAGE_HANDLER(NM_MOVE_TO_GROUP, OnListMoveSelectionToGroup)
+		COMMAND_ID_HANDLER(ID_CLIPORDER_MOVEUP, OnCliporderMoveup)
+		COMMAND_ID_HANDLER(ID_CLIPORDER_MOVEDOWN, OnCliporderMovedown)
+		COMMAND_ID_HANDLER(ID_CLIPORDER_MOVETOTOP, OnCliporderMovetotop)
+		COMMAND_ID_HANDLER(ID_MENU_FILTERON, OnMenuFilteron)
+		COMMAND_ID_HANDLER(ON_TOP_WARNING, OnAlwaysOnTopClicked)
+		COMMAND_ID_HANDLER(ID_SPECIALPASTE_UPPERCASE, OnSpecialpasteUppercase)
+		COMMAND_ID_HANDLER(ID_SPECIALPASTE_LOWERCASE, OnSpecialpasteLowercase)
+		COMMAND_ID_HANDLER(ID_SPECIALPASTE_CAPITALIZE, OnSpecialpasteCapitalize)
+		COMMAND_ID_HANDLER(ID_SPECIALPASTE_SENTENCE, OnSpecialpasteSentence)
+		COMMAND_ID_HANDLER(ID_SPECIALPASTE_REMOVELINEFEEDS, OnSpecialpasteRemovelinefeeds)
+		COMMAND_ID_HANDLER(ID_SPECIALPASTE_PASTE, OnSpecialpastePaste)
+		COMMAND_ID_HANDLER(ID_SPECIALPASTE_PASTE32919, OnSpecialpastePaste32919)
+		COMMAND_ID_HANDLER(ID_SPECIALPASTE_TYPOGLYCEMIA, OnSpecialpasteTypoglycemia)
+		NOTIFY_HANDLER(ID_LIST_HEADER, NM_CLICK, OnNMClickList1)
+		NOTIFY_HANDLER(ID_LIST_HEADER, NM_DBLCLK, OnNMDblclkList1)
+		NOTIFY_HANDLER(ID_LIST_HEADER, NM_RCLICK, OnNMRClickList1)
+		NOTIFY_HANDLER(ID_LIST_HEADER, NM_RDBLCLK, OnNMRDblclkList1)
+		COMMAND_ID_HANDLER(ID_QUICKOPTIONS_SHOWTEXTFORFIRSTTENCOPYHOTKEYS, OnQuickoptionsShowtextforfirsttencopyhotkeys)
+		COMMAND_ID_HANDLER(ID_QUICKOPTIONS_SHOWINDICATORACLIPHASBEENPASTED, OnQuickoptionsShowindicatoracliphasbeenpasted)
+		COMMAND_ID_HANDLER(ID_GROUPS_TOGGLELASTGROUP, OnGroupsTogglelastgroup)
+		COMMAND_ID_HANDLER(ID_SPECIALPASTE_PASTE32927, OnSpecialpastePaste32927)
+		COMMAND_ID_HANDLER(ID_MENU_GLOBALHOTKEYS32933, OnMenuGlobalhotkeys32933)
+		COMMAND_ID_HANDLER(ID_MENU_DELETECLIPDATA32934, OnMenuDeleteclipdata32934)
+		COMMAND_ID_HANDLER(ID_MENU_IMPORTCLIP32935, OnMenuImportclip32935)
+		COMMAND_ID_HANDLER(ID_MENU_NEWCLIP32937, OnMenuNewclip32937)
+		MESSAGE_HANDLER(NM_FOCUS_ON_SEARCH, OnSearchFocused)
+		COMMAND_ID_HANDLER(ID_CLIPORDER_REPLACETOPSTICKYCLIP, OnCliporderReplacetopstickyclip)
+		COMMAND_ID_HANDLER(ID_SENDTO_PROMPTFORNAME, OnSendtoPromptforname)
+		COMMAND_ID_HANDLER(ID_IMPORT_IMPORTCOPIEDFILE, OnImportImportcopiedfile)
+		COMMAND_RANGE_HANDLER(CustomFriendStartId, (CustomFriendStartId + MaxCustomFriends + 1), OnCustomSendToFriend)
+		COMMAND_RANGE_HANDLER(ChaiScriptMenuStartId, (ChaiScriptMenuStartId + MaxChaiScripts + 1), OnChaiScriptPaste)
+		MESSAGE_HANDLER(WM_DPICHANGED, OnDpiChanged)
+		COMMAND_ID_HANDLER(ID_CLIPORDER_MOVETOLAST, OnCliporderMovetolast)
+		COMMAND_ID_HANDLER(ID_SPECIALPASTE_PASTE32945, OnSpecialpastePasteDontUpdateOrder)
+		COMMAND_ID_HANDLER(ID_SPECIALPASTE_TRIM, OnSpecialpasteTrim)
+		COMMAND_ID_HANDLER(ID_TRANSPARENCY_INCREASE, OnTransparencyIncrease)
+		COMMAND_ID_HANDLER(ID_TRANSPARENCY_DECREASE, OnTransparencyDecrease)
+		COMMAND_ID_HANDLER(ID_TRANSPARENCY_TOGGLE, OnTransparencyToggle)
+		COMMAND_ID_HANDLER(ID_TRANSPARENCY_35, OnTransparency35)
+		COMMAND_ID_HANDLER(ID_IMPORT_EMAILTO, OnImportEmailto)
+		COMMAND_ID_HANDLER(ID_IMPORT_GMAIL, OnImportGmail)
+		COMMAND_ID_HANDLER(ID_IMPORT_EMAILTOASATTACHMENT, OnImportEmailtoasattachment)
+		COMMAND_ID_HANDLER(ID_SPECIALPASTE_SLUGIFY, OnSpecialpasteSlugify)
+		COMMAND_ID_HANDLER(ID_IMPORT_EMAIL_CONTENT_ATTACH, OnImportEmailContentAttach)
+		COMMAND_ID_HANDLER(ID_SPECIALPASTE_TOGGLECASE, OnSpecialpasteTogglecase)
+		COMMAND_ID_HANDLER(ID_FIRST_SHOWSTARTUPMESSAGE, OnFirstShowstartupmessage)
+		COMMAND_ID_HANDLER(ID_MENU_RESTOREDATABSAE, OnFirstRestoreDb)
+		COMMAND_ID_HANDLER(ID_MENU_BACKUPDATABASE, OnFirstBackupDb)
+		COMMAND_ID_HANDLER(ID_MENU_DELETEALLNONUSEDCLIPS, OnMenuDeleteallnonusedclips)
+		COMMAND_ID_HANDLER(ID_IMPORT_SETDRAGFILENAME, OnImportSetdragfilename)
+		COMMAND_ID_HANDLER(ID_SPECIALPASTE_CAMELCASE, OnSpecialpasteCamelcase)
+		COMMAND_ID_HANDLER(ID_SPECIALPASTE_MULTIPLEIMAGESHORIZONTALLY, OnSpecialpasteMultipleImagesHorz)
+		COMMAND_ID_HANDLER(ID_SPECIALPASTE_MULTIPLEIMAGESVERTICALLY, OnSpecialpasteMultipleImagesVert)
+		COMMAND_ID_HANDLER(ID_SPECIALPASTE_ASCIITEXTONLY, OnSpecialpasteAsciitextonly)
+		MESSAGE_HANDLER(WM_INITMENUPOPUP, OnInitMenuPopup)
+		CHAIN_MSG_MAP(CWndEx)
+		REFLECT_NOTIFICATIONS_MSG_FILTERED(WM_DRAWITEM)
+		REFLECT_NOTIFICATIONS_MSG_FILTERED(WM_CTLCOLORSTATIC)
+	END_MSG_MAP()
+
+	LRESULT OnInitMenuPopup(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	void UpdateMenuCommands(HMENU hMenu);
     CQPasteWnd();
 
     // Attributes
@@ -109,14 +322,12 @@ public:
 
     // Overrides
     // ClassWizard generated virtual function overrides
-    //{{AFX_VIRTUAL(CQPasteWnd)
 public:
-    virtual BOOL Create(CRect rect, CWnd *pParentWnd);
+    BOOL Create(const CRect& rcStart, CWindow *pWndParent);
     virtual BOOL PreTranslateMessage(MSG *pMsg);
 
 	bool CheckActions(MSG * pMsg);
 
-	//}}AFX_VIRTUAL
 
     // Implementation
 public:
@@ -195,11 +406,11 @@ public:
     //Menu Items
     void SetLinesPerRow(int lines, bool force, bool resetListCount);
     void SetTransparency(int percent);
-    void OnUpdateLinesPerRow(CCmdUI *pCmdUI, int nValue);
-    void OnUpdateTransparency(CCmdUI *pCmdUI, int nValue);
-    void SetMenuChecks(CMenu *pMenu);
-    void SetSendToMenu(CMenu *pMenu, int nMenuID, int nArrayPos);
-	void SetFriendChecks(CMenu *pMenu);
+    void OnUpdateLinesPerRow(CmdUI *pCmdUI, int nValue);
+    void OnUpdateTransparency(CmdUI *pCmdUI, int nValue);
+    void SetMenuChecks(CMenuHandle *pMenu);
+    void SetSendToMenu(CMenuHandle *pMenu, int nMenuID, int nArrayPos);
+	void SetFriendChecks(CMenuHandle *pMenu);
 
     BOOL SendToFriendbyPos(int nPos, CString override_IP_Host);
 
@@ -217,12 +428,10 @@ public:
 	void SetSearchImages();
 	void RemoveStickyInternal(int id, bool &sort);
 
-	DROPEFFECT OnDragOver(COleDataObject* pDataObject, DWORD dwKeyState, CPoint point);
-	DROPEFFECT OnDragEnter(COleDataObject* pDataObject, DWORD dwKeyState, CPoint point);
-	BOOL OnDrop(COleDataObject* pDataObject, DROPEFFECT dropEffect, CPoint point);
+	DWORD OnDragOver(IDataObject * pDataObject, DWORD dwKeyState, CPoint point);
+	DWORD OnDragEnter(IDataObject * pDataObject, DWORD dwKeyState, CPoint point);
+	BOOL OnDrop(IDataObject * pDataObject, DWORD dropEffect, CPoint point);
 	void OnDragLeave();
-	COleDropTarget *m_pDropTarget;
-
 	bool DoAction(CAccel a);
 	bool DoAction(DWORD cmd);
 	bool DoActionShowDescription();
@@ -319,7 +528,7 @@ public:
 	bool OnDeleteClipData();
 	bool OnGlobalHotkyes();
 	
-	void UpdateMenuShortCut(CCmdUI *pCmdUI, DWORD action);
+	void UpdateMenuShortCut(CmdUI *pCmdUI, DWORD action);
 
 	bool ShowProperties(int id, int row);
 	bool DeleteClips(CClipIDs &IDs, ARRAY &Indexs);
@@ -334,271 +543,268 @@ public:
 	void SetCurrentTransparency();
 
     // Generated message map functions
-protected:
-    //{{AFX_MSG(CQPasteWnd)
-    DECLARE_MESSAGE_MAP()
-	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
-    afx_msg void OnSize(UINT nType, int cx, int cy);
-    afx_msg void OnSetFocus(CWnd *pOldWnd);
-	afx_msg void OnKillFocus(CWnd *pOldWnd);
-    afx_msg void OnActivate(UINT nState, CWnd *pWndOther, BOOL bMinimized);
-    afx_msg void OnMenuLinesperrow1();
-    afx_msg void OnMenuLinesperrow2();
-    afx_msg void OnMenuLinesperrow3();
-    afx_msg void OnMenuLinesperrow4();
-    afx_msg void OnMenuLinesperrow5();
-    afx_msg void OnMenuTransparency10();
-    afx_msg void OnMenuTransparency15();
-    afx_msg void OnMenuTransparency20();
-    afx_msg void OnMenuTransparency25();
-    afx_msg void OnMenuTransparency30();
-    afx_msg void OnMenuTransparency40();
-    afx_msg void OnMenuTransparency5();
-    afx_msg void OnMenuTransparencyNone();
-    afx_msg void OnMenuDelete();
-    afx_msg void OnMenuPositioningAtcaret();
-    afx_msg void OnMenuPositioningAtcursor();
-    afx_msg void OnMenuPositioningAtpreviousposition();
-    afx_msg void OnMenuOptions();
-    afx_msg LRESULT OnCancelFilter(WPARAM wParam, LPARAM lParam);
-    afx_msg void OnMenuExitprogram();
-    afx_msg void OnMenuToggleConnectCV();
-    afx_msg void OnMenuProperties();
-    afx_msg void OnClose();
-    afx_msg void OnBegindrag(NMHDR *pNMHDR, LRESULT *pResult);
-    afx_msg void OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
-    afx_msg void GetDispInfo(NMHDR *pNMHDR, LRESULT *pResult);
-    afx_msg void OnFindItem(NMHDR *pNMHDR, LRESULT *pResult);
-    afx_msg void OnMenuFirsttenhotkeysUsectrlnum();
-    afx_msg void OnMenuFirsttenhotkeysShowhotkeytext();
-    afx_msg void OnMenuQuickoptionsAllwaysshowdescription();
-    afx_msg void OnMenuQuickoptionsDoubleclickingoncaptionTogglesalwaysontop();
-    afx_msg void OnMenuQuickoptionsDoubleclickingoncaptionRollupwindow();
-    afx_msg void OnMenuQuickoptionsDoubleclickingoncaptionTogglesshowdescription();
-    afx_msg void OnMenuQuickoptionsPromptfornewgroupnames();
-    afx_msg void OnShowGroupsBottom();
-    afx_msg void OnShowGroupsTop();
-    afx_msg void OnMenuViewgroups();
-    afx_msg void OnMenuQuickpropertiesSettoneverautodelete();
-    afx_msg void OnMenuQuickpropertiesAutodelete();
-    afx_msg void OnMenuQuickpropertiesRemovehotkey();
-    afx_msg void OnMenuSenttoFriendEight();
-    afx_msg void OnMenuSenttoFriendEleven();
-    afx_msg void OnMenuSenttoFriendFifteen();
-    afx_msg void OnMenuSenttoFriendFive();
-    afx_msg void OnMenuSenttoFriendFore();
-    afx_msg void OnMenuSenttoFriendForeteen();
-    afx_msg void OnMenuSenttoFriendNine();
-    afx_msg void OnMenuSenttoFriendSeven();
-    afx_msg void OnMenuSenttoFriendSix();
-    afx_msg void OnMenuSenttoFriendTen();
-    afx_msg void OnMenuSenttoFriendThirteen();
-    afx_msg void OnMenuSenttoFriendThree();
-    afx_msg void OnMenuSenttoFriendTwelve();
-    afx_msg void OnMenuSenttoFriendTwo();
-    afx_msg void OnMenuSenttoFriendone();
-    afx_msg void OnMenuSenttoPromptforip();
-    afx_msg void OnMenuGroupsMovetogroup();
-    afx_msg void OnMenuPasteplaintextonly();
-    afx_msg void OnMenuHelp();
-    afx_msg void OnMenuQuickoptionsFont();
-    afx_msg void OnMenuQuickoptionsShowthumbnails();
-    afx_msg void OnMenuQuickoptionsDrawrtftext();
-    afx_msg void OnMenuQuickoptionsPasteclipafterselection();
-    afx_msg void OnSearchEditChange();
-    afx_msg void OnMenuQuickoptionsFindasyoutype();
-    afx_msg void OnMenuQuickoptionsEnsureentirewindowisvisible();
-    afx_msg void OnMenuQuickoptionsShowclipsthatareingroupsinmainlist();
-    afx_msg void OnMenuPastehtmlasplaintext();
-    afx_msg void OnPromptToDeleteClip();
-    afx_msg void OnUpdateMenuNewgroup(CCmdUI *pCmdUI);
-    afx_msg void OnUpdateMenuNewgroupselection(CCmdUI *pCmdUI);
-    afx_msg void OnUpdateMenuAllwaysontop(CCmdUI *pCmdUI);
-    afx_msg void OnUpdateMenuViewfulldescription(CCmdUI *pCmdUI);
-    afx_msg void OnUpdateMenuViewgroups(CCmdUI *pCmdUI);
-    afx_msg void OnUpdateMenuPasteplaintextonly(CCmdUI *pCmdUI);
-    afx_msg void OnUpdateMenuDelete(CCmdUI *pCmdUI);
-    afx_msg void OnUpdateMenuProperties(CCmdUI *pCmdUI);
-    afx_msg void OnDestroy();
-    afx_msg LRESULT OnSearchEnterKeyPressed(WPARAM wParam, LPARAM lParam);
-    afx_msg LRESULT OnListEnd(WPARAM wParam, LPARAM lParam);
-    afx_msg LRESULT OnSearch(WPARAM wParam, LPARAM lParam);
-    afx_msg LRESULT OnDelete(WPARAM wParam, LPARAM lParam);
-    afx_msg void OnGetToolTipText(NMHDR *pNMHDR, LRESULT *pResult);
-    afx_msg LRESULT OnListSelect_DB_ID(WPARAM wParam, LPARAM lParam);
-	afx_msg LRESULT OnListMoveSelectionToGroup(WPARAM wParam, LPARAM lParam);
-    afx_msg LRESULT OnRefreshView(WPARAM wParam, LPARAM lParam);
-	afx_msg LRESULT OnReloadClipInUI(WPARAM wParam, LPARAM lParam);
-    afx_msg LRESULT OnGroupTreeMessage(WPARAM wParam, LPARAM lParam);
-    afx_msg LRESULT OnFillRestOfList(WPARAM wParam, LPARAM lParam);
-    afx_msg LRESULT OnRefeshRow(WPARAM wParam, LPARAM lParam);
-	afx_msg LRESULT OnSetListCount(WPARAM wParam, LPARAM lParam);
-    afx_msg HBRUSH CtlColor(CDC *pDC, UINT nCtlColor);
-    afx_msg void OnNcLButtonDblClk(UINT nHitTest, CPoint point);
-    afx_msg void OnViewcaptionbaronRight();
-    afx_msg void OnViewcaptionbaronBottom();
-    afx_msg void OnViewcaptionbaronLeft();
-    afx_msg void OnViewcaptionbaronTop();
-    afx_msg void OnMenuAutohide();
-    afx_msg void OnMenuViewfulldescription();
-    afx_msg void OnMenuAllwaysontop();
-    afx_msg void OnMenuNewGroup();
-    afx_msg void OnMenuNewGroupSelection();
-    afx_msg void OnBackButton();
-	afx_msg void OnSystemButton();
-    afx_msg LRESULT OnUpDown(WPARAM wParam, LPARAM lParam);
-    afx_msg LRESULT OnItemDeleted(WPARAM wParam, LPARAM lParam);
-    LRESULT OnToolTipWndInactive(WPARAM wParam, LPARAM lParam);
-    afx_msg void OnTimer(UINT_PTR nIDEvent);
-    afx_msg void OnMenuExport();
-    afx_msg void OnMenuImport();
-    afx_msg void OnQuickpropertiesRemovequickpaste();
-    afx_msg void OnMenuEdititem();
-    afx_msg void OnMenuNewclip();
-    afx_msg void OnUpdateMenuEdititem(CCmdUI *pCmdUI);
-    afx_msg void OnUpdateMenuNewclip(CCmdUI *pCmdUI);
-    afx_msg void OnAddinSelect(UINT id);
-	afx_msg void OnCustomSendToFriend(UINT idIn);
-	afx_msg void OnChaiScriptPaste(UINT idIn);
-    afx_msg LRESULT OnSelectAll(WPARAM wParam, LPARAM lParam);
-	afx_msg LRESULT OnShowHideScrollBar(WPARAM wParam, LPARAM lParam);
-	afx_msg void OnMenuSearchDescription();
-	afx_msg void OnMenuSearchFullText();
-	afx_msg void OnMenuSearchQuickPaste();
-	afx_msg void OnMenuSimpleTextSearch();
-	afx_msg LRESULT OnPostOptions(WPARAM wParam, LPARAM lParam);
-	afx_msg void OnMakeTopStickyClip();
-	afx_msg void OnMakeLastStickyClip();
-	afx_msg void OnRemoveSticky();
-	afx_msg void OnElevateAppToPasteIntoElevatedApp();
+public:
+	int OnCreate(LPCREATESTRUCT lpCreateStruct);
+    LRESULT OnSize(UINT nType, CSize size);
+    void OnSetFocus(CWindow wndOld);
+	void OnKillFocus(CWindow wndLostFocus);
+    void OnActivate(UINT nState, BOOL bMinimized, CWindow wndOther);
+    LRESULT OnMenuLinesperrow1(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuLinesperrow2(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuLinesperrow3(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuLinesperrow4(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuLinesperrow5(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuTransparency10(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuTransparency15(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuTransparency20(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuTransparency25(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuTransparency30(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuTransparency40(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuTransparency5(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuTransparencyNone(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuDelete(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuPositioningAtcaret(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuPositioningAtcursor(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuPositioningAtpreviousposition(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuOptions(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnCancelFilter(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT OnMenuExitprogram(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuToggleConnectCV(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuProperties(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    void OnClose();
+    LRESULT OnBegindrag(int idCtrl, LPNMHDR pNMHDR, BOOL& bHandled);
+    LRESULT GetDispInfo(int idCtrl, LPNMHDR pNMHDR, BOOL& bHandled);
+    LRESULT OnFindItem(int idCtrl, LPNMHDR pNMHDR, BOOL& bHandled);
+    LRESULT OnMenuFirsttenhotkeysUsectrlnum(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuFirsttenhotkeysShowhotkeytext(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuQuickoptionsAllwaysshowdescription(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuQuickoptionsDoubleclickingoncaptionTogglesalwaysontop(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuQuickoptionsDoubleclickingoncaptionRollupwindow(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuQuickoptionsDoubleclickingoncaptionTogglesshowdescription(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuQuickoptionsPromptfornewgroupnames(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnShowGroupsBottom(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnShowGroupsTop(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuViewgroups(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuQuickpropertiesSettoneverautodelete(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuQuickpropertiesAutodelete(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuQuickpropertiesRemovehotkey(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuSenttoFriendEight(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuSenttoFriendEleven(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuSenttoFriendFifteen(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuSenttoFriendFive(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuSenttoFriendFore(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuSenttoFriendForeteen(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuSenttoFriendNine(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuSenttoFriendSeven(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuSenttoFriendSix(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuSenttoFriendTen(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuSenttoFriendThirteen(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuSenttoFriendThree(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuSenttoFriendTwelve(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuSenttoFriendTwo(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuSenttoFriendone(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuSenttoPromptforip(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuGroupsMovetogroup(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuPasteplaintextonly(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuHelp(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuQuickoptionsFont(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuQuickoptionsShowthumbnails(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuQuickoptionsDrawrtftext(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuQuickoptionsPasteclipafterselection(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnSearchEditChange(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuQuickoptionsFindasyoutype(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuQuickoptionsEnsureentirewindowisvisible(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuQuickoptionsShowclipsthatareingroupsinmainlist(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    void OnMenuPastehtmlasplaintext();
+    LRESULT OnPromptToDeleteClip(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    void OnUpdateMenuNewgroup(CmdUI *pCmdUI);
+    void OnUpdateMenuNewgroupselection(CmdUI *pCmdUI);
+    void OnUpdateMenuAllwaysontop(CmdUI *pCmdUI);
+    void OnUpdateMenuViewfulldescription(CmdUI *pCmdUI);
+    void OnUpdateMenuViewgroups(CmdUI *pCmdUI);
+    void OnUpdateMenuPasteplaintextonly(CmdUI *pCmdUI);
+    void OnUpdateMenuDelete(CmdUI *pCmdUI);
+    void OnUpdateMenuProperties(CmdUI *pCmdUI);
+    void OnDestroy();
+    LRESULT OnSearchEnterKeyPressed(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT OnListEnd(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT OnSearch(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT OnDelete(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT OnGetToolTipText(int idCtrl, LPNMHDR pNMHDR, BOOL& bHandled);
+    LRESULT OnListSelect_DB_ID(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnListMoveSelectionToGroup(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT OnRefreshView(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnReloadClipInUI(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT OnGroupTreeMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT OnFillRestOfList(WPARAM wParam, LPARAM lParam);
+    LRESULT OnRefeshRow(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnSetListCount(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    HBRUSH CtlColor(HDC hDC);
+    void OnNcLButtonDblClk(UINT nHitTest, CPoint point);
+    LRESULT OnViewcaptionbaronRight(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnViewcaptionbaronBottom(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnViewcaptionbaronLeft(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnViewcaptionbaronTop(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuAutohide(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuViewfulldescription(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuAllwaysontop(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuNewGroup(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuNewGroupSelection(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnBackButton(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnSystemButton(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnUpDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT OnItemDeleted(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT OnToolTipWndInactive(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    void OnTimer(UINT_PTR nIDEvent);
+    LRESULT OnMenuExport(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuImport(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnQuickpropertiesRemovequickpaste(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuEdititem(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnMenuNewclip(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    void OnUpdateMenuEdititem(CmdUI *pCmdUI);
+    void OnUpdateMenuNewclip(CmdUI *pCmdUI);
+    LRESULT OnAddinSelect(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnCustomSendToFriend(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnChaiScriptPaste(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnSelectAll(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnShowHideScrollBar(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnMenuSearchDescription(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnMenuSearchFullText(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnMenuSearchQuickPaste(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnMenuSimpleTextSearch(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnPostOptions(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnMakeTopStickyClip(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnMakeLastStickyClip(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnRemoveSticky(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnElevateAppToPasteIntoElevatedApp(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	
 public:
-	afx_msg void OnQuickoptionsShowintaskbar();
-	afx_msg void OnMenuViewasqrcode();
-	afx_msg void OnExportExporttotextfile();
-	afx_msg void OnCompareCompare();
-	afx_msg void OnCompareSelectleftcompare();
-	afx_msg void OnCompareCompareagainst();
-	afx_msg void OnUpdateCompareCompare(CCmdUI *pCmdUI);
-	afx_msg LRESULT OnShowProperties(WPARAM wParam, LPARAM lParam);
-	afx_msg LRESULT OnNewGroup(WPARAM wParam, LPARAM lParam);
-	afx_msg LRESULT OnDeleteId(WPARAM wParam, LPARAM lParam);
-	afx_msg void OnMenuRegularexpressionsearch();
-	afx_msg void OnImportExporttogoogletranslate();
-	afx_msg void OnUpdateImportExporttogoogletranslate(CCmdUI *pCmdUI);
-	afx_msg void OnImportExportclipBitmap();
-	afx_msg void OnUpdateImportExportclipBitmap(CCmdUI *pCmdUI);
-	afx_msg void OnMenuWildcardsearch();
-	afx_msg void OnMenuSavecurrentclipboard();
-	afx_msg void OnUpdateMenuSavecurrentclipboard(CCmdUI *pCmdUI);
-	afx_msg void OnCliporderMoveup();
-	afx_msg void OnUpdateCliporderMoveup(CCmdUI *pCmdUI);
-	afx_msg void OnCliporderMovedown();
-	afx_msg void OnUpdateCliporderMovedown(CCmdUI *pCmdUI);
-	afx_msg void OnCliporderMovetotop();
-	afx_msg void OnUpdateCliporderMovetotop(CCmdUI *pCmdUI);
-	afx_msg void OnMenuFilteron();
-	afx_msg void OnUpdateMenuFilteron(CCmdUI *pCmdUI);
-	afx_msg void OnAlwaysOnTopClicked();
+	LRESULT OnQuickoptionsShowintaskbar(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnMenuViewasqrcode(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnExportExporttotextfile(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnCompareCompare(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnCompareSelectleftcompare(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnCompareCompareagainst(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateCompareCompare(CmdUI *pCmdUI);
+	LRESULT OnShowProperties(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnNewGroup(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnDeleteId(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnMenuRegularexpressionsearch(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnImportExporttogoogletranslate(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateImportExporttogoogletranslate(CmdUI *pCmdUI);
+	LRESULT OnImportExportclipBitmap(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateImportExportclipBitmap(CmdUI *pCmdUI);
+	LRESULT OnMenuWildcardsearch(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnMenuSavecurrentclipboard(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateMenuSavecurrentclipboard(CmdUI *pCmdUI);
+	LRESULT OnCliporderMoveup(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateCliporderMoveup(CmdUI *pCmdUI);
+	LRESULT OnCliporderMovedown(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateCliporderMovedown(CmdUI *pCmdUI);
+	LRESULT OnCliporderMovetotop(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateCliporderMovetotop(CmdUI *pCmdUI);
+	LRESULT OnMenuFilteron(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateMenuFilteron(CmdUI *pCmdUI);
+	LRESULT OnAlwaysOnTopClicked(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	//afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
-	afx_msg void OnSpecialpasteUppercase();
-	afx_msg void OnUpdateSpecialpasteUppercase(CCmdUI *pCmdUI);
-	afx_msg void OnSpecialpasteLowercase();
-	afx_msg void OnUpdateSpecialpasteLowercase(CCmdUI *pCmdUI);
-	afx_msg void OnSpecialpasteCapitalize();
-	afx_msg void OnUpdateSpecialpasteCapitalize(CCmdUI *pCmdUI);
-	afx_msg void OnSpecialpasteSentence();
-	afx_msg void OnUpdateSpecialpasteSentence(CCmdUI *pCmdUI);
-	afx_msg void OnSpecialpasteRemovelinefeeds();
-	afx_msg void OnUpdateSpecialpasteRemovelinefeeds(CCmdUI *pCmdUI);
-	afx_msg void OnSpecialpastePaste();
-	afx_msg void OnUpdateSpecialpastePaste(CCmdUI *pCmdUI);
-	afx_msg void OnSpecialpastePaste32919();
-	afx_msg void OnUpdateSpecialpastePaste32919(CCmdUI *pCmdUI);
-	afx_msg void OnSpecialpasteTypoglycemia();
-	afx_msg void OnUpdateSpecialpasteTypoglycemia(CCmdUI *pCmdUI);
-	afx_msg void OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnNMDblclkList1(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnNMRClickList1(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnNMRDblclkList1(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnQuickoptionsShowtextforfirsttencopyhotkeys();
-	afx_msg void OnUpdateQuickoptionsShowtextforfirsttencopyhotkeys(CCmdUI *pCmdUI);
-	afx_msg void OnQuickoptionsShowindicatoracliphasbeenpasted();
-	afx_msg void OnUpdateQuickoptionsShowindicatoracliphasbeenpasted(CCmdUI *pCmdUI);
-	afx_msg void OnGroupsTogglelastgroup();
-	afx_msg void OnUpdateGroupsTogglelastgroup(CCmdUI *pCmdUI);
-	afx_msg void OnUpdateStickyclipsMaketopstickyclip(CCmdUI *pCmdUI);
-	afx_msg void OnUpdateStickyclipsMakelaststickyclip(CCmdUI *pCmdUI);
-	afx_msg void OnUpdateStickyclipsRemovestickysetting(CCmdUI *pCmdUI);
-	afx_msg void OnSpecialpastePaste32927();
-	afx_msg void OnUpdateSpecialpastePaste32927(CCmdUI *pCmdUI);
-	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
-	afx_msg void OnMenuGlobalhotkeys32933();
-	afx_msg void OnMenuDeleteclipdata32934();
-	afx_msg void OnMenuImportclip32935();
-	afx_msg void OnMenuNewclip32937();
-	afx_msg void OnUpdateMenuImportclip32935(CCmdUI *pCmdUI);
-	afx_msg void OnUpdateMenuNewclip32937(CCmdUI *pCmdUI);
-	afx_msg void OnUpdateMenuGlobalhotkeys32933(CCmdUI *pCmdUI);
-	afx_msg void OnUpdateMenuDeleteclipdata32934(CCmdUI *pCmdUI);
-	afx_msg LRESULT OnSearchFocused(WPARAM wParam, LPARAM lParam);
-	afx_msg void OnCliporderReplacetopstickyclip();
-	afx_msg void OnUpdateCliporderReplacetopstickyclip(CCmdUI *pCmdUI);
-	afx_msg void OnSendtoPromptforname();
-	afx_msg void OnUpdateSendtoPromptforname(CCmdUI *pCmdUI);
-	afx_msg void OnImportImportcopiedfile();
-	afx_msg void OnUpdateImportImportcopiedfile(CCmdUI *pCmdUI);
-	afx_msg void OnUpdate32775(CCmdUI *pCmdUI);
-	afx_msg LRESULT OnDpiChanged(WPARAM wParam, LPARAM lParam);
-	afx_msg void OnCliporderMovetolast();
-	afx_msg void OnUpdateCliporderMovetolast(CCmdUI *pCmdUI);
-	afx_msg LRESULT OnCopyClip(WPARAM wParam, LPARAM lParam);
-	afx_msg void OnSpecialpastePasteDontUpdateOrder();
-	afx_msg void OnUpdateOnSpecialPasteDontUpdateOrder(CCmdUI *pCmdUI);
+	LRESULT OnSpecialpasteUppercase(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateSpecialpasteUppercase(CmdUI *pCmdUI);
+	LRESULT OnSpecialpasteLowercase(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateSpecialpasteLowercase(CmdUI *pCmdUI);
+	LRESULT OnSpecialpasteCapitalize(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateSpecialpasteCapitalize(CmdUI *pCmdUI);
+	LRESULT OnSpecialpasteSentence(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateSpecialpasteSentence(CmdUI *pCmdUI);
+	LRESULT OnSpecialpasteRemovelinefeeds(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateSpecialpasteRemovelinefeeds(CmdUI *pCmdUI);
+	LRESULT OnSpecialpastePaste(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateSpecialpastePaste(CmdUI *pCmdUI);
+	LRESULT OnSpecialpastePaste32919(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateSpecialpastePaste32919(CmdUI *pCmdUI);
+	LRESULT OnSpecialpasteTypoglycemia(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateSpecialpasteTypoglycemia(CmdUI *pCmdUI);
+	LRESULT OnNMClickList1(int idCtrl, LPNMHDR pNMHDR, BOOL& bHandled);
+	LRESULT OnNMDblclkList1(int idCtrl, LPNMHDR pNMHDR, BOOL& bHandled);
+	LRESULT OnNMRClickList1(int idCtrl, LPNMHDR pNMHDR, BOOL& bHandled);
+	LRESULT OnNMRDblclkList1(int idCtrl, LPNMHDR pNMHDR, BOOL& bHandled);
+	LRESULT OnQuickoptionsShowtextforfirsttencopyhotkeys(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateQuickoptionsShowtextforfirsttencopyhotkeys(CmdUI *pCmdUI);
+	LRESULT OnQuickoptionsShowindicatoracliphasbeenpasted(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateQuickoptionsShowindicatoracliphasbeenpasted(CmdUI *pCmdUI);
+	LRESULT OnGroupsTogglelastgroup(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateGroupsTogglelastgroup(CmdUI *pCmdUI);
+	void OnUpdateStickyclipsMaketopstickyclip(CmdUI *pCmdUI);
+	void OnUpdateStickyclipsMakelaststickyclip(CmdUI *pCmdUI);
+	void OnUpdateStickyclipsRemovestickysetting(CmdUI *pCmdUI);
+	LRESULT OnSpecialpastePaste32927(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateSpecialpastePaste32927(CmdUI *pCmdUI);
+	LRESULT OnEraseBkgnd(HDC hDC);
+	LRESULT OnMenuGlobalhotkeys32933(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnMenuDeleteclipdata32934(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnMenuImportclip32935(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnMenuNewclip32937(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateMenuImportclip32935(CmdUI *pCmdUI);
+	void OnUpdateMenuNewclip32937(CmdUI *pCmdUI);
+	void OnUpdateMenuGlobalhotkeys32933(CmdUI *pCmdUI);
+	void OnUpdateMenuDeleteclipdata32934(CmdUI *pCmdUI);
+	LRESULT OnSearchFocused(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnCliporderReplacetopstickyclip(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateCliporderReplacetopstickyclip(CmdUI *pCmdUI);
+	LRESULT OnSendtoPromptforname(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateSendtoPromptforname(CmdUI *pCmdUI);
+	LRESULT OnImportImportcopiedfile(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateImportImportcopiedfile(CmdUI *pCmdUI);
+	void OnUpdate32775(CmdUI *pCmdUI);
+	LRESULT OnDpiChanged(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnCliporderMovetolast(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateCliporderMovetolast(CmdUI *pCmdUI);
+	LRESULT OnCopyClip(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnSpecialpastePasteDontUpdateOrder(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateOnSpecialPasteDontUpdateOrder(CmdUI *pCmdUI);
 
-	afx_msg void OnSpecialpasteTrim();
-	afx_msg void OnUpdateSpecialpasteTrim(CCmdUI *pCmdUI);
-	afx_msg void OnTransparencyIncrease();
-	afx_msg void OnUpdateTransparencyIncrease(CCmdUI *pCmdUI);
-	afx_msg void OnTransparencyDecrease();
-	afx_msg void OnUpdateTransparencyDecrease(CCmdUI *pCmdUI);
-	afx_msg void OnTransparencyToggle();
-	afx_msg void OnUpdateTransparencyToggle(CCmdUI *pCmdUI);
-	afx_msg void OnUpdateTransparencyNone(CCmdUI *pCmdUI);
-	afx_msg void OnUpdateTransparency5(CCmdUI *pCmdUI);
-	afx_msg void OnUpdateTransparency10(CCmdUI *pCmdUI);
-	afx_msg void OnUpdateTransparency15(CCmdUI *pCmdUI);
-	afx_msg void OnUpdateTransparency20(CCmdUI *pCmdUI);
-	afx_msg void OnUpdateTransparency25(CCmdUI *pCmdUI);
-	afx_msg void OnUpdateTransparency30(CCmdUI *pCmdUI);
-	afx_msg void OnUpdateTransparency35(CCmdUI *pCmdUI);
-	afx_msg void OnUpdateTransparency40(CCmdUI *pCmdUI);
-	afx_msg void OnTransparency35();
-	afx_msg void OnImportEmailto();
-	afx_msg void OnUpdateImportEmailto(CCmdUI *pCmdUI);
-	afx_msg void OnImportGmail();
-	afx_msg void OnUpdateImportGmail(CCmdUI *pCmdUI);
-	afx_msg void OnImportEmailtoasattachment();
-	afx_msg void OnUpdateImportEmailtoasattachment(CCmdUI *pCmdUI);
-	afx_msg void OnSpecialpasteSlugify();
-	afx_msg void OnUpdateSpecialpasteSlugify(CCmdUI *pCmdUI);
-	afx_msg void OnImportEmailContentAttach();
-	afx_msg void OnUpdateImportEmailContentAttach(CCmdUI *pCmdUI);
-	afx_msg void OnSpecialpasteTogglecase();
-	afx_msg void OnUpdateSpecialpasteTogglecase(CCmdUI *pCmdUI);
-	afx_msg void OnFirstShowstartupmessage();
-	afx_msg void CQPasteWnd::OnFirstBackupDb();
-	afx_msg void CQPasteWnd::OnFirstRestoreDb();
-	afx_msg void OnMenuDeleteallnonusedclips();
-	afx_msg void OnUpdateMenuDeleteallnonusedclips(CCmdUI* pCmdUI);
-	afx_msg void OnImportSetdragfilename();
-	afx_msg void OnUpdateImportSetdragfilename(CCmdUI* pCmdUI);
-	afx_msg void OnSpecialpasteCamelcase();
-	afx_msg void OnUpdateSpecialpasteCamelcase(CCmdUI* pCmdUI);
-	afx_msg void OnSpecialpasteMultipleImagesHorz();
-	afx_msg void OnUpdateSpecialpasteMultipleImagesHorz(CCmdUI* pCmdUI);
-	afx_msg void OnSpecialpasteMultipleImagesVert();
-	afx_msg void OnUpdateSpecialpasteMultipleImagesVert(CCmdUI* pCmdUI);
-	afx_msg void OnSpecialpasteAsciitextonly();
-	afx_msg void OnUpdateSpecialpasteAsciitextonly(CCmdUI* pCmdUI);
+	LRESULT OnSpecialpasteTrim(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateSpecialpasteTrim(CmdUI *pCmdUI);
+	LRESULT OnTransparencyIncrease(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateTransparencyIncrease(CmdUI *pCmdUI);
+	LRESULT OnTransparencyDecrease(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateTransparencyDecrease(CmdUI *pCmdUI);
+	LRESULT OnTransparencyToggle(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateTransparencyToggle(CmdUI *pCmdUI);
+	void OnUpdateTransparencyNone(CmdUI *pCmdUI);
+	void OnUpdateTransparency5(CmdUI *pCmdUI);
+	void OnUpdateTransparency10(CmdUI *pCmdUI);
+	void OnUpdateTransparency15(CmdUI *pCmdUI);
+	void OnUpdateTransparency20(CmdUI *pCmdUI);
+	void OnUpdateTransparency25(CmdUI *pCmdUI);
+	void OnUpdateTransparency30(CmdUI *pCmdUI);
+	void OnUpdateTransparency35(CmdUI *pCmdUI);
+	void OnUpdateTransparency40(CmdUI *pCmdUI);
+	LRESULT OnTransparency35(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnImportEmailto(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateImportEmailto(CmdUI *pCmdUI);
+	LRESULT OnImportGmail(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateImportGmail(CmdUI *pCmdUI);
+	LRESULT OnImportEmailtoasattachment(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateImportEmailtoasattachment(CmdUI *pCmdUI);
+	LRESULT OnSpecialpasteSlugify(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateSpecialpasteSlugify(CmdUI *pCmdUI);
+	LRESULT OnImportEmailContentAttach(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateImportEmailContentAttach(CmdUI *pCmdUI);
+	LRESULT OnSpecialpasteTogglecase(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateSpecialpasteTogglecase(CmdUI *pCmdUI);
+	LRESULT OnFirstShowstartupmessage(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnFirstBackupDb(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnFirstRestoreDb(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnMenuDeleteallnonusedclips(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateMenuDeleteallnonusedclips(CmdUI *pCmdUI);
+	LRESULT OnImportSetdragfilename(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateImportSetdragfilename(CmdUI *pCmdUI);
+	LRESULT OnSpecialpasteCamelcase(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateSpecialpasteCamelcase(CmdUI *pCmdUI);
+	LRESULT OnSpecialpasteMultipleImagesHorz(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateSpecialpasteMultipleImagesHorz(CmdUI *pCmdUI);
+	LRESULT OnSpecialpasteMultipleImagesVert(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateSpecialpasteMultipleImagesVert(CmdUI *pCmdUI);
+	LRESULT OnSpecialpasteAsciitextonly(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateSpecialpasteAsciitextonly(CmdUI *pCmdUI);
 };

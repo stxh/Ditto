@@ -4,7 +4,6 @@
 
 class CAdvGeneral : public CDialogEx
 {
-	DECLARE_DYNAMIC(CAdvGeneral)
 
 public:
 	CAdvGeneral(CWnd* pParent = NULL);   // standard constructor

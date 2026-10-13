@@ -14,7 +14,6 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CCopyThread
 
-IMPLEMENT_DYNCREATE(CCopyThread, WTL::CWinThread)
 
 CCopyThread::CCopyThread():
 	m_bQuit(false),
@@ -134,7 +133,7 @@ void CCopyThread::SyncConfig()
 	{
 		CClipTypes* pTypes = NULL;
 		
-		ATL::CCritSecLock csLock(m_cs.m_sect);
+		ATL::CCritSecLock csLock(m_cs);
 		
 		pTypes = m_LocalConfig.m_pSupportedTypes;
 		
@@ -177,7 +176,7 @@ void CCopyThread::SetConnectCV(bool bConnect)
 
 void CCopyThread::SetSupportedTypes( CClipTypes* pTypes )
 {
-	ATL::CCritSecLock csLock(m_cs.m_sect);
+	ATL::CCritSecLock csLock(m_cs);
 
 	if(m_SharedConfig.m_pSupportedTypes)
 	{
@@ -190,7 +189,7 @@ void CCopyThread::SetSupportedTypes( CClipTypes* pTypes )
 
 HWND CCopyThread::SetClipHandler(HWND hWnd)
 {
-	ATL::CCritSecLock csLock(m_cs.m_sect);
+	ATL::CCritSecLock csLock(m_cs);
 
 	HWND hRet = m_SharedConfig.m_hClipHandler;
 	m_SharedConfig.m_hClipHandler = hWnd;
@@ -200,7 +199,7 @@ HWND CCopyThread::SetClipHandler(HWND hWnd)
 }
 HWND CCopyThread::GetClipHandler()
 {
-	ATL::CCritSecLock csLock(m_cs.m_sect);
+	ATL::CCritSecLock csLock(m_cs);
 
 	HWND hRet = m_SharedConfig.m_hClipHandler;
 
@@ -208,7 +207,7 @@ HWND CCopyThread::GetClipHandler()
 }
 bool CCopyThread::SetCopyOnChange(bool bVal)
 {
-	ATL::CCritSecLock csLock(m_cs.m_sect);
+	ATL::CCritSecLock csLock(m_cs);
 
 	bool bRet = m_SharedConfig.m_bCopyOnChange;
 	m_SharedConfig.m_bCopyOnChange = bVal;
@@ -218,7 +217,7 @@ bool CCopyThread::SetCopyOnChange(bool bVal)
 }
 bool CCopyThread::GetCopyOnChange()
 {
-	ATL::CCritSecLock csLock(m_cs.m_sect);
+	ATL::CCritSecLock csLock(m_cs);
 
 	bool bRet = m_SharedConfig.m_bCopyOnChange;
 
@@ -226,7 +225,7 @@ bool CCopyThread::GetCopyOnChange()
 }
 bool CCopyThread::SetAsyncCopy(bool bVal)
 {
-	ATL::CCritSecLock csLock(m_cs.m_sect);
+	ATL::CCritSecLock csLock(m_cs);
 
 	bool bRet = m_SharedConfig.m_bAsyncCopy;
 	m_SharedConfig.m_bAsyncCopy = bVal;
@@ -236,7 +235,7 @@ bool CCopyThread::SetAsyncCopy(bool bVal)
 }
 bool CCopyThread::GetAsyncCopy()
 {
-	ATL::CCritSecLock csLock(m_cs.m_sect);
+	ATL::CCritSecLock csLock(m_cs);
 
 	bool bRet = m_SharedConfig.m_bAsyncCopy;
 

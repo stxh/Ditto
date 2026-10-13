@@ -1,11 +1,4 @@
-#if !defined(AFX_WNDEX_H__E14EA019_CE71_469A_AEB4_3D3CB271C531__INCLUDED_)
-#define AFX_WNDEX_H__E14EA019_CE71_469A_AEB4_3D3CB271C531__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-// WndEx.h : header file
-//
 
 #include "DittoWindow.h"
 #include "GdipButton.h"
@@ -15,25 +8,17 @@
 #define FORCE_MIN				2
 #define FORCE_MAX				3
 
-class CWndEx : public CWnd
+class CWndEx : public CWindowImpl<CWndEx, CWindow, CNullTraits>
 {
-// Construction
 public:
+	DECLARE_WND_CLASS_EX(_T("QPasteClass"), CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW, COLOR_WINDOW)
+
 	CWndEx();
+	virtual ~CWndEx();
 
-// Attributes
 public:
-
-// Operations
-public:
-
-// Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CWndEx)
-	public:
-	virtual BOOL Create(const CRect& crStart, CWnd* pParentWnd);
-	virtual BOOL PreTranslateMessage(MSG* pMsg);
-	//}}AFX_VIRTUAL
+	virtual BOOL Create(const CRect& crStart, CWindow* pParentWnd);
+	BOOL PreTranslateMessage(MSG* pMsg);
 
 public:
 	void InvalidateNc();
@@ -53,41 +38,43 @@ public:
 	CDittoWindow m_DittoWindow;
 
 protected:	
-	
+		
 	bool m_bMaxSetTimer;	
 	int m_lDelayMaxSeconds;
 	CToolTipCtrl m_toolTip;
 	SnapWindow m_snap;
 
-// Implementation
 public:
-	virtual ~CWndEx();
+	int OnCreate(LPCREATESTRUCT lpCreateStruct);
+	LRESULT OnNcPaint(HRGN hRgn);
+	LRESULT OnNcCalcSize(BOOL bCalcValidRects, LPARAM lpncsp);
+	LRESULT OnNcHitTest(CPoint point);
+	void OnNcLButtonDown(UINT nHitTest, CPoint point);
+	void OnNcMouseMove(UINT nHitTest, CPoint point);
+	void OnNcLButtonUp(UINT nHitTest, CPoint point);
+	LRESULT OnEraseBkgnd(HDC hDC);
+	void OnTimer(UINT_PTR nIDEvent);
+	void OnWindowPosChanging(WINDOWPOS* lpwndpos);
+	void OnInitMenuPopup(HMENU hMenu, UINT nIndex, BOOL bSysMenu);
 
-	// Generated message map functions
-protected:
-	//{{AFX_MSG(CWndEx)
-	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
-	afx_msg void OnNcPaint();
-	afx_msg void OnNcCalcSize(BOOL bCalcValidRects, NCCALCSIZE_PARAMS FAR* lpncsp);
-	afx_msg HITTEST_RET OnNcHitTest(CPoint point);
-	afx_msg void OnNcLButtonDown(UINT nHitTest, CPoint point);
-	afx_msg void OnNcMouseMove(UINT nHitTest, CPoint point);
-	afx_msg void OnNcLButtonUp(UINT nHitTest, CPoint point);
-	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
-	afx_msg void OnTimer(UINT_PTR nIDEvent);
-	afx_msg void OnWindowPosChanging(WINDOWPOS* lpwndpos);
-	afx_msg void OnInitMenuPopup(CMenu *pPopupMenu, UINT nIndex,BOOL bSysMenu);
-	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP()
-public:
-	afx_msg void OnSize(UINT nType, int cx, int cy);
-	afx_msg void OnMoving(UINT fwSide, LPRECT pRect);
-	afx_msg void OnEnterSizeMove();
+	LRESULT OnSize(UINT nType, CSize size);
+	void OnMoving(UINT fwSide, LPRECT pRect);
+	void OnEnterSizeMove();
+
+	BEGIN_MSG_MAP_EX(CWndEx)
+		MSG_WM_CREATE(OnCreate)
+		MSG_WM_NCPAINT(OnNcPaint)
+		MSG_WM_NCCALCSIZE(OnNcCalcSize)
+		MSG_WM_NCHITTEST(OnNcHitTest)
+		MSG_WM_NCLBUTTONDOWN(OnNcLButtonDown)
+		MSG_WM_NCMOUSEMOVE(OnNcMouseMove)
+		MSG_WM_NCLBUTTONUP(OnNcLButtonUp)
+		MSG_WM_ERASEBKGND(OnEraseBkgnd)
+		MSG_WM_TIMER(OnTimer)
+		MSG_WM_WINDOWPOSCHANGING(OnWindowPosChanging)
+		MSG_WM_INITMENUPOPUP(OnInitMenuPopup)
+		MSG_WM_SIZE(OnSize)
+		MSG_WM_MOVING(OnMoving)
+		MSG_WM_ENTERSIZEMOVE(OnEnterSizeMove)
+	END_MSG_MAP()
 };
-
-/////////////////////////////////////////////////////////////////////////////
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
-
-#endif // !defined(AFX_WNDEX_H__E14EA019_CE71_469A_AEB4_3D3CB271C531__INCLUDED_)

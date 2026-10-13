@@ -5,7 +5,7 @@
 //          
 //
 // Description:
-//     GdipButton is a CButton derived control that uses GDI+ 
+//     GdipButton is a button control that uses GDI+ 
 //     to support alternate image formats
 //
 // History
@@ -26,16 +26,20 @@
 
 #pragma once
 
-// GdipButton.h : header file
-//
-
 class CGdiPlusBitmapResource;
+
+#ifdef _WIN32
+#ifndef _WINDOWS_
+#include <windows.h>
+#endif
+#endif
 /////////////////////////////////////////////////////////////////////////////
 // CGdipButton window
 
-class CGdipButton : public CButton
+class CGdipButton : public ATL::CWindowImpl<CGdipButton, WTL::CButton>
 {
 public:
+	DECLARE_WND_SUPERCLASS(NULL, WTL::CButton::GetWndClassName())
 
 	CGdipButton();
 	virtual ~CGdipButton();
@@ -50,7 +54,7 @@ public:
 	// sets the image type
 	void SetImage(int type);
 
-	void CGdipButton::Test(CString c);
+	void Test(CString c);
 	BOOL LoadAltImage(UINT id, LPCTSTR pType);
 	BOOL LoadStdImage(UINT id, LPCTSTR pType);
 
@@ -65,7 +69,7 @@ public:
 	// return the enable/disable state
 	BOOL IsDisabled(void) {return (m_bIsDisabled == TRUE); }
 
-	void SetBkGnd(CDC* pDC);
+	void SetBkGnd(HDC hDC);
 
 	void SetToolTipText(CString spText, BOOL bActivate = TRUE);
 	void SetToolTipText(UINT nId, BOOL bActivate = TRUE);
@@ -77,8 +81,10 @@ public:
 
 protected:
 
-	void PaintBk(CDC* pDC);
-	void PaintBtn(CDC* pDC);
+	// creates the offscreen DCs from the images, using hDC as the color source
+	void	InitBitmaps(HDC hDC);
+	void PaintBk(HDC hDC);
+	void PaintBtn(HDC hDC);
 
 	BOOL	m_bHaveAltImage;
 	BOOL	m_bHaveBitmaps;
@@ -94,38 +100,40 @@ protected:
 	CGdiPlusBitmapResource* m_pStdImage;
 
 	CString			m_tooltext;
-	CToolTipCtrl*	m_pToolTip;
+	WTL::CToolTipCtrl*	m_pToolTip;
 	
 	void	InitToolTip();
 
-	virtual void PreSubclassWindow();
-	virtual void DrawItem(LPDRAWITEMSTRUCT /*lpDrawItemStruct*/);
-	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	BEGIN_MSG_MAP_EX(CGdipButton)
+		MESSAGE_HANDLER(OCM_DRAWITEM, OnDrawItem)
+		MESSAGE_HANDLER(WM_ERASEBKGND, OnEraseBkgnd)
+		MESSAGE_HANDLER(WM_MOUSEMOVE, OnMouseMove)
+		MESSAGE_HANDLER(WM_MOUSELEAVE, OnMouseLeave)
+		MESSAGE_HANDLER(WM_MOUSEHOVER, OnMouseHover)
+		MESSAGE_HANDLER(WM_LBUTTONDBLCLK, OnLButtonDblClk)
+	END_MSG_MAP()
 
-	//{{AFX_MSG(CGdipButton)
-	afx_msg HBRUSH CtlColor(CDC* pDC, UINT nCtlColor);
-	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
-	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
-	afx_msg LRESULT OnMouseLeave(WPARAM wparam, LPARAM lparam);
-	afx_msg LRESULT OnMouseHover(WPARAM wparam, LPARAM lparam) ;
-	//}}AFX_MSG
-
-	DECLARE_MESSAGE_MAP()
+	LRESULT OnDrawItem(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnEraseBkgnd(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnMouseLeave(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnMouseHover(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnLButtonDblClk(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 
 private:
 
-	CDC		m_dcBk;			// button background
+	WTL::CDC		m_dcBk;			// button background
 	
-	CDC		m_dcStd;		// standard button
-	CDC		m_dcStdP;		// standard button pressed
-	CDC		m_dcStdH;		// standard button hot
+	WTL::CDC		m_dcStd;		// standard button
+	WTL::CDC		m_dcStdP;		// standard button pressed
+	WTL::CDC		m_dcStdH;		// standard button hot
 
-	CDC		m_dcAlt;		// alternate button
-	CDC		m_dcAltP;		// alternate button pressed
-	CDC		m_dcAltH;		// alternate button hot
+	WTL::CDC		m_dcAlt;		// alternate button
+	WTL::CDC		m_dcAltP;		// alternate button pressed
+	WTL::CDC		m_dcAltH;		// alternate button hot
 
-	CDC		m_dcGS;			// grayscale button (does not have a hot or pressed state)
+	WTL::CDC		m_dcGS;			// grayscale button (does not have a hot or pressed state)
 
-	CDC*	m_pCurBtn;		// current pointer to one of the above
+	WTL::CDC*	m_pCurBtn;		// current pointer to one of the above
 
 };

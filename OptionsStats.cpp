@@ -159,7 +159,7 @@ BOOL COptionsStats::OnInitDialog()
 	pWnd = GetDlgItem(IDC_LAST_STARTED);
 	if (pWnd) pWnd->SetWindowText(m_eLastStarted);
 
-	theApp.m_Language.UpdateOptionStats(this);
+	theApp.m_Language.UpdateOptionStats(m_hWnd);
 	
 	return TRUE;
 }
@@ -187,9 +187,7 @@ LRESULT COptionsStats::OnResetCounts(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*
 
 LRESULT COptionsStats::OnRemoveAll(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/) 
 {
-	if(MessageBox(theApp.m_Language.GetString("Remove_All", "This will remove all Copy Entries!
-
-Continue?"), _T("Warning"), MB_YESNO) == IDYES)
+	if(MessageBox(theApp.m_Language.GetString("Remove_All", "This will remove all Copy Entries!\n\nContinue?"), _T("Warning"), MB_YESNO) == IDYES)
 	{
 		if( DeleteAllIDs() )
 		{

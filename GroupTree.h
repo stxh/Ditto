@@ -1,34 +1,55 @@
-#if !defined(AFX_GROUPTREE_H__A1F01358_5440_45A8_B402_3F32F46FCAA5__INCLUDED_)
-#define AFX_GROUPTREE_H__A1F01358_5440_45A8_B402_3F32F46FCAA5__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-// GroupTree.h : header file
-//
+
+#include <atlctrls.h>
+#include "resource.h"
 #include "Accels.h"
 
-/////////////////////////////////////////////////////////////////////////////
-// CGroupTree window
-
-class CGroupTree : public CTreeCtrl
+class CGroupTree : public CWindowImpl<CGroupTree, CTreeViewCtrl>
 {
-// Construction
 public:
+	DECLARE_WND_SUPERCLASS(_T("Ditto_GroupTree"), CTreeViewCtrl::GetWndClassName())
+
 	CGroupTree();
+	~CGroupTree();
 
-// Attributes
-public:
+	BOOL PreTranslateMessage(MSG* pMsg);
 
-// Operations
-public:
 	void FillTree();
 	void SetNotificationWndEx(HWND hWnd)	{ m_NotificationWnd = hWnd;	}
 	bool m_bHide;
+	bool m_bSendAllready;
 	int m_selectedFolderID;
 	int GetSelectedTree();
 	bool AddNode(CString csText, int id);
+	void DeleteAll();
+
+	int OnCreate(LPCREATESTRUCT lpCreateStruct);
+	LRESULT OnReflectNotify(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnActivate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnRButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnMenuNewgroup32896(WORD wID, WORD wNotifyCode, HWND hWnd, BOOL& bHandled);
+	LRESULT OnMenuDeletegroup(WORD wID, WORD wNotifyCode, HWND hWnd, BOOL& bHandled);
+	LRESULT OnMenuProperties32898(WORD wID, WORD wNotifyCode, HWND hWnd, BOOL& bHandled);
+	LRESULT OnInitMenuPopup(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+
+	BEGIN_MSG_MAP_EX(CGroupTree)
+		MSG_WM_CREATE(OnCreate)
+		MESSAGE_HANDLER(OCM_NOTIFY, OnReflectNotify)
+		MESSAGE_HANDLER(WM_ACTIVATE, OnActivate)
+		MESSAGE_HANDLER(WM_RBUTTONDOWN, OnRButtonDown)
+		COMMAND_ID_HANDLER(ID_MENU_NEWGROUP32896, OnMenuNewgroup32896)
+		COMMAND_ID_HANDLER(ID_MENU_DELETEGROUP, OnMenuDeletegroup)
+		COMMAND_ID_HANDLER(ID_MENU_PROPERTIES32898, OnMenuProperties32898)
+		MESSAGE_HANDLER(WM_INITMENUPOPUP, OnInitMenuPopup)
+	END_MSG_MAP()
+
 	bool m_showRightClickMenu;
+
+private:
+	HWND m_NotificationWnd;
+
+	void ShowGroupMenu();
+	void UpdateMenuShortCut(HMENU hMenu, DWORD action, UINT nID);
 
 protected:
 	void FillTree(int parentId, HTREEITEM hParent);
@@ -39,57 +60,38 @@ protected:
 	bool DoActionNewGroup();
 	bool DoActionDeleteSelected();
 	bool DoActionClipProperties();
-	void UpdateMenuShortCut(CCmdUI *pCmdUI, DWORD action);
+	UINT DoActionPasteFromGroup(int groupId);
+	bool DoActionEditSelected();
+	bool DoActionShowOnly();
+	bool DoActionShowOnlyNextPrev();
+	bool DoActionCopyAs();
+	bool DoActionPasteToGroup(int groupId);
+	CString GetSelectedNodeText();
+	HTREEITEM GetSelectedNode();
+	int GetSelectedGroupId();
+	int GetParentGroupId(int groupId);
+	bool AddNewGroup(CString newGroupName);
+	bool DeleteGroup(int groupId);
+	bool RenameGroup(int groupId, CString newName);
+	void RefreshGroupNames();
+	int GetGroupIdFromName(CString name);
+	int GetGroupParentId(int groupId);
+	CString GetGroupName(int groupId);
+	int GetGroupNodeType(int groupId);
 
-	HWND m_NotificationWnd;
-	CBitmap m_bmOpenFolder;
-	CBitmap m_bmClosedFolder;
-	bool m_bSendAllready;
+	CString GetNodeText(HTREEITEM hItem);
+	int GetNodeId(HTREEITEM hItem);
+	HTREEITEM GetNodeFromId(int id);
+
 	CAccels m_actions;
 
-// Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CGroupTree)
-	public:
-	virtual BOOL Create(LPCTSTR lpszClassName, LPCTSTR lpszWindowName, DWORD dwStyle, const RECT& rect, CWnd* pParentWnd, UINT nID, CCreateContext* pContext = NULL);
-	virtual BOOL PreTranslateMessage(MSG *pMsg);
-	//}}AFX_VIRTUAL
+	HTREEITEM m_selectedItem;
+	HTREEITEM m_rightClickItem;
 
-// Implementation
-public:
-	virtual ~CGroupTree();
+	HTREEITEM m_lastCopiedItem;
+	int lastCopiedGroupId;
+	bool m_expandOnSelect;
 
-	// Generated message map functions
-protected:
-	//{{AFX_MSG(CGroupTree)
-	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
-	afx_msg void OnSelchanged(NMHDR* pNMHDR, LRESULT* pResult);
-	afx_msg void OnKillFocus(CWnd* pNewWnd);
-	afx_msg void OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized);
-	afx_msg void OnDblclk(NMHDR* pNMHDR, LRESULT* pResult);
-	afx_msg void OnKeydown(NMHDR* pNMHDR, LRESULT* pResult);
-	afx_msg void OnRclickQuickPaste(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
-	//}}AFX_MSG
-
-	DECLARE_MESSAGE_MAP()
-	// Generated OLE dispatch map functions
-	//{{AFX_DISPATCH(CGroupTree)
-		// NOTE - the ClassWizard will add and remove member functions here.
-	//}}AFX_DISPATCH
-public:
-	afx_msg void OnMenuNewgroup32896();
-	afx_msg void OnMenuDeletegroup();
-	afx_msg void OnMenuProperties32898();
-	afx_msg void OnUpdateMenuNewgroup32896(CCmdUI *pCmdUI);
-	afx_msg void OnUpdateMenuDeletegroup(CCmdUI *pCmdUI);
-	afx_msg void OnUpdateMenuProperties32898(CCmdUI *pCmdUI);
-	afx_msg void OnInitMenuPopup(CMenu *pPopupMenu, UINT nIndex,BOOL bSysMenu);
+	CBitmap m_bmClosedFolder;
+	CBitmap m_bmOpenFolder;
 };
-
-/////////////////////////////////////////////////////////////////////////////
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
-
-#endif // !defined(AFX_GROUPTREE_H__A1F01358_5440_45A8_B402_3F32F46FCAA5__INCLUDED_)

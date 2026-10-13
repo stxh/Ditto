@@ -6,7 +6,6 @@
 
 class CEditWnd : public CWnd
 {
-	DECLARE_DYNAMIC(CEditWnd)
 
 public:
 	CEditWnd();

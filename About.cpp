@@ -20,15 +20,15 @@ CAbout::~CAbout()
 {
 }
 
-BEGIN_MSG_MAP(CAbout)
-	MSG_WM_INITDIALOG(OnInitDialog)
-END_MSG_MAP()
 /////////////////////////////////////////////////////////////////////////////
 // CAbout message handlers
 
-BOOL CAbout::OnInitDialog(HWND hWnd, LPARAM lParam)
+LRESULT CAbout::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	CPropertyPageImpl<CAbout>::OnInitDialog(hWnd, lParam);
+	m_List.Attach(GetDlgItem(IDC_LIST));
+	m_HyperLink.Attach(GetDlgItem(IDC_HYPER_LINK));
+	m_Link.Attach(GetDlgItem(IDC_STATIC_LINK));
+
 	m_List.AddString(_T("Ditto"));
 
 	CInternetUpdate update;
@@ -80,24 +80,25 @@ BOOL CAbout::OnInitDialog(HWND hWnd, LPARAM lParam)
 		m_List.AddString(_T("    ") + arr[i]);
 	}
 
-RECT rect;
+	CRect rect;
 	GetClientRect(&rect);	
 	rect.bottom -= 30;
 	
-	m_List.MoveWindow(rect);
+	m_List.MoveWindow(&rect);
 
 	rect.top = rect.bottom + 10;
 	rect.bottom = rect.top + 30;
 	
-	m_HyperLink.MoveWindow(rect);
+	m_HyperLink.MoveWindow(&rect);
 
-	m_HyperLink.SetURL(_T("mailto:sabrogden@gmail.com"));
+	m_HyperLink.SetHyperLink(_T("mailto:sabrogden@gmail.com"));
 
 	rect.top = rect.bottom + 5;
 	rect.bottom = rect.top + 5;
-	m_Link.MoveWindow(rect);
-	m_Link.SetURL(_T("https://ditto-cp.sourceforge.io/"));
-		
+	m_Link.MoveWindow(&rect);
+	m_Link.SetHyperLink(_T("https://ditto-cp.sourceforge.io/"));
+
+	bHandled = FALSE;
 	return TRUE;  // return TRUE unless you set the focus to a control
 	              // EXCEPTION: OCX Property Pages should return FALSE
 }

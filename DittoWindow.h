@@ -15,27 +15,27 @@ public:
 	CDittoWindow(void);
 	~CDittoWindow(void);
 
-	void DoNcPaint(CWnd *pWnd);
-	void DrawChevronBtn(CWindowDC &dc, CWnd *pWnd);
-	void DrawCloseBtn(CWindowDC &dc, CWnd *pWnd);
-	void DrawMaximizeBtn(CWindowDC &dc, CWnd *pWnd);
-	void DrawMinimizeBtn(CWindowDC &dc, CWnd *pWnd);
-	void DrawWindowIcon(CWindowDC &dc, CWnd *pWnd);
+	void DoNcPaint(WTL::CWindow *pWnd);
+	void DrawChevronBtn(WTL::CDC &dc, WTL::CWindow *pWnd);
+	void DrawCloseBtn(WTL::CDC &dc, WTL::CWindow *pWnd);
+	void DrawMaximizeBtn(WTL::CDC &dc, WTL::CWindow *pWnd);
+	void DrawMinimizeBtn(WTL::CDC &dc, WTL::CWindow *pWnd);
+	void DrawWindowIcon(WTL::CDC &dc, WTL::CWindow *pWnd);
 
-	void DoCreate(CWnd *pWnd);
+	void DoCreate(WTL::CWindow *pWnd);
 	void DoNcCalcSize(BOOL bCalcValidRects, NCCALCSIZE_PARAMS FAR* lpncsp);
-	UINT DoNcHitTest(CWnd *pWnd, CPoint point);
-	long DoNcLButtonUp(CWnd *pWnd, UINT nHitTest, CPoint point);
-	int DoNcLButtonDown(CWnd *pWnd, UINT nHitTest, CPoint point);
-	void DoNcMouseMove(CWnd *pWnd, UINT nHitTest, CPoint point) ;
+	UINT DoNcHitTest(WTL::CWindow *pWnd, CPoint point);
+	long DoNcLButtonUp(WTL::CWindow *pWnd, UINT nHitTest, CPoint point);
+	int DoNcLButtonDown(WTL::CWindow *pWnd, UINT nHitTest, CPoint point);
+	void DoNcMouseMove(WTL::CWindow *pWnd, UINT nHitTest, CPoint point) ;
 	bool DoPreTranslateMessage(MSG* pMsg);
-	void SetCaptionOn(CWnd *pWnd, int nPos, bool bOnstartup, int captionSize, int captionFontSize);
+	void SetCaptionOn(WTL::CWindow *pWnd, int nPos, bool bOnstartup, int captionSize, int captionFontSize);
 	bool SetCaptionColors(COLORREF left, COLORREF right, COLORREF border);
 	void SetCaptionTextColor(COLORREF color);
-	void MinMaxWindow(CWnd *pWnd, long lOption);
-	void SetTitleTextHeight(CWnd *pWnd);
+	void MinMaxWindow(WTL::CWindow *pWnd, long lOption);
+	void SetTitleTextHeight(WTL::CWindow *pWnd);
 	int IndexToPos(int index, bool horizontal);
-	void OnDpiChanged(CWnd *pWnd, int dpi);
+	void OnDpiChanged(WTL::CWindow *pWnd, int dpi);
 	
 	bool m_bDrawClose;
 	bool m_sendWMClose;
