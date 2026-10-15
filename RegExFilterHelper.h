@@ -10,7 +10,7 @@ class CRegExFilterData
 public:
 	std::wstring m_regEx;
 	CString m_processFilters;
-	CStringArray m_parsedProcessFilters;
+	std::vector<CString> m_parsedProcessFilters;
 
 	void ParseFilters();
 

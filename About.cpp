@@ -72,9 +72,9 @@ LRESULT CAbout::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHan
 	m_List.AddString(_T("Addins"));
 
 	//Show what addins are loaded
-	CStringArray arr;
+	std::vector<CString> arr;
 	theApp.m_Addins.AboutScreenText(arr);
-	INT_PTR count = arr.GetCount();
+	int count = (int)arr.size();
 	for(int i = 0; i < count; i++)
 	{
 		m_List.AddString(_T("    ") + arr[i]);

@@ -18,7 +18,7 @@ public:
 	CListBox	m_lbCandidateTypes;
 	CString	m_eCustomType;
 
-	CStringArray m_csSelectedTypes;
+	std::vector<CString> m_csSelectedTypes;
 
 	void AddCommonTypes();
 	void AddCurrentClipboardTypes();

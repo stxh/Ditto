@@ -110,7 +110,7 @@ LRESULT CAddType::OnBnClickedAdd(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL&
 
 void CAddType::AddSelectedTypes()
 {
-	m_csSelectedTypes.RemoveAll();
+	m_csSelectedTypes.clear();
 
 	if (::SendDlgItemMessage(m_hWnd, IDC_RADIO_PRIMARY_TYPES, BM_GETCHECK, 0, 0) == BST_CHECKED ||
 		::SendDlgItemMessage(m_hWnd, IDC_RADIO_CURRENT_TYPES, BM_GETCHECK, 0, 0) == BST_CHECKED)
@@ -125,7 +125,7 @@ void CAddType::AddSelectedTypes()
 			for (int i = 0; i < nCount; i++)
 			{
 				m_lbCandidateTypes.GetText(items[i], cs);
-				m_csSelectedTypes.Add(cs);
+				m_csSelectedTypes.push_back(cs);
 			}
 		}
 	}
@@ -134,7 +134,7 @@ void CAddType::AddSelectedTypes()
 		// Get text from edit control
 		::GetDlgItemText(m_hWnd, IDC_EDIT1, m_eCustomType.GetBuffer(50), 50);
 		m_eCustomType.ReleaseBuffer();
-		m_csSelectedTypes.Add(m_eCustomType);
+		m_csSelectedTypes.push_back(m_eCustomType);
 	}
 
 	EndDialog(IDOK);

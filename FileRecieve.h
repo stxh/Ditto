@@ -18,7 +18,7 @@ public:
 
 	HGLOBAL CreateCF_HDROPBufferAsString();
 
-	void AddFile(CString csFile)	{ m_RecievedFiles.Add(csFile); }
+	void AddFile(CString csFile)	{ m_RecievedFiles.push_back(csFile); }
 
 protected:
 	long RecieveFileData(ULONG lFileSize, CString csFileName, CString &md5String);
@@ -26,6 +26,6 @@ protected:
 protected:
 	CRecieveSocket m_Sock;
 	CString m_csReceivingFromIP;
-	CStringArray m_RecievedFiles;
+	std::vector<CString> m_RecievedFiles;
 	CFileTransferProgressDlg *m_pProgress;
 };

@@ -51,7 +51,7 @@ CStringA CGetSetOptions::m_csPassword;
 BOOL CGetSetOptions::m_bDrawRTF;
 BOOL CGetSetOptions::m_bMultiPasteReverse;
 CString CGetSetOptions::m_csPlaySoundOnCopy;
-CStringArray CGetSetOptions::m_csNetworkPasswordArray;
+std::vector<CString> CGetSetOptions::m_csNetworkPasswordArray;
 BOOL CGetSetOptions::m_bSendPasteMessageAfterSelection;
 BOOL CGetSetOptions::m_bFindAsYouType;
 BOOL CGetSetOptions::m_bEnsureEntireWindowCanBeSeen;
@@ -1561,7 +1561,7 @@ CString CGetSetOptions::GetExtraNetworkPassword(bool bFillArray)
 
 	if(bFillArray)
 	{
-		m_csNetworkPasswordArray.RemoveAll();
+		m_csNetworkPasswordArray.clear();
 
 		TCHAR seps[]   = _T(",");
 		TCHAR *token;
@@ -1576,7 +1576,7 @@ CString CGetSetOptions::GetExtraNetworkPassword(bool bFillArray)
 			cs.TrimLeft();
 			cs.TrimRight();
 
-			m_csNetworkPasswordArray.Add(cs);
+			m_csNetworkPasswordArray.push_back(cs);
 
 			// Get next token
 			token = STRTOK(NULL, seps);

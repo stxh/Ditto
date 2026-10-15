@@ -93,7 +93,7 @@ protected:
 
 	CAccel m_lastSearchShortCut;
 
-	CStringArray m_searches;
+	std::vector<CString> m_searches;
 
 	CDPI *m_windowDpi;
 

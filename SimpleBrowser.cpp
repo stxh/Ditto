@@ -808,13 +808,13 @@ bool SimpleBrowser::OnBeforeNavigate2(CString URL, CString frame, void *post_dat
     return cancel;
 }
 
-bool SimpleBrowser::ParsePostData(CString post_data, CStringArray &names, CStringArray &values)
+bool SimpleBrowser::ParsePostData(CString post_data, std::vector<CString> &names, std::vector<CString> &values)
 {
 	bool result = true;
 	
 	int size = 1;
-	names.SetSize(size);
-	values.SetSize(size);
+	names.resize(size);
+	values.resize(size);
 	
 	int offset = 0;
 	bool parsing_name = true;
@@ -857,8 +857,8 @@ bool SimpleBrowser::ParsePostData(CString post_data, CStringArray &names, CStrin
 			if (!parsing_name) {
 				parsing_name = true;
 				size += 1;
-				names.SetSize(size);
-				values.SetSize(size);
+				names.resize(size);
+				values.resize(size);
 			}
 			else {
 				values[size - 1].AppendChar(post_data[offset]);
@@ -872,8 +872,8 @@ bool SimpleBrowser::ParsePostData(CString post_data, CStringArray &names, CStrin
 	}
 
 	if ((names[size - 1] == _T("")) && (values[size - 1] == _T(""))) {
-		names.SetSize(size - 1);
-		values.SetSize(size - 1);
+		names.resize(size - 1);
+		values.resize(size - 1);
 	}
 
 	return result;

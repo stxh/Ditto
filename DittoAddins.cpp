@@ -156,7 +156,7 @@ void CDittoAddins::LoadDittoInfo(CDittoInfo &DittoInfo)
 	DittoInfo.m_hWndDitto = theApp.QPastehWnd();
 }
 
-void CDittoAddins::AboutScreenText(CStringArray &arr)
+void CDittoAddins::AboutScreenText(std::vector<CString> &arr)
 {
 	INT_PTR count = m_Addins.size();
 	for(int i = 0; i < count; i++)
@@ -166,15 +166,15 @@ void CDittoAddins::AboutScreenText(CStringArray &arr)
 		{
 			CString csLine;
 			csLine.Format(_T("%s Ver: %d, Ver2: %d"), pAddin->DisplayName(), pAddin->Version(), pAddin->PrivateVersion());
-			arr.Add(csLine);
+			arr.push_back(csLine);
 			INT_PTR subCount = pAddin->m_PrePasteFunctions.size();
 			for(int x = 0; x < subCount; x++)
 			{
 				CString csLine2;
 				csLine2.Format(_T("    %s (%s)"), pAddin->m_PrePasteFunctions[x].m_csDisplayName, pAddin->m_PrePasteFunctions[x].m_csDetailDescription);
-				arr.Add(csLine2);
+				arr.push_back(csLine2);
 			}
-			arr.Add("");
+			arr.push_back("");
 		}
 	}
 }

@@ -10,7 +10,7 @@
 
 void CRegExFilterData::ParseFilters()
 {
-	m_parsedProcessFilters.RemoveAll();
+	m_parsedProcessFilters.clear();
 
 	CTokenizer token(m_processFilters, CGetSetOptions::GetCopyAppSeparator());
 	CString line;
@@ -19,7 +19,7 @@ void CRegExFilterData::ParseFilters()
 	{
 		if (line != "")
 		{
-			m_parsedProcessFilters.Add(line);
+			m_parsedProcessFilters.push_back(line);
 		}
 	}
 }
@@ -31,7 +31,7 @@ bool CRegExFilterData::MatchesProcessFilters(CString &activeApp)
 		return true;
 	}
 
-	int count = (int)m_parsedProcessFilters.GetCount();
+	int count = (int)m_parsedProcessFilters.size();
 
 	if (count == 0)
 	{

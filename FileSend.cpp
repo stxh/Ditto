@@ -44,7 +44,7 @@ BOOL CFileSend::SendClientFiles(SOCKET sock, CClipList *pClipList)
 	CSendInfo Info;
 	BOOL bRet = FALSE;
 
-	CStringArray CopyFiles;
+	std::vector<CString> CopyFiles;
 
 	CClipFormat *pFormat = GetCF_HDROP_Data(pClipList);
 	if(pFormat)
@@ -59,7 +59,7 @@ BOOL CFileSend::SendClientFiles(SOCKET sock, CClipList *pClipList)
  			{
 				if(PathIsDirectory(file) == FALSE)
 				{
-					CopyFiles.Add(file);
+					CopyFiles.push_back(file);
 				}
  			}
  		}
@@ -67,7 +67,7 @@ BOOL CFileSend::SendClientFiles(SOCKET sock, CClipList *pClipList)
 		GlobalUnlock(pFormat->m_hgData);
 	}
 
-	Info.m_lParameter1 = (long)CopyFiles.GetSize();
+	Info.m_lParameter1 = (long)CopyFiles.size();
 	if(Info.m_lParameter1 > 0)
 	{
 		if(m_Send.SendCSendData(Info, MyEnums::START))

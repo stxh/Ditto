@@ -98,10 +98,10 @@ long CFileRecieve::RecieveFiles(SOCKET sock, CString csIP, CFileTransferProgress
 		{
 			if (Info.m_lParameter1 != 0 &&
 				Info.m_lParameter2 != 0 &&
-				m_RecievedFiles.GetCount() > 0)
+				!m_RecievedFiles.empty())
 			{
 				bool md5Error = false;
-				CString fileName = m_RecievedFiles[m_RecievedFiles.GetCount() - 1];
+				CString fileName = m_RecievedFiles.back();
 
 				if (strlen(Info.m_md5) > 0 &&
 					CGetSetOptions::GetCheckMd5OnFileTransfers())
@@ -253,7 +253,7 @@ long CFileRecieve::RecieveFileData(ULONG lFileSize, CString csFileName, CString 
 
 	if(bRet)
 	{
-		m_RecievedFiles.Add(csFile);
+		m_RecievedFiles.push_back(csFile);
 	}
 
 	delete []pBuffer;
@@ -265,7 +265,7 @@ long CFileRecieve::RecieveFileData(ULONG lFileSize, CString csFileName, CString 
 HGLOBAL CFileRecieve::CreateCF_HDROPBufferAsString()
 {
 	CString data;
-	int nFileArraySize = (int) m_RecievedFiles.GetSize();
+	int nFileArraySize = (int)m_RecievedFiles.size();
 	for (int i = 0; i < nFileArraySize; i++)
 	{
 		data += m_RecievedFiles[i];
@@ -279,7 +279,7 @@ HGLOBAL CFileRecieve::CreateCF_HDROPBufferAsString()
 
 HGLOBAL CFileRecieve::CreateCF_HDROPBuffer()
 {
-	int nFileArraySize = (int)m_RecievedFiles.GetSize();
+	int nFileArraySize = (int)m_RecievedFiles.size();
 	if(nFileArraySize <= 0)
 	{
 		LogSendRecieveInfo(_T("Recieved files array is empty not creating cf_hdrop structure"));

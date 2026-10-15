@@ -59,7 +59,7 @@ LPVOID CRecieveSocket::ReceiveEncryptedData(long lInSize, long &lOutSize)
 		if(RecieveExactSize(pInput, lInSize))
 		{
 			CStringA csPassword;
-			INT_PTR count = CGetSetOptions::m_csNetworkPasswordArray.GetSize();
+			int count = (int)CGetSetOptions::m_csNetworkPasswordArray.size();
 			INT_PTR nIndex;
 			for(int i = -2; i < count; i++)
 			{

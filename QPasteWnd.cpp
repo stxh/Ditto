@@ -7495,7 +7495,7 @@ bool CQPasteWnd::DoActionEmailToAttachContent()
 	int dragId = CGetSetOptions::GetDragId();
 	int origDragId = dragId;
 
-	CStringArray fileList;
+	std::vector<CString> fileList;
 
 	for (int i = 0; i < clipIds.GetCount(); i++)
 	{
@@ -7509,7 +7509,7 @@ bool CQPasteWnd::DoActionEmailToAttachContent()
 			file.Format(_T("%stext_%d.txt"), path, dragId++);
 
 			fileClip.WriteTextToFile(file, TRUE, FALSE, FALSE);
-			fileList.Add(file);
+			fileList.push_back(file);
 		}
 		else
 		{
@@ -7520,7 +7520,7 @@ bool CQPasteWnd::DoActionEmailToAttachContent()
 				file.Format(_T("%stext_%d.txt"), path, dragId++);
 
 				fileClip.WriteTextToFile(file, FALSE, TRUE, FALSE);
-				fileList.Add(file);
+				fileList.push_back(file);
 			}
 			else
 			{
@@ -7539,7 +7539,7 @@ bool CQPasteWnd::DoActionEmailToAttachContent()
 
 					if (fileClip.WriteImageToFile(file))
 					{
-						fileList.Add(file);
+						fileList.push_back(file);
 					}
 				}
 			}
@@ -7549,9 +7549,9 @@ bool CQPasteWnd::DoActionEmailToAttachContent()
 		break;
 	}
 
-	if (fileList.GetCount() > 0)
+	if (!fileList.empty())
 	{
-		SendMail::Send(_T(""), _T(""), fileList[0]);
+		SendMail::Send(_T(""), _T(""), fileList.front());
 	}
 
 	if (dragId != origDragId)

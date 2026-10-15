@@ -44,8 +44,8 @@ public:
 
 	long GetSelectionFontSize();
 	CString GetSelectionFontName();
-	CStringArray m_saFontList;
-	void GetSystemFonts(CStringArray &saFontList);
+	std::vector<CString> m_saFontList;
+	void GetSystemFonts(std::vector<CString> &saFontList);
 	void SetFontSize(int nPointSize);
 	void SetFontName(CString sFontName);
 	void SelectColor();

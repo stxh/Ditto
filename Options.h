@@ -4,6 +4,7 @@
 #include "RegExFilterHelper.h"
 #include "ChaiScriptXml.h"
 #include <set>
+#include <vector>
 
 #define MAX_SEND_CLIENTS	15
 class CSendClients
@@ -345,7 +346,7 @@ public:
 	static BOOL		GetEnableOutputDebugStringLogging();
 	static void		SetEnableOutputDebugStringLogging(BOOL bSet);
 
-	static CStringArray m_csNetworkPasswordArray;
+	static std::vector<CString> m_csNetworkPasswordArray;
 
 	static CString  GetPath(long lPathID);
 

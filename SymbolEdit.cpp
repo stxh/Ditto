@@ -160,7 +160,7 @@ CString CSymbolEdit::SavePastSearches()
 	TiXmlElement* outer = new TiXmlElement("PastSearches");
 	doc.LinkEndChild(outer);
 
-	int count = (int)m_searches.GetCount();
+	int count = (int)m_searches.size();
 	for (int i = 0; i < count; i++)
 	{		
 		TiXmlElement* searchElement = new TiXmlElement("Search");
@@ -181,7 +181,7 @@ CString CSymbolEdit::SavePastSearches()
 
 void CSymbolEdit::LoadPastSearches(CString values)
 {
-	m_searches.RemoveAll();
+	m_searches.clear();
 
 	TiXmlDocument doc;
 	CStringA xmlA = CTextConvert::UnicodeToUTF8(values);
@@ -204,7 +204,7 @@ void CSymbolEdit::LoadPastSearches(CString values)
 				CString toAdd = item.Left(MAX_SAVED_SEARCH_LENGTH);
 				if (toAdd != _T(""))
 				{
-					m_searches.Add(toAdd);
+					m_searches.push_back(toAdd);
 				}
 
 				ItemElement = ItemElement->NextSiblingElement();
@@ -229,19 +229,19 @@ void CSymbolEdit::AddToSearchHistory()
 		//save and causing memory issues.
 		cs = cs.Left(MAX_SAVED_SEARCH_LENGTH);
 
-		if (m_searches.GetCount() >= LIST_MAX_COUNT)
+		if (m_searches.size() >= static_cast<size_t>(LIST_MAX_COUNT))
 		{
-			m_searches.RemoveAt(0);
+			m_searches.erase(m_searches.begin());
 		}
 
 		bool existing = false;
-		int count = (int)m_searches.GetCount();
+		int count = (int)m_searches.size();
 		for (int i = 0; i < count; i++)
 		{
 			if (m_searches[i] == cs)
 			{
-				m_searches.RemoveAt(i);
-				m_searches.Add(cs);
+				m_searches.erase(m_searches.begin() + i);
+				m_searches.push_back(cs);
 				existing = true;
 				break;
 			}
@@ -249,14 +249,14 @@ void CSymbolEdit::AddToSearchHistory()
 
 		if (existing == false)
 		{
-			m_searches.Add(cs);
+			m_searches.push_back(cs);
 		}
 	}
 }
 
 bool CSymbolEdit::ShowSearchHistoryMenu()
 {
-	if (m_searches.GetCount() == 0)
+	if (m_searches.empty())
 	{
 		return false;
 	}
@@ -264,7 +264,7 @@ bool CSymbolEdit::ShowSearchHistoryMenu()
 	CMenu cmPopUp;
 	cmPopUp.CreatePopupMenu();
 
-	int count = min((int)m_searches.GetCount(), LIST_MAX_COUNT);
+	int count = min((int)m_searches.size(), LIST_MAX_COUNT);
 	for (int i = count-1; i >= 0; i--)
 	{
 		CString text = m_searches[i];
@@ -742,10 +742,10 @@ LRESULT CSymbolEdit::OnSelectSearchString(WORD wNotifyCode, WORD wID, HWND hWndC
 
 	if (wID == CLEAR_LIST)
 	{
-		m_searches.RemoveAll();
+		m_searches.clear();
 	}
 	else if (index >= 0 &&
-		index < m_searches.GetCount())
+		index < static_cast<int>(m_searches.size()))
 	{
 		CString cs = m_searches[index];
 		this->SetWindowTextW(cs);
@@ -755,8 +755,8 @@ LRESULT CSymbolEdit::OnSelectSearchString(WORD wNotifyCode, WORD wID, HWND hWndC
 
 		this->Invalidate();
 
-		m_searches.RemoveAt(index);
-		m_searches.Add(cs);
+		m_searches.erase(m_searches.begin() + index);
+		m_searches.push_back(cs);
 	}
 	return 0;
 }
@@ -764,9 +764,9 @@ LRESULT CSymbolEdit::OnSelectSearchString(WORD wNotifyCode, WORD wID, HWND hWndC
 bool CSymbolEdit::ApplyLastSearch()
 {
 	bool ret = false;
-	if (m_searches.GetCount() > 0)
+	if (!m_searches.empty())
 	{
-		CString cs = m_searches[m_searches.GetCount()-1];
+		CString cs = m_searches.back();
 		this->SetWindowTextW(cs);
 
 		this->SetFocus();

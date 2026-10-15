@@ -480,7 +480,7 @@ void CRichEditCtrlEx::SetFontSize(int nPointSize)
 	SetSelectionCharFormat(cf);
 }
 
-void CRichEditCtrlEx::GetSystemFonts(CStringArray &saFontList)
+void CRichEditCtrlEx::GetSystemFonts(std::vector<CString> &saFontList)
 {
 	HDC hDC = GetDC();
 
@@ -496,7 +496,7 @@ BOOL CALLBACK CRichEditCtrlEx::CBEnumFonts(LPLOGFONT lplf, LPTEXTMETRIC lptm, DW
 
 	if (dwType == TRUETYPE_FONTTYPE) 
 	{
-		((CStringArray *) lpData)->Add( lplf->lfFaceName );
+		((std::vector<CString>*)lpData)->push_back(lplf->lfFaceName);
 	}
 
 	return true;

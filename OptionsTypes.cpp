@@ -98,7 +98,7 @@ LRESULT COptionsTypes::OnAdd(WORD, WORD, HWND, BOOL&)
 
 	if(add.DoModal(m_hWnd) == IDOK)
 	{
-		INT_PTR nCount = add.m_csSelectedTypes.GetSize();
+		int nCount = (int)add.m_csSelectedTypes.size();
 		if(nCount)
 		{
 			m_bSave = true;

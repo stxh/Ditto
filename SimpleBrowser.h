@@ -96,8 +96,8 @@ public:
 	};
 
 	bool ParsePostData(CString post_data,
-	                   CStringArray &names,
-	                   CStringArray &values);
+	                   std::vector<CString> &names,
+	                   std::vector<CString> &values);
 
 	void OnFinalMessage(HWND hWnd);
 
