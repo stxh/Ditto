@@ -407,7 +407,12 @@ BOOL CCP_MainApp::InitInstance(HINSTANCE hInstance, int nCmdShow)
 		csMutex += CGetSetOptions::GetExeFileName();
 	}
 
-	
+	// MFC did this through CWinApp::RegisterWithRestartManager() with
+	// m_dwRestartManagerSupportFlags = AFX_RESTART_MANAGER_SUPPORT_RESTART, i.e. relaunch
+	// on reboot/upgrade but never on a crash or hang.
+	HRESULT hrRestart = ::RegisterApplicationRestart(csMutex, RESTART_NO_CRASH | RESTART_NO_HANG);
+	if (FAILED(hrRestart))
+		Log(StrF(_T("RegisterApplicationRestart failed hr: 0x%x"), hrRestart));
 
 	//create mutex doesn't like slashes, remove them, it always returns NULL with them in
 	csMutex.Replace(_T("\\"), _T("_"));

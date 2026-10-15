@@ -122,7 +122,7 @@ static CString FormatClipTime(time_t nTime)
 	if (nTime == 0)
 		return _T("");
 
-	return CTime(nTime).Format(_T("%m/%d/%Y %H:%M:%S"));
+	return COleDateTime(nTime).Format();
 }
 
 void CCopyProperties::LoadDataFromCClip(CClip &Clip)
