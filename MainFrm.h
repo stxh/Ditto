@@ -41,6 +41,7 @@ class COptionsSheet;
 {
 public:
     CMainFrame();
+    ~CMainFrame();
 
     DECLARE_FRAME_WND_CLASS(NULL, IDR_MAINFRAME)
 
@@ -138,6 +139,7 @@ public:
     void RefreshShowInTaskBar();
     void ShowEditWnd(CClipIDs& Ids);
     void ShowQPasteWithActiveWindowCheck();
+    void SaveCurrentClipboard();
 
     LRESULT OnHotKey(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
     LRESULT OnShowTrayIcon(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);

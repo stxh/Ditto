@@ -1,4 +1,4 @@
-// OptionsSheet.cpp : implementation file
+﻿// OptionsSheet.cpp : implementation file
 //
 
 #include "stdafx.h"
@@ -34,10 +34,10 @@ COptionsSheet::COptionsSheet(LPCTSTR pszCaption, HWND hWndParent, UINT iSelectPa
 	m_pUtilites = NULL;
 	m_hWndParent = NULL;
 
-	EnableStackedTabs(TRUE);
-
 	m_pGeneralOptions = new COptionsGeneral;
+	m_pGeneralOptions->SetParentSheet(this);
 	m_pKeyBoardOptions = new COptionsKeyBoard;
+	m_pKeyBoardOptions->SetParentSheet(this);
 	//m_pQuickPasteOptions = new COptionsQuickPaste;
 	m_pQuickPasteShortCuts = new CQuickPasteKeyboard;
 
@@ -46,19 +46,19 @@ COptionsSheet::COptionsSheet(LPCTSTR pszCaption, HWND hWndParent, UINT iSelectPa
 	m_pTypes = new COptionsTypes;
 	m_pAbout = new CAbout;
 
-	AddPage(m_pGeneralOptions);
-	AddPage(m_pTypes);
-	AddPage(m_pKeyBoardOptions);
-	AddPage(m_pCopyBuffers);
+	AddPage(*m_pGeneralOptions);
+	AddPage(*m_pTypes);
+	AddPage(*m_pKeyBoardOptions);
+	AddPage(*m_pCopyBuffers);
 	//AddPage(m_pQuickPasteOptions);
-	AddPage(m_pQuickPasteShortCuts);
+	AddPage(*m_pQuickPasteShortCuts);
 	if(CGetSetOptions::GetAllowFriends())
 	{
 		m_pFriends = new COptionFriends;
-		AddPage(m_pFriends);
+		AddPage(*m_pFriends);
 	}
-	AddPage(m_pStats);
-	AddPage(m_pAbout);
+	AddPage(*m_pStats);
+	AddPage(*m_pAbout);
 
 	
 }
@@ -84,7 +84,7 @@ void COptionsSheet::SetNotifyWnd(HWND hWnd)
 
 BOOL COptionsSheet::OnInitDialog(HWND hWndFocus, LPARAM lParam) 
 {
-	BOOL bResult = CPropertySheetImpl<COptionsSheet>::OnInitDialog(hWndFocus, lParam);
+	BOOL bResult = TRUE;
 
 	HICON b = (HICON)LoadImage(theApp.GetModuleInstance(), MAKEINTRESOURCE(IDR_MAINFRAME), IMAGE_ICON, 64, 64, LR_SHARED);
 	SetIcon(b, TRUE);

@@ -15,7 +15,7 @@ CSaveAnimation::~CSaveAnimation(void)
 {
 }
 
-void CSaveAnimation::DoAnimation(CRect crStart, CRect crEnd, CWnd *pWnd)
+void CSaveAnimation::DoAnimation(CRect crStart, CRect crEnd, HWND hWnd)
 {
 	m_crStart = crStart;
 	m_crEnd = crEnd;
@@ -23,7 +23,7 @@ void CSaveAnimation::DoAnimation(CRect crStart, CRect crEnd, CWnd *pWnd)
 	long lMaxDist = GetMaxDistance();
 	GetPercentages(lMaxDist);
 
-	CDC* pDC = pWnd->GetDC();
+	HDC pDC = ::GetDC(hWnd);
 	CRect crCur(m_crStart);
 	CRect crPrev(-1, -1, -1, -1);
 	MSG msg;
@@ -45,11 +45,11 @@ void CSaveAnimation::DoAnimation(CRect crStart, CRect crEnd, CWnd *pWnd)
 			}
 
 			//Remove the old focus rect
-			pDC->DrawFocusRect(crPrev);
+			::DrawFocusRect(pDC, crPrev);
 		}
 		Timer.Start(TRUE);
 
-		pDC->DrawFocusRect(crCur);
+		::DrawFocusRect(pDC, crCur);
 
 		crPrev = crCur;
 
@@ -63,7 +63,7 @@ void CSaveAnimation::DoAnimation(CRect crStart, CRect crEnd, CWnd *pWnd)
 		crCur.right = (int)dCurRight;
 		crCur.bottom = (int)dCurBottom;
 
-		while (PeekMessage(&msg, pWnd->m_hWnd, 0, 0, PM_REMOVE))
+		while (PeekMessage(&msg, hWnd, 0, 0, PM_REMOVE))
 		{
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
@@ -71,14 +71,14 @@ void CSaveAnimation::DoAnimation(CRect crStart, CRect crEnd, CWnd *pWnd)
 	}
 
 	//Draw one more time to remove the last focus rect
-	pDC->DrawFocusRect(crPrev);
-	while (PeekMessage(&msg, pWnd->m_hWnd, 0, 0, PM_REMOVE))
+	::DrawFocusRect(pDC, crPrev);
+	while (PeekMessage(&msg, hWnd, 0, 0, PM_REMOVE))
 	{
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
 
-	pWnd->ReleaseDC(pDC);
+	::ReleaseDC(hWnd, pDC);
 }
 
 long CSaveAnimation::GetMaxDistance()

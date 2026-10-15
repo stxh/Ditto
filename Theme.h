@@ -3,11 +3,11 @@
 #include "tinyxml\Tinyxml.h"
 #include "tinyxml\tinystr.h"
 
-class CTheme
+class CDittoTheme
 {
 public:
-	CTheme(void);
-	~CTheme(void);
+	CDittoTheme(void);
+	~CDittoTheme(void);
 
 	bool Load(CString csTheme, bool bHeaderOnly = false, bool bCheckLastWriteTime = false);	
 

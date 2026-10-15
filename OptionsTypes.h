@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <atlbase.h>
 #include <atlwin.h>
@@ -23,7 +23,7 @@ public:
 	LRESULT OnDelete(WORD, WORD, HWND, BOOL&);
 	LRESULT OnAdd(WORD, WORD, HWND, BOOL&);
 	
-	int OnApply() override;
+	int OnApply();
 
 private:
 	bool m_bSave;

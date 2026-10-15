@@ -26,29 +26,10 @@ CImageViewer::~CImageViewer()
 
 BOOL CImageViewer::Create(HWND hParent)
 {
-	BOOL bSuccess;
+	HWND hWnd = CWindowImpl<CImageViewer, ATL::CWindow>::Create(hParent, CRect(0, 0, 390, 130), _T(""),
+		WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_HSCROLL);
 
-	// Register window class
-	CString csClassName = AtlRegisterClass(NULL, CS_OWNDC | CS_HREDRAW | CS_VREDRAW,
-		LoadCursor(NULL, IDC_ARROW),
-		CBrush(::GetSysColor(COLOR_BTNFACE)), NULL, NULL);
-
-	// If no parent supplied then try and get a pointer to it anyway
-	if (!hParent)
-		hParent = GetMainWnd();
-
-	// Create popup window
-	bSuccess = Create(NULL,
-		csClassName,
-		_T(""),
-		WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_HSCROLL,
-		0, 0,
-		390, 130,
-		hParent,
-		NULL);
-	if (!bSuccess) return FALSE;
-
-	return TRUE;
+	return hWnd != NULL;
 }
 
 void CImageViewer::UpdateBitmapSize(bool setScale)
@@ -215,7 +196,7 @@ LRESULT CImageViewer::OnMouseWheel(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL
 
 		Invalidate();
 
-		UnlockWindowUpdate();
+		::LockWindowUpdate(NULL);
 	}
 	else
 	{
@@ -264,11 +245,11 @@ LRESULT CImageViewer::OnSetCursor(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL&
 	{
 		if (CGetSetOptions::GetScaleImagesToDescWindow())
 		{
-			::SetCursor(LoadCursor(ATL_BASE_MODULE, MAKEINTRESOURCE(IDC_CURSOR_ZOOM_IN)));
+			::SetCursor(LoadCursor(theApp.GetModuleInstance(), MAKEINTRESOURCE(IDC_CURSOR_ZOOM_IN)));
 		}
 		else
 		{
-			::SetCursor(LoadCursor(ATL_BASE_MODULE, MAKEINTRESOURCE(IDC_CURSOR_ZOOM_OUT)));
+			::SetCursor(LoadCursor(theApp.GetModuleInstance(), MAKEINTRESOURCE(IDC_CURSOR_ZOOM_OUT)));
 		}
 
 		m_hoveringOverImage = true;
@@ -330,7 +311,7 @@ LRESULT CImageViewer::OnGesture(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& b
 			switch (gi.dwFlags)
 			{
 			case GF_BEGIN:
-				m_dwArguments = LODWORD(gi.ullArguments);
+				m_dwArguments = (DWORD)gi.ullArguments;
 				m_ptFirst.x = gi.ptsLocation.x;
 				m_ptFirst.y = gi.ptsLocation.y;
 				::ScreenToClient(m_hWnd, &m_ptFirst);
@@ -349,7 +330,7 @@ LRESULT CImageViewer::OnGesture(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& b
 				ptZoomCenter.x = (m_ptFirst.x + m_ptSecond.x) / 2;
 				ptZoomCenter.y = (m_ptFirst.y + m_ptSecond.y) / 2;
 
-				k = (double)(LODWORD(gi.ullArguments)) / (double)(m_dwArguments);
+				k = (double)(DWORD)gi.ullArguments / (double)(m_dwArguments);
 
 				CString cs;
 				cs.Format(_T("ZOOM k: %f, x: %d, y: %d\r\n"), k, ptZoomCenter.x, ptZoomCenter.y);

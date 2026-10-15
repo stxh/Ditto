@@ -22,6 +22,8 @@ public:
 
 	void AddCommonTypes();
 	void AddCurrentClipboardTypes();
+	void ShowCurrentTypes();
+	void AddSelectedTypes();
 
 // Implementation
 protected:

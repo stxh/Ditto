@@ -102,7 +102,6 @@ protected:
 
 	void DestroyIcon();
 	void RecalcLayout();
-	virtual void PreSubclassWindow();
 
 	int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	LRESULT OnSetFont(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);

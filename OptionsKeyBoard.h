@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "stdafx.h"
 #include "CP_Main.h"
@@ -23,10 +23,10 @@ public:
 
 	LRESULT OnInitDialog(UINT, WPARAM, LPARAM, BOOL&);
 	
-	int OnWizardNext() override;
-	BOOL OnWizardFinish() override;
-	int OnApply() override;
-	void OnReset() override;
+	int OnApply();
+	void OnReset();
+
+	void SetParentSheet(COptionsSheet* pParent)	{ m_pParent = pParent; }
 
 private:
 	COptionsSheet *m_pParent;

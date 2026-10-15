@@ -1,4 +1,4 @@
-#if !defined(AFX_OPTIONSGENERAL_H__A13ABBF6_7636_4426_9A31_0189D4CA8F2F__INCLUDED_)
+﻿#if !defined(AFX_OPTIONSGENERAL_H__A13ABBF6_7636_4426_9A31_0189D4CA8F2F__INCLUDED_)
 #define AFX_OPTIONSGENERAL_H__A13ABBF6_7636_4426_9A31_0189D4CA8F2F__INCLUDED_
 
 #if _MSC_VER > 1000
@@ -51,8 +51,10 @@ public:
 	LRESULT OnClickedMaximumEntries(WORD, WORD, HWND, BOOL&);
 	LRESULT OnClickedExpireEntries(WORD, WORD, HWND, BOOL&);
 
-	int OnApply() override;
+	int OnApply();
 	BOOL OnSetActive();
+
+	void SetParentSheet(COptionsSheet* pParent)	{ m_pParent = pParent; }
 
 private:
 	void FillThemes();

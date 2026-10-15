@@ -1,4 +1,4 @@
-// AeroEdit.cpp : implementation file
+﻿// AeroEdit.cpp : implementation file
 //
 
 #include "stdafx.h"
@@ -150,7 +150,7 @@ BOOL CSymbolEdit::PreTranslateMessage(MSG* pMsg)
 	}
 	}
 
-	return CEdit::PreTranslateMessage(pMsg);
+	return FALSE;
 }
 
 CString CSymbolEdit::SavePastSearches()
@@ -298,11 +298,12 @@ bool CSymbolEdit::ShowSearchHistoryMenu()
 	this->GetWindowRect(&windowRect);
 	POINT pp;
 	GetCursorPos(&pp);
-	POINT x = this->GetCaretPos();
+	POINT x = { 0 };
+	::GetCaretPos(&x);
 	ClientToScreen(&x);
 	x.y += windowRect.Height();
 
-	cmPopUp.TrackPopupMenu(TPM_LEFTALIGN | TPM_TOPALIGN | TPM_RIGHTBUTTON, x.x, x.y, this, NULL);
+	cmPopUp.TrackPopupMenu(TPM_LEFTALIGN | TPM_TOPALIGN | TPM_RIGHTBUTTON, x.x, x.y, m_hWnd, NULL);
 	
 	Invalidate();
 	
@@ -462,7 +463,7 @@ LRESULT CSymbolEdit::OnPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHan
 	GetWindowText(text);
 	HFONT oldFont = NULL;
 
-	if(this == GetFocus() || text.GetLength() > 0)
+	if (m_hWnd == ::GetFocus() || text.GetLength() > 0)
 	{
 		dc.FillSolidRect(rect, CGetSetOptions::m_Theme.SearchTextBoxFocusBG());
 
@@ -471,7 +472,7 @@ LRESULT CSymbolEdit::OnPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHan
 		COLORREF oldColor = dc.GetTextColor();
 		dc.SetTextColor(CGetSetOptions::m_Theme.SearchTextBoxFocusText());
 			
-		dc.DrawText(text, textRect, DT_SINGLELINE | DT_INTERNAL | DT_EDITCONTROL | DT_NOPREFIX);
+		dc.DrawText(text, text.GetLength(), textRect, DT_SINGLELINE | DT_INTERNAL | DT_EDITCONTROL | DT_NOPREFIX);
 
 		dc.SelectFont(oldFont);
 		dc.SetTextColor(oldColor);
@@ -490,13 +491,13 @@ LRESULT CSymbolEdit::OnPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHan
 		COLORREF color = dc.GetTextColor();
 		dc.SetTextColor(m_colorPromptText);
 
-		dc.DrawText(m_strPromptText, textRect, DT_LEFT | DT_SINGLELINE | DT_EDITCONTROL | DT_VCENTER | DT_NOPREFIX);
+		dc.DrawText(m_strPromptText, m_strPromptText.GetLength(), textRect, DT_LEFT | DT_SINGLELINE | DT_EDITCONTROL | DT_VCENTER | DT_NOPREFIX);
 		dc.SetTextColor(color);
 		dc.SelectFont(oldFont);
 	}
 
 	int right = rect.right;
-	if ((text.GetLength() > 0 || this == GetFocus()))
+	if (text.GetLength() > 0 || m_hWnd == ::GetFocus())
 	{
 		m_searchesButtonRect.SetRect(rect.right - m_windowDpi->Scale(18), 0, rect.right, rect.bottom);
 		right = rect.right - m_windowDpi->Scale(18);
@@ -533,7 +534,7 @@ LRESULT CSymbolEdit::OnPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHan
 
 LRESULT CSymbolEdit::OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	CEdit::DefWindowProc(uMsg, wParam, lParam);
+	DefWindowProc(uMsg, wParam, lParam);
 
 	RecalcLayout();
 	bHandled = FALSE;
@@ -649,7 +650,7 @@ LRESULT CSymbolEdit::OnLButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& 
 	{
 		if ((GetWindowTextLength() > 0))
 		{
-			CWindow owner = GetOwner();
+			CWindow owner = GetParent();
 			if (owner)
 			{
 				owner.SendMessage(NM_CANCEL_SEARCH, 0, 0);
@@ -826,7 +827,7 @@ LRESULT CSymbolEdit::OnNcCalcSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL&
 		CDCHandle pDC = GetDC();
 
 		HFONT oldFont = pDC.SelectFont(pFont);
-		pDC.DrawText(_T("Ky"), rectText, DT_CALCRECT | DT_LEFT);
+		pDC.DrawText(_T("Ky"), -1, rectText, DT_CALCRECT | DT_LEFT);
 		UINT uiVClientHeight = rectText.Height();
 
 		pDC.SelectFont(oldFont);
@@ -858,7 +859,7 @@ LRESULT CSymbolEdit::OnNcPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bH
 	CString text;
 	GetWindowText(text);
 
-	CWindowDC dc(this);
+	CWindowDC dc(m_hWnd);
 	
 	CRect r;
 	this->GetWindowRect(r);
@@ -870,7 +871,7 @@ LRESULT CSymbolEdit::OnNcPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bH
 
 	COLORREF c = CGetSetOptions::m_Theme.MainWindowBG();
 
-	if (this == GetFocus() || text.GetLength() > 0)
+	if (m_hWnd == ::GetFocus() || text.GetLength() > 0)
 	{		
 		dc.FillSolidRect(t, CGetSetOptions::m_Theme.SearchTextBoxFocusBG());
 		dc.FillSolidRect(b, CGetSetOptions::m_Theme.SearchTextBoxFocusBG());
@@ -884,7 +885,7 @@ LRESULT CSymbolEdit::OnNcPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bH
 	}	
 
 	{
-		CWindowDC dc(this);
+		CWindowDC dc(m_hWnd);
 
 		CRect rcFrame;
 		this->GetWindowRect(rcFrame);
@@ -893,7 +894,8 @@ LRESULT CSymbolEdit::OnNcPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bH
 		CRect rcBorder(0, 0, rcFrame.Width(), rcFrame.Height());
 
 		int border = m_windowDpi->Scale(1);
-		CBrush borderBrush(c);
+		CBrush borderBrush;
+		borderBrush.CreateSolidBrush(c);
 
 		for (int x = 0; x < border; x++)
 		{
@@ -903,34 +905,6 @@ LRESULT CSymbolEdit::OnNcPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bH
 	}
 
 	return 0;
-}
-	else
-	{
-		dc.FillSolidRect(t, CGetSetOptions::m_Theme.MainWindowBG());
-		dc.FillSolidRect(b, CGetSetOptions::m_Theme.MainWindowBG());
-	}	
-
-	//if ((text.GetLength() > 0 || this == GetFocus()) && m_windowDpi)
-	{
-		CWindowDC dc(this);
-
-		CRect rcFrame;
-		this->GetWindowRect(rcFrame);
-		this->ScreenToClient(rcFrame);
-
-		CRect rcBorder(0, 0, rcFrame.Width(), rcFrame.Height());
-
-		int border = m_windowDpi->Scale(1);
-		CBrush borderBrush(c);
-
-		for (int x = 0; x < border; x++)
-		{
-			dc.FrameRect(rcBorder, &borderBrush);
-			rcBorder.DeflateRect(1, 1, 1, 1);
-		}
-	}
-
-	//OutputDebugString(_T("OnNCPaint \r\n"));
 }
 
 LRESULT CSymbolEdit::OnTimer(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)

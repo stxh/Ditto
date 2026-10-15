@@ -6,7 +6,7 @@
 #include "shared/Tokenizer.h"
 #include "CP_Main.h"
 
-CTheme::CTheme(void)
+CDittoTheme::CDittoTheme(void)
 {
 	m_lFileVersion = 0;
 	m_LastWriteTime = 0;
@@ -15,12 +15,12 @@ CTheme::CTheme(void)
 	LoadDefaults();
 }
 
-CTheme::~CTheme(void)
+CDittoTheme::~CDittoTheme(void)
 {
 }
 
 
-void CTheme::LoadDefaults()
+void CDittoTheme::LoadDefaults()
 {
 	m_CaptionLeft = RGB(255, 255, 255);
 	m_CaptionRight = RGB(204, 204, 204);
@@ -66,7 +66,7 @@ void CTheme::LoadDefaults()
 	m_captionFontSize = 19;
 }
 
-bool CTheme::Load(CString csTheme, bool bHeaderOnly, bool bCheckLastWriteTime)
+bool CDittoTheme::Load(CString csTheme, bool bHeaderOnly, bool bCheckLastWriteTime)
 {
 	bool followWindows10Theme = false;
 	if (csTheme.IsEmpty())
@@ -189,7 +189,7 @@ bool CTheme::Load(CString csTheme, bool bHeaderOnly, bool bCheckLastWriteTime)
 	return true;
 }
 
-void CTheme::LoadWindowsAccentColor()
+void CDittoTheme::LoadWindowsAccentColor()
 {
 	DWORD accent = Windows10AccentColor();
 	if (accent != -1)
@@ -212,19 +212,19 @@ void CTheme::LoadWindowsAccentColor()
 	}
 }
 
-bool CTheme::LoadColor(TiXmlElement *pParent, CStringA csNode, COLORREF &Color)
+bool CDittoTheme::LoadColor(TiXmlElement *pParent, CStringA csNode, COLORREF &Color)
 {
 	int intValue = 0;
 	return LoadElement(pParent, csNode, Color, intValue);
 }
 
-bool CTheme::LoadInt(TiXmlElement *pParent, CStringA csNode, int &intValue)
+bool CDittoTheme::LoadInt(TiXmlElement *pParent, CStringA csNode, int &intValue)
 {
 	COLORREF colorValue = 0;
 	return LoadElement(pParent, csNode, colorValue, intValue);
 }
 
-bool CTheme::LoadElement(TiXmlElement *pParent, CStringA csNode, COLORREF &Color, int &intValue)
+bool CDittoTheme::LoadElement(TiXmlElement *pParent, CStringA csNode, COLORREF &Color, int &intValue)
 {
 	TiXmlElement *pColorNode = pParent->FirstChildElement(csNode);
 	if(pColorNode == NULL)

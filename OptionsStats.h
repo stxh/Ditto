@@ -34,12 +34,12 @@ public:
 
 	CString m_csTitle;
 
-	BOOL OnInitDialog();
+	LRESULT OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 	LRESULT OnResetCounts(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnRemoveAll(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 
 	BEGIN_MSG_MAP(COptionsStats)
-		MSG_WM_INITDIALOG(OnInitDialog)
+		MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
 		COMMAND_ID_HANDLER(IDC_RESET_COUNTS, OnResetCounts)
 		COMMAND_ID_HANDLER(IDC_REMOVE_ALL, OnRemoveAll)
 	END_MSG_MAP()

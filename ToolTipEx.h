@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "Resource.h"
 #include "RichEditCtrlEx.h"
@@ -11,13 +11,12 @@
 #include "SnapWindow.h"
 #include "SimpleBrowser.h"
 
-class CToolTipEx : public ATL::CWindow
+class CToolTipEx : public CWindowImpl<CToolTipEx, CWindow, CNullTraits>
 {
 public:
-	CToolTipEx();
+	DECLARE_WND_CLASS_EX(_T("DittoToolTipEx"), CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW, 0)
 
-// Attributes
-public:
+	CToolTipEx();
 
 // Operations
 public:
@@ -29,8 +28,7 @@ public:
 	void SetRTFText(const CStringA &rtf);
 	void SetHtmlText(const CString &html);
 	void SetGdiplusBitmap(Gdiplus::Bitmap *gdiplusBitmap);
-	void SetNotifyWnd(WTL::CWindow *pNotify)		{ m_pNotifyWnd = pNotify;	}
-	void HideWindowInXMilliSeconds(long lms);
+	void SetNotifyWnd(HWND hWndNotify)		{ m_hWndNotify = hWndNotify;	}
 	CRect GetBoundsRect();
 
 	void SetClipId(int clipId) { m_clipId = clipId; }
@@ -51,17 +49,15 @@ public:
 
 	void GetWindowRectEx(LPRECT lpRect);
 
-	void UpdateMenuShortCut(CMenu *subMenu, int id, DWORD action);
+	void UpdateMenuShortCut(CMenuHandle subMenu, int id, DWORD action);
 
 	void DoSearch();
 	void MoveControls();
 
-	BOOL SetLogFont(LPLOGFONT lpLogFont, BOOL bRedraw /*=TRUE*/);
-
+	BOOL SetLogFont(LPLOGFONT lpLogFont, BOOL bRedraw);
 
 // Overrides
 protected:
-	void PostNcDestroy();
 	BOOL PreTranslateMessage(MSG* pMsg);
 
 // Implementation
@@ -78,12 +74,10 @@ protected:
 	CString m_html;
 	CRichEditCtrlEx m_RichEdit;
 	SimpleBrowser m_browser;
-	WTL::CWindow *m_pNotifyWnd;
+	HWND m_hWndNotify;
 	CGdipButton m_optionsButton;
 	int m_clipId;
 	CString m_searchText;
-	CScrollBar m_vScroll;
-	CScrollBar m_hScroll;
 	CDittoWindow m_DittoWindow;
 	CImageViewer m_imageViewer;
 	CGroupStatic m_clipDataStatic;
@@ -105,103 +99,81 @@ protected:
 	bool m_showingImage;
 
 protected:
-	CString GetFieldFromString(CString ref, int nIndex, TCHAR ch);	
+	CString GetFieldFromString(CString ref, int nIndex, TCHAR ch);
 	BOOL IsCursorInToolTip();
-	void HighlightSearchText();	
+	void HighlightSearchText();
 	void ApplyWordWrap();
 	void SaveWindowSize();
+	CString GetRichEditText(const CHARRANGE& chrg);
+	void ShowOptionsMenu();
 	CString m_mouseDownOnLink;
 
-// Message handlers (simplified - implement in cpp)
-	LRESULT OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-	LRESULT OnNcHitTest(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-	LRESULT OnActivate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-	LRESULT OnNcMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-	LRESULT OnNcLButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-	LRESULT OnNcLButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-	LRESULT OnNcCalcSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-	LRESULT OnNcPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-	LRESULT OnOptions(WORD wID, WORD wNotifyCode, HWND hWnd, BOOL& bHandled);
-	LRESULT OnWindowPosChanging(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-	LRESULT OnEraseBkgnd(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-	LRESULT OnTimer(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-	LRESULT OnRememberwindowposition(WORD wID, WORD wNotifyCode, HWND hWnd, BOOL& bHandled);
-	LRESULT OnSizewindowtocontent(WORD wID, WORD wNotifyCode, HWND hWnd, BOOL& bHandled);
-	LRESULT OnScaleimagestofitwindow(WORD wID, WORD wNotifyCode, HWND hWnd, BOOL& bHandled);
-	LRESULT OnRButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-	LRESULT OnSetFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-	LRESULT OnPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-	LRESULT OnFirstHidedescriptionwindowonm(WORD wID, WORD wNotifyCode, HWND hWnd, BOOL& bHandled);
-	LRESULT OnFirstWraptext(WORD wID, WORD wNotifyCode, HWND hWnd, BOOL& bHandled);
-	LRESULT OnNcLButtonDblClk(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-	LRESULT OnFirstAlwaysontop(WORD wID, WORD wNotifyCode, HWND hWnd, BOOL& bHandled);
-	LRESULT OnEnMsgfilterRichedit21(int idCtrl, LPNMHDR pNMHDR, BOOL& bHandled);
-	LRESULT OnDpiChanged(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-	LRESULT OnMoving(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-	LRESULT OnEnterSizeMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-	LRESULT OnHScroll(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	// message handlers
+	LRESULT OnSize(UINT nType, CSize size);
+	LRESULT OnNcHitTest(CPoint point);
+	void OnActivate(UINT nState, BOOL bMinimized, HWND hWndOther);
+	void OnNcMouseMove(UINT nHitTest, CPoint point);
+	void OnNcLButtonUp(UINT nHitTest, CPoint point);
+	void OnNcLButtonDown(UINT nHitTest, CPoint point);
+	LRESULT OnNcCalcSize(BOOL bCalcValidRects, LPARAM lParam);
+	LRESULT OnNcPaint(HRGN hRgn);
+	void OnNcLButtonDblClk(UINT nHitTest, CPoint point);
+	LRESULT OnEraseBkgnd(HDC hDC);
+	void OnTimer(UINT_PTR nIDEvent);
+	void OnRButtonDown(UINT nFlags, CPoint point);
+	void OnSetFocus(HWND hOldWnd);
+	void OnPaint(HDC hDC);
+	void OnMoving(UINT fwSide, LPRECT pRect);
+	void OnEnterSizeMove();
+	void OnHScroll(int nSBCode, int nPos, HWND hWndScrollBar);
+	void OnCommand(int code, int id, HWND hWndCtl);
+	LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
+	LRESULT OnDpiChanged(UINT dpiX, UINT dpiY, PRECT prcNewWindow);
 	LRESULT OnRefreshFooter(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-	LRESULT OnFirstViewtext(WORD wID, WORD wNotifyCode, HWND hWnd, BOOL& bHandled);
-	LRESULT OnFirstViewrtf(WORD wID, WORD wNotifyCode, HWND hWnd, BOOL& bHandled);
-	LRESULT OnFirstViewhtml(WORD wID, WORD wNotifyCode, HWND hWnd, BOOL& bHandled);
-	LRESULT OnFirstViewImage(WORD wID, WORD wNotifyCode, HWND hWnd, BOOL& bHandled);
-	LRESULT OnEnLink(int idCtrl, LPNMHDR pNMHDR, BOOL& bHandled);
-	LRESULT OnBrowserBeforeNavigate2(int idCtrl, LPNMHDR pNMHDR, BOOL& bHandled);
 
-	// Command handlers (implemented as message handlers)
-	LRESULT OnCommand(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
-	{
-		return OnDefault(uMsg, wParam, lParam, bHandled);
-	}
+	// the object is heap allocated by its callers; ATL calls this once the
+	// window is fully destroyed, which is the only safe point to free it
+	virtual void OnFinalMessage(HWND hWnd);
 
-	// Notification handlers
-	LRESULT OnNotify(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
-	{
-		return OnDefault(uMsg, wParam, lParam, bHandled);
-	}
+	// menu commands
+	void OnOptions();
+	void OnRememberwindowposition();
+	void OnSizewindowtocontent();
+	void OnScaleimagestofitwindow();
+	void OnFirstHidedescriptionwindowonm();
+	void OnFirstWraptext();
+	void OnFirstAlwaysontop();
+	void OnFirstViewtext();
+	void OnFirstViewrtf();
+	void OnFirstViewhtml();
+	void OnFirstViewImage();
 
-	LRESULT OnDefault(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
-	{
-		bHandled = FALSE;
-		return 0;
-	}
+	// notifications
+	LRESULT OnEnLink(int idCtrl, LPNMHDR pNMHDR);
+	LRESULT OnBrowserBeforeNavigate2(int idCtrl, LPNMHDR pNMHDR);
+	LRESULT OnEnMsgfilter(int idCtrl, LPNMHDR pNMHDR);
 
 	BEGIN_MSG_MAP_EX(CToolTipEx)
-		MESSAGE_HANDLER(WM_PAINT, OnPaint)
-		MESSAGE_HANDLER(WM_SIZE, OnSize)
-		MESSAGE_HANDLER(WM_NCHITTEST, OnNcHitTest)
-		MESSAGE_HANDLER(WM_ACTIVATE, OnActivate)
-		MESSAGE_HANDLER(WM_TIMER, OnTimer)
-		MESSAGE_HANDLER(WM_NCLBUTTONDBLCLK, OnNcLButtonDblClk)
-		MESSAGE_HANDLER(WM_NCPAINT, OnNcPaint)
-		MESSAGE_HANDLER(WM_NCCALCSIZE, OnNcCalcSize)
-		MESSAGE_HANDLER(WM_NCLBUTTONDOWN, OnNcLButtonDown)
-		MESSAGE_HANDLER(WM_NCMOUSEMOVE, OnNcMouseMove)
-		MESSAGE_HANDLER(WM_NCLBUTTONUP, OnNcLButtonUp)
-		MESSAGE_HANDLER(WM_ERASEBKGND, OnEraseBkgnd)
-		MESSAGE_HANDLER(WM_RBUTTONDOWN, OnRButtonDown)
-		MESSAGE_HANDLER(WM_SETFOCUS, OnSetFocus)
-		MESSAGE_HANDLER(WM_WINDOWPOSCHANGING, OnWindowPosChanging)
-		MESSAGE_HANDLER(WM_MOVING, OnMoving)
-		MESSAGE_HANDLER(WM_ENTERSIZEMOVE, OnEnterSizeMove)
-		MESSAGE_HANDLER(WM_HSCROLL, OnHScroll)
-		MESSAGE_HANDLER(WM_COMMAND, OnCommand)
-		MESSAGE_HANDLER(WM_NOTIFY, OnNotify)
-		COMMAND_ID_HANDLER(ID_FIRST_REMEMBERWINDOWPOSITION, OnRememberwindowposition)
-		COMMAND_ID_HANDLER(ID_FIRST_SIZEWINDOWTOCONTENT, OnSizewindowtocontent)
-		COMMAND_ID_HANDLER(ID_FIRST_SCALEIMAGESTOFITWINDOW, OnScaleimagestofitwindow)
-		COMMAND_ID_HANDLER(2, OnOptions)
-		COMMAND_ID_HANDLER(ID_FIRST_HIDEDESCRIPTIONWINDOWONM, OnFirstHidedescriptionwindowonm)
-		COMMAND_ID_HANDLER(ID_FIRST_WRAPTEXT, OnFirstWraptext)
-		COMMAND_ID_HANDLER(ID_FIRST_ALWAYSONTOP, OnFirstAlwaysontop)
-		COMMAND_ID_HANDLER(ID_FIRST_VIEWTEXT, OnFirstViewtext)
-		COMMAND_ID_HANDLER(ID_FIRST_VIEWRTF, OnFirstViewrtf)
-		COMMAND_ID_HANDLER(ID_FIRST_VIEWHTML, OnFirstViewhtml)
-		COMMAND_ID_HANDLER(ID_FIRST_VIEWASIMAGE, OnFirstViewImage)
-		NOTIFY_CODE_HANDLER(EN_MSGFILTER, OnEnMsgfilterRichedit21)
-		NOTIFY_CODE_HANDLER(EN_LINK, OnEnLink)
-		NOTIFY_CODE_HANDLER(SimpleBrowser::NotificationType::BeforeNavigate2, OnBrowserBeforeNavigate2)
-		MESSAGE_HANDLER(WM_DPICHANGED, OnDpiChanged)
+		MSG_WM_PAINT(OnPaint)
+		MSG_WM_SIZE(OnSize)
+		MSG_WM_NCHITTEST(OnNcHitTest)
+		MSG_WM_ACTIVATE(OnActivate)
+		MSG_WM_TIMER(OnTimer)
+		MSG_WM_NCLBUTTONDBLCLK(OnNcLButtonDblClk)
+		MSG_WM_NCPAINT(OnNcPaint)
+		MSG_WM_NCCALCSIZE(OnNcCalcSize)
+		MSG_WM_NCLBUTTONDOWN(OnNcLButtonDown)
+		MSG_WM_NCMOUSEMOVE(OnNcMouseMove)
+		MSG_WM_NCLBUTTONUP(OnNcLButtonUp)
+		MSG_WM_ERASEBKGND(OnEraseBkgnd)
+		MSG_WM_RBUTTONDOWN(OnRButtonDown)
+		MSG_WM_SETFOCUS(OnSetFocus)
+		MSG_WM_MOVING(OnMoving)
+		MSG_WM_ENTERSIZEMOVE(OnEnterSizeMove)
+		MSG_WM_HSCROLL(OnHScroll)
+		MSG_WM_COMMAND(OnCommand)
+		MSG_WM_NOTIFY(OnNotify)
+		MSG_WM_DPICHANGED(OnDpiChanged)
 		MESSAGE_HANDLER(WM_REFRESH_FOOTER, OnRefreshFooter)
 		REFLECT_NOTIFICATIONS_MSG_FILTERED(WM_DRAWITEM)
 		REFLECT_NOTIFICATIONS_MSG_FILTERED(WM_CTLCOLORSTATIC)

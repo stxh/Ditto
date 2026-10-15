@@ -12,9 +12,9 @@ LRESULT CFriendPromptDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM 
 
 	m_brush.CreateSolidBrush(RGB(255, 255, 255));
 
-	int extendedStyle = GetWindowLong(m_hWnd, GWL_EXSTYLE);
-	SetWindowLong(m_hWnd, GWL_EXSTYLE, extendedStyle | WS_EX_DLGMODALFRAME);
-	SetWindowPos(NULL, 0, 0, 0, 0, SWP_NOMOVE |	SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+	int extendedStyle = ::GetWindowLong(m_hWnd, GWL_EXSTYLE);
+	::SetWindowLong(m_hWnd, GWL_EXSTYLE, extendedStyle | WS_EX_DLGMODALFRAME);
+	::SetWindowPos(m_hWnd, NULL, 0, 0, 0, 0, SWP_NOMOVE |	SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 
 	CheckDlgButton(IDC_CHECK_SAVE, BST_CHECKED);
 

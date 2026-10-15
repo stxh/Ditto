@@ -103,9 +103,13 @@ public:
 				m_restartFromRestartManager = true;
 			}
   		}
- 
-// Base class ParseParam removed - we handle all parameters here
-  	}
+  		else
+  		{
+  			m_strFileName = pszParam;
+  		}
+	}
+
+	CString m_strFileName;
 	BOOL m_bDisconnect;
 	BOOL m_bConnect;
 	BOOL m_pasteClip;
@@ -118,6 +122,29 @@ public:
 	BOOL m_editClip;
 	BOOL m_restartFromRestartManager;
 };
+
+// Replaces MFC's CWinApp::ParseCommandLine / CCommandLineInfo::Parse
+static void ParseCommandLine(DittoCommandLineInfo &cmdInfo)
+{
+	int argc = 0;
+	LPWSTR* argv = ::CommandLineToArgvW(::GetCommandLineW(), &argc);
+
+	for (int i = 1; i < argc; i++)
+	{
+		BOOL bFlag = FALSE;
+		const TCHAR* pszParam = argv[i];
+
+		if (pszParam[0] == _T('-') || pszParam[0] == _T('/'))
+		{
+			bFlag = TRUE;
+			pszParam++;
+		}
+
+		cmdInfo.ParseParam(pszParam, bFlag, (i == argc - 1));
+	}
+
+	::LocalFree(argv);
+}
 
 CCP_MainApp theApp;
 
@@ -139,6 +166,7 @@ CCP_MainApp::CCP_MainApp()
 	m_connectOnStartup = -1;
 	m_MainhWnd = NULL;
 	m_pMainFrame = NULL;
+	m_pLoop = NULL;
 	BOOL set = ::AllowSetForegroundWindow(ASFW_ANY);
 
 	m_bShowingQuickPaste = false;
@@ -177,7 +205,8 @@ CCP_MainApp::CCP_MainApp()
 
 CCP_MainApp::~CCP_MainApp()
 {
-	
+	delete m_pLoop;
+	m_pLoop = NULL;
 }
 
 BOOL CCP_MainApp::InitInstance(HINSTANCE hInstance, int nCmdShow)
@@ -190,7 +219,12 @@ BOOL CCP_MainApp::InitInstance(HINSTANCE hInstance, int nCmdShow)
 	InitCommonControlsEx(&InitCtrls);
 
 	// Initialize WTL application module
-	CAppModule::Init(hInstance);
+	CAppModule::Init(NULL, hInstance);
+
+	// Create the message loop before any window does: CMainFrame::OnCreate registers
+	// itself as a message filter and idle handler on the loop of the current thread.
+	m_pLoop = new WTL::CMessageLoop;
+	CAppModule::AddMessageLoop(m_pLoop);
 
 	// Initialize OLE (replaces AfxOleInit)
 	OleInitialize(NULL);
@@ -414,7 +448,7 @@ BOOL CCP_MainApp::InitInstance(HINSTANCE hInstance, int nCmdShow)
 			return FALSE;
 		}
 
-		HWND hFrame = m_pNoDbMainFrame->CreateEx(NULL, _T("Ditto"), WS_OVERLAPPEDWINDOW);
+		HWND hFrame = m_pNoDbMainFrame->Create(NULL);
 		if(hFrame == NULL)
 		{
 			Log(_T("Failed to create no-db frame window"));
@@ -449,7 +483,7 @@ void CCP_MainApp::CreateMainWnd()
 
 	m_pMainFrame = pFrame;
 
-	HWND hFrame = pFrame->CreateEx(NULL, _T("Ditto"), WS_OVERLAPPEDWINDOW);
+	HWND hFrame = pFrame->Create(NULL);
 	if(hFrame == NULL)
 	{
 		Log(_T("Failed to create main frame window"));
@@ -958,32 +992,12 @@ int CCP_MainApp::ExitInstance()
 
 	Gdiplus::GdiplusShutdown(m_gdiplusToken);
 
-	// Clean up OLE
+	// paired with OleInitialize in InitInstance
 	OleUninitialize();
 
-	// Clean up GDI+
-	Gdiplus::GdiplusShutdown(m_gdiplusToken);
+	Term();
 
-	// Clean up database
-	if (m_db.isOpen())
-		m_db.close();
-
-	// Clean up mutexes
-	if (m_hMutex)
-		CloseHandle(m_hMutex);
-	if (m_adminPasteMutex)
-		CloseHandle(m_adminPasteMutex);
-
-	return CAppModule::ExitInstance();
-}
-
-// return TRUE if there is more idle processing to do
-BOOL CCP_MainApp::OnIdle(LONG lCount)
-{
-	// let winapp handle its idle processing
-	
-
-	return FALSE;
+	return 0;
 }
 
 void CCP_MainApp::SetConnectCV(bool bConnect)
@@ -1284,9 +1298,10 @@ HWND CCP_MainApp::QPastehWnd()
 { 
 	if(m_pMainFrame != NULL)
 	{
-		if(m_pMainFrame->m_quickPaste.m_pwndPaste != NULL)
+		if(m_pMainFrame->m_quickPaste.m_pwndPaste != NULL &&
+			::IsWindow(m_pMainFrame->m_quickPaste.m_pwndPaste->m_hWnd))
 		{
-			return m_pMainFrame->m_quickPaste.m_pwndPaste->GetSafeHwnd();
+			return m_pMainFrame->m_quickPaste.m_pwndPaste->m_hWnd;
 		}
 	}
 
@@ -1375,46 +1390,22 @@ int CCP_MainApp::GetActiveGroupId()
 return ret;
 }
 
-// WTL WinMain function (replaces MFC's WinMain)
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+// WTL entry point, replacing the WinMain provided by the MFC framework.
+// The application object is the global theApp, which every window and thread uses.
+int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPWSTR /*lpCmdLine*/, int nCmdShow)
 {
-	// Parse command line
-	DittoCommandLineInfo cmdInfo;
-	int argc = 0;
-	LPWSTR* argv = CommandLineToArgvW(GetCommandLineW(), &argc);
-	
-	for(int i = 1; i < argc; i++)
+	if(!theApp.InitInstance(hInstance, nCmdShow))
 	{
-		BOOL bFlag = FALSE;
-		if(argv[i][0] == '-' || argv[i][0] == '/')
-		{
-			bFlag = TRUE;
-			cmdInfo.ParseParam(argv[i] + 1, bFlag, (i == argc - 1));
-		}
-		else
-		{
-			cmdInfo.ParseParam(argv[i], bFlag, (i == argc - 1));
-		}
-	}
-	
-	LocalFree(argv);
-
-	// Initialize and run the application
-	CCP_MainApp app;
-	if(!app.InitInstance(hInstance, nCmdShow))
-	{
+		theApp.RemoveMessageLoop();
 		return FALSE;
 	}
 
-	// Main message loop
-	MSG msg;
-	while(GetMessage(&msg, NULL, 0, 0))
-	{
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
-	}
+	// Main message loop; filters registered by the windows (CMainFrame) get first look at each message
+	theApp.m_pLoop->Run();
 
-	return app.ExitInstance();
+	theApp.RemoveMessageLoop();
+
+	return theApp.ExitInstance();
 }
 void CCP_MainApp::SetCopyReason(CopyReasonEnum::CopyReason copyReason)
 {

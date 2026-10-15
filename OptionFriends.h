@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "OptionsSheet.h"
 #include <atlbase.h>
@@ -27,7 +27,7 @@ public:
 	LRESULT OnKeydownList(int, LPNMHDR pnmh, BOOL&);
 	LRESULT OnCheckDisableFriends(WORD, WORD, HWND, BOOL&);
 	
-	int OnApply() override;
+	int OnApply();
 
 private:
 	void InitListCtrlCols();

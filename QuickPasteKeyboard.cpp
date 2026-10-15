@@ -13,11 +13,15 @@ CQuickPasteKeyboard::CQuickPasteKeyboard()
 	m_psp.dwFlags |= PSP_USETITLE;
 }
 
+CQuickPasteKeyboard::~CQuickPasteKeyboard()
+{
+}
+
 LRESULT CQuickPasteKeyboard::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 {
 	m_list.Attach(GetDlgItem(IDC_LIST1));
-	m_hotKey1.Attach(GetDlgItem(IDC_HOTKEY1));
-	m_hotKey2.Attach(GetDlgItem(IDC_HOTKEY2));
+	m_hotKey1.SubclassWindow(GetDlgItem(IDC_HOTKEY1));
+	m_hotKey2.SubclassWindow(GetDlgItem(IDC_HOTKEY2));
 	m_assignedCombo.Attach(GetDlgItem(IDC_COMBO_ALL_ASSIGNED));
 	m_mouseType1.Attach(GetDlgItem(IDC_MOUSE_1));
 	m_mouseType2.Attach(GetDlgItem(IDC_MOUSE_2));
@@ -59,7 +63,7 @@ LRESULT CQuickPasteKeyboard::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 
 void CQuickPasteKeyboard::InitListCtrlCols()
 {
-	m_list.SetExtendedStyle(LVS_EX_FULLROWSELECT);
+	m_list.SetExtendedListViewStyle(LVS_EX_FULLROWSELECT);
 
 	m_list.InsertColumn(0, theApp.m_Language.GetString("QPHotKey", "Hot Key"), LVCFMT_LEFT, 150);
 	m_list.InsertColumn(1, theApp.m_Language.GetString("QPCommand", "Command"), LVCFMT_LEFT, 350);
@@ -67,7 +71,7 @@ void CQuickPasteKeyboard::InitListCtrlCols()
 
 int CALLBACK MyCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
 {
-	CListCtrl* pListCtrl = (CListCtrl*)lParamSort;
+	CListViewCtrl* pListCtrl = (CListViewCtrl*)lParamSort;
 
 	LVFINDINFO pInfo1, pInfo2;
 	pInfo1.flags = LVFI_PARAM;
@@ -76,8 +80,10 @@ int CALLBACK MyCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
 	pInfo2.lParam = lParam2;
 	int ind1 = pListCtrl->FindItem(&pInfo1);
 	int ind2 = pListCtrl->FindItem(&pInfo2);
-	CString strItem1 = pListCtrl->GetItemText(ind1, 1);
-	CString strItem2 = pListCtrl->GetItemText(ind2, 1);
+	CString strItem1;
+	CString strItem2;
+	pListCtrl->GetItemText(ind1, 1, strItem1);
+	pListCtrl->GetItemText(ind2, 1, strItem2);
 
 	return strItem1.CompareNoCase(strItem2);
 }
@@ -155,7 +161,7 @@ void CQuickPasteKeyboard::LoadItems()
 		row++;
 	}
 
-	m_list.SortItems(MyCompareProc, (LPARAM)&m_list);
+	m_list.SortItems(MyCompareProc, reinterpret_cast<LPARAM>(&m_list));
 
 	SelectedRow(0);
 }
@@ -457,14 +463,12 @@ LRESULT CQuickPasteKeyboard::OnBnClickedButtonAdd(WORD, WORD, HWND, BOOL&)
 int CQuickPasteKeyboard::SelectedCommandId()
 {
 	int id = -1;
-	POSITION pos = m_list.GetFirstSelectedItemPosition();
-	if (pos != NULL)
+
+	int row = m_list.GetNextItem(-1, LVNI_SELECTED);
+	while (row != -1)
 	{
-		while (pos)
-		{
-			int row = m_list.GetNextSelectedItem(pos);
-			id = (int)m_list.GetItemData(row);
-		}
+		id = (int)m_list.GetItemData(row);
+		row = m_list.GetNextItem(row, LVNI_SELECTED);
 	}
 
 	return id;
@@ -472,18 +476,7 @@ int CQuickPasteKeyboard::SelectedCommandId()
 
 int CQuickPasteKeyboard::SelectedCommandRow()
 {
-	int row = -1;
-	POSITION pos = m_list.GetFirstSelectedItemPosition();
-	if (pos != NULL)
-	{
-		while (pos)
-		{
-			row = m_list.GetNextSelectedItem(pos);
-			break;
-		}
-	}
-
-	return row;
+	return m_list.GetNextItem(-1, LVNI_SELECTED);
 }
 
 int CQuickPasteKeyboard::SelectedCommandShortCutId()
@@ -765,6 +758,104 @@ LRESULT CQuickPasteKeyboard::OnBnClickedCheckEnableSecondPress(WORD, WORD, HWND,
 
 		::ShowWindow(::GetDlgItem(m_hWnd, IDC_STATIC_SECOND_PRESS), SW_HIDE);
 	}
+
+	return 0;
+}
+
+void CQuickPasteKeyboard::SelectMouseTypeCombo(CComboBox& combo, int value)
+{
+	int count = combo.GetCount();
+	for (int i = 0; i < count; i++)
+	{
+		int itemData = (int)combo.GetItemData(i);
+		if (itemData == value)
+		{
+			combo.SetCurSel(i);
+			break;
+		}
+	}
+}
+
+void CQuickPasteKeyboard::SelectedRow(int row)
+{
+	m_list.SetItemState(row, LVIS_FOCUSED, LVIS_FOCUSED);
+	m_list.SetItemState(row, LVIS_SELECTED, LVIS_SELECTED);
+	m_list.SetSelectionMark(row);
+	m_list.EnsureVisible(row, FALSE);
+}
+
+LRESULT CQuickPasteKeyboard::OnCbnKillfocusComboEnterModifier(WORD, WORD, HWND, BOOL&)
+{
+	return 0;
+}
+
+LRESULT CQuickPasteKeyboard::OnEnKillfocusEdit1(WORD, WORD, HWND, BOOL&)
+{
+	return 0;
+}
+
+LRESULT CQuickPasteKeyboard::OnBnClickedButtonEnter(WORD, WORD, HWND, BOOL&)
+{
+	m_hotKey1.SetHotKey(VK_RETURN, CAccels::GetKeyStateModifiers());
+
+	return 0;
+}
+
+LRESULT CQuickPasteKeyboard::OnBnClickedButtonEnter2(WORD, WORD, HWND, BOOL&)
+{
+	m_hotKey2.SetHotKey(VK_RETURN, CAccels::GetKeyStateModifiers());
+
+	return 0;
+}
+
+LRESULT CQuickPasteKeyboard::OnKillFocus(UINT, WPARAM, LPARAM, BOOL& bHandled)
+{
+	bHandled = FALSE;
+
+	return 0;
+}
+
+LRESULT CQuickPasteKeyboard::OnKeyUp(UINT, WPARAM, LPARAM, BOOL& bHandled)
+{
+	bHandled = FALSE;
+
+	return 0;
+}
+
+LRESULT CQuickPasteKeyboard::OnBnClickedButtonReset(WORD, WORD, HWND, BOOL&)
+{
+	for (std::map<DWORD, KeyboardArray>::iterator it = m_map.begin(); it != m_map.end(); ++it)
+	{
+		for (int i = 0; i < 10; i++)
+		{
+			int newA = ActionEnums::GetDefaultShortCutKeyA((ActionEnums::ActionEnumValues)it->first, i);
+			int newB = ActionEnums::GetDefaultShortCutKeyB((ActionEnums::ActionEnumValues)it->first, i);
+			if (it->second.Array[i].A != newA ||
+				it->second.Array[i].B != newB)
+			{
+				it->second.Array[i].A = newA;
+				it->second.Array[i].B = newB;
+				it->second.Array[i].Dirty = true;
+			}
+		}
+	}
+
+	int count = m_list.GetItemCount();
+	for (int row = 0; row < count; row++)
+	{
+		int actionId = (int)m_list.GetItemData(row);
+
+		CString sh = GetShortCutText(m_map[actionId]);
+
+		LVITEM lvi;
+		lvi.mask = LVIF_TEXT;
+		lvi.iItem = row;
+		lvi.iSubItem = 0;
+		lvi.pszText = (LPTSTR)(LPCTSTR)(sh);
+		m_list.SetItem(&lvi);
+	}
+
+	SelectedRow(0);
 
 	return 0;
 }

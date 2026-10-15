@@ -17,8 +17,7 @@ public:
 	CQuickPaste();
 	virtual ~CQuickPaste();
 
-	void Create(CWnd *pParent);
-	void ShowQPasteWnd(CWnd *pParent, bool bAtPrevPos, bool bFromKeyboard, BOOL bReFillList);
+	void ShowQPasteWnd(CWindow *pParent, bool bAtPrevPos, bool bFromKeyboard, BOOL bReFillList);
 	void HideQPasteWnd();
 	BOOL CloseQPasteWnd();
 	BOOL IsWindowVisibleEx();

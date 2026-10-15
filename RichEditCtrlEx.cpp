@@ -47,13 +47,8 @@ BOOL CRichEditCtrlEx::Create(HWND hWndParent, UINT nID, DWORD dwStyle, DWORD dwE
     {
         rc = *lpRect;
     }
-    return CRichEditCtrl::Create(_T("RichEdit50W"), NULL, dwStyle, dwExStyle, 
-        (HMENU)UIntToPtr(nID), hWndParent, &rc) != NULL;
-}
-
-int CRichEditCtrlEx::OnCreate(LPCREATESTRUCT lpCreateStruct) 
-{
-    return 0;
+    return CRichEditCtrl::Create(hWndParent, &rc, _T("RichEdit50W"), dwStyle, dwExStyle,
+        (HMENU)UIntToPtr(nID)) != NULL;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -487,10 +482,11 @@ void CRichEditCtrlEx::SetFontSize(int nPointSize)
 
 void CRichEditCtrlEx::GetSystemFonts(CStringArray &saFontList)
 {
-	CDC *pDC = GetDC ();
+	HDC hDC = GetDC();
 
-	EnumFonts (pDC->GetSafeHdc(),NULL,(FONTENUMPROC) CBEnumFonts,(LPARAM)&saFontList);//Enumerate
+	EnumFonts(hDC, NULL, (FONTENUMPROC) CBEnumFonts, (LPARAM)&saFontList); //Enumerate
 
+	ReleaseDC(hDC);
 }
 
 BOOL CALLBACK CRichEditCtrlEx::CBEnumFonts(LPLOGFONT lplf, LPTEXTMETRIC lptm, DWORD dwType, LPARAM lpData)
@@ -522,14 +518,4 @@ long CRichEditCtrlEx::GetSelectionFontSize()
 	long nSize = cf.yHeight/20;
 
 	return nSize;
-}
-
-int CRichEditCtrlEx::OnCreate(LPCREATESTRUCT lpCreateStruct) 
-{
-	if (CRichEditCtrl::OnCreate(lpCreateStruct) == -1)
-		return -1;
-	
-	// TODO: Add your specialized creation code here
-	
-	return 0;
 }

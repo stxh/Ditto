@@ -1411,43 +1411,39 @@ BOOL CTrayNotifyIcon::CreateHelperWindow()
 
 CTrayWnd  CTrayNotifyIcon::m_wndInvisible;
 
-BOOL CTrayNotifyIcon::RemoveTaskbarIcon(CWnd* pWnd)
+BOOL CTrayNotifyIcon::RemoveTaskbarIcon(HWND hWnd)
 {
-	LPCTSTR pstrOwnerClass = AfxRegisterWndClass(0);
-
 	// Create static invisible window
 	if (!::IsWindow(m_wndInvisible.m_hWnd))
 	{
-		if (!m_wndInvisible.CreateEx(0, pstrOwnerClass, _T(""), WS_POPUP,
-			CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-			NULL, 0))
+		if (m_wndInvisible.Create(NULL, CWindow::rcDefault, _T(""), WS_POPUP) == NULL)
 		{
 			return FALSE;
 		}
 	}
 
-	pWnd->SetParent(&m_wndInvisible);
+	::SetParent(hWnd, m_wndInvisible.m_hWnd);
 
 	return TRUE;
 }
 
-void CTrayNotifyIcon::MinimiseToTray(CWnd* pWnd)
+void CTrayNotifyIcon::MinimiseToTray(HWND hWnd)
 {
-	RemoveTaskbarIcon(pWnd);
-	pWnd->ModifyStyle(WS_VISIBLE, 0);
+	RemoveTaskbarIcon(hWnd);
+	CWindow(hWnd).ModifyStyle(WS_VISIBLE, 0);
 }
 
-void CTrayNotifyIcon::MaximiseFromTray(CWnd* pWnd)
+void CTrayNotifyIcon::MaximiseFromTray(HWND hWnd)
 {
-	pWnd->SetParent(NULL);
+	::SetParent(hWnd, NULL);
 
-	pWnd->ModifyStyle(0, WS_VISIBLE);
-	pWnd->RedrawWindow(NULL, NULL, RDW_UPDATENOW | RDW_ALLCHILDREN | RDW_FRAME |
+	CWindow(hWnd).ModifyStyle(0, WS_VISIBLE);
+	::RedrawWindow(hWnd, NULL, NULL, RDW_UPDATENOW | RDW_ALLCHILDREN | RDW_FRAME |
 		RDW_INVALIDATE | RDW_ERASE);
 
 	// Move focus away and back again to ensure taskbar icon is recreated
 	if (::IsWindow(m_wndInvisible.m_hWnd))
 		m_wndInvisible.SetActiveWindow();
-	pWnd->SetActiveWindow();
-	pWnd->SetForegroundWindow();
+	::SetActiveWindow(hWnd);
+	::SetForegroundWindow(hWnd);
 }

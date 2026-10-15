@@ -10,10 +10,12 @@
 /////////////////////////////////////////////////////////////////////////////
 // CNumberEdit window
 
-class CNumberEdit : public CEdit
+class CNumberEdit : public ATL::CWindowImpl<CNumberEdit, WTL::CEdit>
 {
 // Construction
 public:
+	DECLARE_WND_SUPERCLASS(_T("Ditto_NumberEdit"), GetWndClassName())
+
 	CNumberEdit();
 
 // Attributes
@@ -44,13 +46,12 @@ protected:
 public:
 	virtual ~CNumberEdit();
 
-	// Generated message map functions
 protected:
-	//{{AFX_MSG(CNumberEdit)
-	afx_msg void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
-	//}}AFX_MSG
+	LRESULT OnChar(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 
-	DECLARE_MESSAGE_MAP()
+	BEGIN_MSG_MAP(CNumberEdit)
+		MESSAGE_HANDLER(WM_CHAR, OnChar)
+	END_MSG_MAP()
 };
 
 /////////////////////////////////////////////////////////////////////////////

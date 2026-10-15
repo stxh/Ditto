@@ -7,10 +7,6 @@
 
 static BOOL bDummy = FALSE;
 
-CScriptEditor::CScriptEditor()
-{
-}
-
 LRESULT CScriptEditor::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 {
 	SetWindowText(m_title);
@@ -87,7 +83,7 @@ LRESULT CScriptEditor::OnLbnSelchangeListScripts(WORD, WORD, HWND, BOOL&)
 		}
 		SetDlgItemText(IDC_RICHEDIT21, m_xml.m_list[listIndex].m_script);
 
-		GetDlgItem(IDC_EDIT_NAME)->SetFocus();
+		GetDlgItem(IDC_EDIT_NAME).SetFocus();
 	}
 	return 0;
 }
@@ -112,7 +108,7 @@ LRESULT CScriptEditor::OnBnClickedButtonAddScript(WORD, WORD, HWND, BOOL&)
 	SetDlgItemText(IDC_RICHEDIT21, _T(""));
 	CheckDlgButton(IDC_CHECK_ACTIVE, BST_CHECKED);
 
-	GetDlgItem(IDC_EDIT_NAME)->SetFocus();
+	GetDlgItem(IDC_EDIT_NAME).SetFocus();
 
 	EnableDisable(TRUE);
 
@@ -222,39 +218,6 @@ LRESULT CScriptEditor::OnBnClickedButtonDeleteScript(WORD, WORD, HWND, BOOL&)
 		{
 			EnableDisable(FALSE);
 		}
-	}
-	return 0;
-}
-
-LRESULT CScriptEditor::OnBnClickedButtonDeleteScript(WORD, WORD, HWND, BOOL&)
-{
-	int listIndex = m_scriptsList.GetCurSel();
-	if (listIndex >= 0 && listIndex < (int)m_xml.m_list.size())
-	{
-		m_xml.m_list.erase(m_xml.m_list.begin() + listIndex);
-		m_scriptsList.DeleteString(listIndex);
-
-		if (m_scriptsList.GetCount() <= listIndex)
-		{
-			listIndex--;
-		}
-
-		if (listIndex >= 0)
-		{
-			m_scriptsList.SetSel(listIndex);
-			m_scriptsList.SetCurSel(listIndex);
-			m_scriptsList.SetCaretIndex(listIndex);
-			m_scriptsList.SetAnchorIndex(listIndex);
-
-			OnLbnSelchangeListScripts(0, 0, NULL, bDummy);
-		}
-		else
-		{
-			EnableDisable(FALSE);
-		}
-	}
-	return 0;
-}
 	}
 	return 0;
 }

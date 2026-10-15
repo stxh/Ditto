@@ -10,16 +10,6 @@
 #define TIMER_OPEN_DB 1
 #define TIMER_ERROR_MSG 2
 
-BEGIN_MSG_MAP(CNoDbFrameWnd)
-    MESSAGE_HANDLER(WM_CREATE, OnCreate)
-    COMMAND_ID_HANDLER(ID_FIRST_OPTIONS, OnFirstOptions)
-    COMMAND_ID_HANDLER(ID_FIRST_EXIT_NO_DB, OnFirstExitNoDb)
-    MESSAGE_HANDLER(WM_TRAYNOTIFY, OnTrayNotification)
-    MESSAGE_HANDLER(WM_OPTIONS_CLOSED, OnOptionsClosed)
-    MESSAGE_HANDLER(WM_TIMER, OnTimer)
-    MESSAGE_HANDLER(WM_HOTKEY, OnHotKey)
-    CHAIN_MSG_MAP(CFrameWindowImpl<CNoDbFrameWnd>)
-END_MSG_MAP()
 CNoDbFrameWnd::CNoDbFrameWnd()
 {
 	m_pOptions = NULL;
@@ -39,7 +29,7 @@ LRESULT CNoDbFrameWnd::OnCreate(UINT, WPARAM wParam, LPARAM lParam, BOOL& bHandl
 
 	m_trayIcon.Create(this, IDR_MENU_NO_DB, _T("Ditto"), CTrayNotifyIcon::LoadIcon(IDI_MAINFRAME_NO_DB), WM_TRAYNOTIFY, 0, 1);
 	m_trayIcon.SetDefaultMenuItem(ID_FIRST_OPTIONS, FALSE);
-	m_trayIcon.MinimiseToTray(this);
+	m_trayIcon.MinimiseToTray(m_hWnd);
 
 	SetTimer(TIMER_OPEN_DB, 15000, NULL);
 	SetTimer(TIMER_ERROR_MSG, 180000, NULL);

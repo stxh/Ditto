@@ -8,7 +8,8 @@
 #include <richedit.h>
 #include "wtl_compatibility.h"
 
-#pragma comment(lib, "riched20")
+// The rich edit APIs used here go through SendMessage/EM_STREAMIN, and the text services
+// are loaded at run-time from msftedit.dll, so no import library is required.
 
 /////////////////////////////////////////////////////////////////////////////
 // CRichEditCtrlEx window
@@ -77,8 +78,6 @@ public:
 
 	void SetText(CString sText);
 	CString GetText();
-
-	int OnCreate(LPCREATESTRUCT lpCreateStruct);
 
 private:
 	void SetCharStyle(int MASK, int STYLE, int nStart, int nEnd);

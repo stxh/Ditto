@@ -69,7 +69,7 @@ bool CGetSetOptions::m_windowsApp = false;
 bool CGetSetOptions::m_chocolateyApp = false;
 CString CGetSetOptions::m_csIniFileName;
 __int64 CGetSetOptions::nLastDbWriteTime = 0;
-CTheme CGetSetOptions::m_Theme;
+CDittoTheme CGetSetOptions::m_Theme;
 BOOL CGetSetOptions::m_showScrollBar = false;
 BOOL CGetSetOptions::m_bShowAlwaysOnTopWarning = TRUE;
 CRegExFilterHelper CGetSetOptions::m_regexHelper;

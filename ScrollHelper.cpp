@@ -17,7 +17,11 @@ static void GetClientRectSB(HWND hWnd, CRect& rect)
 
     CRect winRect;
     ::GetWindowRect(hWnd, &winRect);
-    ::ScreenToClient(hWnd, &winRect);
+    POINT ptTopLeft = winRect.TopLeft();
+    POINT ptBottomRight = winRect.BottomRight();
+    ::ScreenToClient(hWnd, &ptTopLeft);
+    ::ScreenToClient(hWnd, &ptBottomRight);
+    winRect.SetRect(ptTopLeft.x, ptTopLeft.y, ptBottomRight.x, ptBottomRight.y);
 
     ::GetClientRect(hWnd, &rect);
 
@@ -390,7 +394,7 @@ void CScrollHelper::UpdateScrollInfo()
 
     if ( deltaPos.cx != 0 || deltaPos.cy != 0 )
     {
-        ::ScrollWindow(m_attachWnd, deltaPos.cx, deltaPos.y, NULL, NULL);
+        ::ScrollWindow(m_attachWnd, deltaPos.cx, deltaPos.cy, NULL, NULL);
     }                                                        
 }
 

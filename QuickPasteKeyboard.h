@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <atlbase.h>
 #include <atlwin.h>
@@ -6,10 +6,38 @@
 #include <atlctrls.h>
 #include <atlctrlx.h>
 
+#include "Accels.h"
+
+// The hot key control reports Escape as a selectable key instead of closing the dialog.
+class CDittoHotKeyCtrl : public ATL::CWindowImpl<CDittoHotKeyCtrl, WTL::CHotKeyCtrl>
+{
+public:
+	DECLARE_WND_SUPERCLASS(_T("DittoHotKeyCtrl"), GetWndClassName())
+
+	BEGIN_MSG_MAP(CDittoHotKeyCtrl)
+		MESSAGE_HANDLER(WM_KEYDOWN, OnKeyDown)
+	END_MSG_MAP()
+
+	LRESULT OnKeyDown(UINT, WPARAM wParam, LPARAM, BOOL& bHandled)
+	{
+		if (wParam == VK_ESCAPE)
+		{
+			SetHotKey(VK_ESCAPE, CAccels::GetKeyStateModifiers());
+			return 0;
+		}
+
+		bHandled = FALSE;
+		return 0;
+	}
+};
+
 class CQuickPasteKeyboard : public CPropertyPageImpl<CQuickPasteKeyboard>
 {
 public:
 	enum { IDD = IDD_OPTIONS_QUICK_PASTE_KEYBOARD };
+
+	CQuickPasteKeyboard();
+	~CQuickPasteKeyboard();
 
 	class KeyboardAB
 	{
@@ -45,9 +73,10 @@ public:
 		NOTIFY_HANDLER(IDC_LIST1, LVN_ITEMACTIVATE, OnLvnItemActivateList1)
 		NOTIFY_HANDLER(IDC_LIST1, LVN_ITEMCHANGED, OnLvnItemchangedList1)
 		COMMAND_ID_HANDLER(IDC_ASSIGN, OnBnClickedAssign)
+		COMMAND_HANDLER(IDC_COMBO_ALL_ASSIGNED, CBN_SELCHANGE, OnCbnSelchangeComboAllAssigned)
 		COMMAND_ID_HANDLER(IDC_BUTTON_REMOVE, OnBnClickedButtonRemove)
 		COMMAND_ID_HANDLER(IDC_BUTTON_ADD, OnBnClickedButtonAdd)
-		COMMAND_ID_HANDLER(IDC_COMBO_ENTER_MODIFIER, OnCbnKillfocusComboEnterModifier)
+		COMMAND_HANDLER(IDC_COMBO_ENTER_MODIFIER, CBN_KILLFOCUS, OnCbnKillfocusComboEnterModifier)
 		COMMAND_HANDLER(IDC_HOTKEY1, EN_KILLFOCUS, OnEnKillfocusEdit1)
 		COMMAND_ID_HANDLER(IDC_BUTTON_ENTER, OnBnClickedButtonEnter)
 		COMMAND_ID_HANDLER(IDC_BUTTON_ENTER2, OnBnClickedButtonEnter2)
@@ -66,6 +95,7 @@ public:
 	LRESULT OnLvnItemActivateList1(int, LPNMHDR, BOOL&);
 	LRESULT OnLvnItemchangedList1(int, LPNMHDR, BOOL&);
 	LRESULT OnBnClickedAssign(WORD, WORD, HWND, BOOL&);
+	LRESULT OnCbnSelchangeComboAllAssigned(WORD, WORD, HWND, BOOL&);
 	LRESULT OnBnClickedButtonRemove(WORD, WORD, HWND, BOOL&);
 	LRESULT OnBnClickedButtonAdd(WORD, WORD, HWND, BOOL&);
 	LRESULT OnCbnKillfocusComboEnterModifier(WORD, WORD, HWND, BOOL&);
@@ -79,10 +109,7 @@ public:
 	LRESULT OnBnClickedRadioMouse2(WORD, WORD, HWND, BOOL&);
 	LRESULT OnBnClickedCheckEnableSecondPress(WORD, WORD, HWND, BOOL&);
 
-	int OnApply() override;
-	BOOL PreTranslateMessage(MSG* pMsg);
-	BOOL OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult);
-	BOOL OnCommand(WPARAM wParam, LPARAM lParam);
+	int OnApply();
 
 private:
 	void InitListCtrlCols();
@@ -97,11 +124,10 @@ private:
 	int SelectedCommandRow();
 	void SelectMouseTypeCombo(CComboBox& combo, int value);
 	void SelectedRow(int row);
-	void OnCbnSelchangeComboAllAssigned(WORD, WORD, HWND, BOOL&);
 
-	CListCtrl m_list;
-	CHotKeyCtrl m_hotKey1;
-	CHotKeyCtrl m_hotKey2;
+	CListViewCtrl m_list;
+	CDittoHotKeyCtrl m_hotKey1;
+	CDittoHotKeyCtrl m_hotKey2;
 	CComboBox m_assignedCombo;
 	CComboBox m_mouseType1;
 	CComboBox m_mouseType2;

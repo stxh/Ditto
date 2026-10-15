@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "CP_Main.h"
 #include "OptionsTypes.h"
 #include "Shared/ArrayEx.h"
@@ -94,9 +94,9 @@ LRESULT COptionsTypes::OnDelete(WORD, WORD, HWND, BOOL&)
 LRESULT COptionsTypes::OnAdd(WORD, WORD, HWND, BOOL&) 
 {
 	CDimWnd dim(this->GetParent().m_hWnd);
-	CAddType add(this);
+	CAddType add;
 
-	if(add.DoModal() == IDOK)
+	if(add.DoModal(m_hWnd) == IDOK)
 	{
 		INT_PTR nCount = add.m_csSelectedTypes.GetSize();
 		if(nCount)

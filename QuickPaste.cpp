@@ -26,34 +26,13 @@ CQuickPaste::~CQuickPaste()
 	}	
 }
 
-void CQuickPaste::Create(CWnd *pParent)
-{
-	CPoint point;
-	CSize csSize;
-	
-	ASSERT(!m_pwndPaste);
-	m_pwndPaste = new CQPasteWnd;
-	ASSERT(m_pwndPaste);
-	// load previous position and size
-	CGetSetOptions::GetQuickPastePoint(point);
-	CGetSetOptions::GetQuickPasteSize(csSize);
-
-	CRect crRect = CRect(point, csSize);
-	// Create the window
-	ASSERT( m_pwndPaste->Create(crRect, pParent) );
-	// place it at the previous position and size
-	m_pwndPaste->MoveWindow(CRect(point, csSize));
-
-	Log(_T("Creating QPasteWnd"));
-}
-
 BOOL CQuickPaste::CloseQPasteWnd()
 {
 	if(m_pwndPaste)
 	{		
 		if(m_pwndPaste)
 		{
-			m_pwndPaste->CloseWindow();
+			m_pwndPaste->ShowWindow(SW_MINIMIZE);
 			m_pwndPaste->DestroyWindow();
 		}
 
@@ -68,7 +47,7 @@ BOOL CQuickPaste::CloseQPasteWnd()
 	return TRUE;
 }
 
-void CQuickPaste::ShowQPasteWnd(CWnd *pParent, bool bAtPrevPos, bool bFromKeyboard, BOOL bReFillList)
+void CQuickPaste::ShowQPasteWnd(CWindow *pParent, bool bAtPrevPos, bool bFromKeyboard, BOOL bReFillList)
 {		
 	Log(StrF(_T("Start of ShowQPasteWnd, AtPrevPos: %d, FromKeyboard: %d, RefillList: %d"), bAtPrevPos, bFromKeyboard, bReFillList));
 
@@ -76,7 +55,7 @@ void CQuickPaste::ShowQPasteWnd(CWnd *pParent, bool bAtPrevPos, bool bFromKeyboa
 	{
 		if(m_pwndPaste)
 		{
-			m_pwndPaste->CloseWindow();
+			m_pwndPaste->ShowWindow(SW_MINIMIZE);
 			m_pwndPaste->DestroyWindow();
 		}
 
@@ -95,7 +74,7 @@ void CQuickPaste::ShowQPasteWnd(CWnd *pParent, bool bAtPrevPos, bool bFromKeyboa
 	{
 		m_pwndPaste->ShowWindow(SW_SHOW);
 		m_pwndPaste->MinMaxWindow(FORCE_MAX);
-		m_pwndPaste->SetForegroundWindow();
+		::SetForegroundWindow(m_pwndPaste->m_hWnd);
 		return;
 	}
 	
@@ -218,7 +197,7 @@ void CQuickPaste::ShowQPasteWnd(CWnd *pParent, bool bAtPrevPos, bool bFromKeyboa
 
 	if( !IsWindow(m_pwndPaste->m_hWnd) )
 	{
-		CWnd *pLocalParent = pParent;
+		CWindow *pLocalParent = pParent;
 
 		if(CGetSetOptions::GetShowInTaskBar())
 		{
@@ -285,7 +264,7 @@ void CQuickPaste::ShowQPasteWnd(CWnd *pParent, bool bAtPrevPos, bool bFromKeyboa
 	{
 		m_pwndPaste->ShowQPasteWindow(bReFillList);
 	}
-	m_pwndPaste->SetForegroundWindow();
+	::SetForegroundWindow(m_pwndPaste->m_hWnd);
 
 	Log(StrF(_T("END of ShowQPasteWnd, AtPrevPos: %d, FromKeyboard: %d, RefillList: %d, Position, %d %d %d %d"), bAtPrevPos, bFromKeyboard, bReFillList, crRect.left, crRect.top, crRect.right, crRect.bottom));
 
@@ -347,7 +326,7 @@ bool CQuickPaste::IsWindowTopLevel()
 {
 	if(m_pwndPaste)
 	{
-		return ::GetForegroundWindow() == m_pwndPaste->GetSafeHwnd();
+		return ::GetForegroundWindow() == m_pwndPaste->m_hWnd;
 	}
 
 	return false;

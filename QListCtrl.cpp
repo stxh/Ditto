@@ -1,4 +1,4 @@
-// QListCtrl.cpp : implementation file
+﻿// QListCtrl.cpp : implementation file
 //
 
 #include "stdafx.h"
@@ -95,28 +95,19 @@ int CQListCtrl::GetFirstTenNum(int index)
 /////////////////////////////////////////////////////////////////////////////
 // CQListCtrl message handlers
 
-LRESULT CQListCtrl::OnKeydown(int, LPNMHDR pNMHDR, BOOL& bHandled)
+LRESULT CQListCtrl::OnKeydown(LPNMHDR pNMHDR)
 {
 	LV_KEYDOWN* pLVKeyDown = (LV_KEYDOWN*)pNMHDR;
 
-	bHandled = TRUE;
 	return 0;
-}
-
-DROPEFFECT CQListCtrl::OnDragOver(COleDataObject* pDataObject, DWORD dwKeyState, CPoint point)
-{
-	return DROPEFFECT_COPY;
 }
 
 void CQListCtrl::GetSelectionIndexes(ARRAY &arr)
 {
 	arr.RemoveAll();
 
-	POSITION pos = GetFirstSelectedItemPosition();
-	while (pos)
-	{
-		arr.Add(GetNextSelectedItem(pos));
-	}
+	for (int nItem = GetNextItem(-1, LVNI_SELECTED); nItem != -1; nItem = GetNextItem(nItem, LVNI_SELECTED))
+		arr.Add(nItem);
 }
 
 bool CQListCtrl::PutSelectedItemOnDittoCopyBuffer(long lBuffer)
@@ -137,24 +128,17 @@ bool CQListCtrl::PutSelectedItemOnDittoCopyBuffer(long lBuffer)
 void CQListCtrl::GetSelectionItemData(ARRAY &arr)
 {
 	DWORD dwData;
-	int i;
 	arr.RemoveAll();
-	POSITION pos = GetFirstSelectedItemPosition();
-	while (pos)
+	for (int nItem = GetNextItem(-1, LVNI_SELECTED); nItem != -1; nItem = GetNextItem(nItem, LVNI_SELECTED))
 	{
-		i = GetNextSelectedItem(pos);
-		dwData = GetItemData(i);
+		dwData = GetItemData(nItem);
 		arr.Add(dwData);
 	}
 }
 
 void CQListCtrl::RemoveAllSelection()
 {
-	POSITION pos = GetFirstSelectedItemPosition();
-	while (pos)
-	{
-		SetSelection(GetNextSelectedItem(pos), FALSE);
-	}
+	SetItemState(-1, 0, LVIS_SELECTED);
 }
 
 BOOL CQListCtrl::SetSelection(int nRow, BOOL bSelect)
@@ -233,23 +217,26 @@ void CQListCtrl::MeasureItem(LPMEASUREITEMSTRUCT lpMeasureItemStruct)
 {
 	TEXTMETRIC tm;
 	HDC hDC = ::GetDC(NULL);
-	CFont* pFont = GetFont();
-	HFONT hFontOld = (HFONT)SelectObject(hDC, pFont->GetSafeHandle());
+	HFONT hFontOld = (HFONT)::SelectObject(hDC, GetFont());
 	GetTextMetrics(hDC, &tm);
 	if (m_windowDpi != NULL)
 	{
 		lpMeasureItemStruct->itemHeight = ((tm.tmHeight + tm.tmExternalLeading) * m_linesPerRow) + m_windowDpi->Scale(ROW_BOTTOM_BORDER);
 		m_rowHeight = lpMeasureItemStruct->itemHeight;
 	}
-	SelectObject(hDC, hFontOld);
+	::SelectObject(hDC, hFontOld);
 	::ReleaseDC(NULL, hDC);
 }
 
-LRESULT CQListCtrl::OnCustomdrawList(int, LPNMHDR pNMHDR, BOOL& bHandled)
+LRESULT CQListCtrl::OnMeasureItem(UINT, WPARAM, LPARAM lParam, BOOL&)
+{
+	MeasureItem((LPMEASUREITEMSTRUCT)lParam);
+	return TRUE;
+}
+
+LRESULT CQListCtrl::OnCustomdrawList(LPNMHDR pNMHDR)
 {
 	NMLVCUSTOMDRAW* pLVCD = reinterpret_cast<NMLVCUSTOMDRAW*>(pNMHDR);
-
-	bHandled = TRUE;
 
 	if (CDDS_PREPAINT == pLVCD->nmcd.dwDrawStage)
 	{
@@ -355,31 +342,31 @@ LRESULT CQListCtrl::OnCustomdrawList(int, LPNMHDR pNMHDR, BOOL& bHandled)
 				drawInGroupIcon = false;
 		}
 
-		DrawCopiedColorCode(csText, rcText, &hDC);
+		DrawCopiedColorCode(csText, rcText, hDC);
 
-		DrawBitMap(nItem, rcText, &hDC, csText);
+		DrawBitMap(nItem, rcText, hDC, csText);
 
 		if (strSymbols.GetLength() > 0)
 		{
 			if (strSymbols.Find(_T("<group>")) >= 0)
 			{
-				m_groupFolder.Draw(&hDC, *m_windowDpi, m_hWnd, rcText.left, rcText.top, false, false);
+				m_groupFolder.Draw(hDC, *m_windowDpi, m_hWnd, rcText.left, rcText.top, false, false);
 				rcText.left += m_groupFolder.ImageWidth() + m_windowDpi->Scale(2);
 			}
 			if (strSymbols.Find(_T("<noautodelete>")) >= 0)
 			{
-				m_dontDeleteImage.Draw(&hDC, *m_windowDpi, m_hWnd, rcText.left, rcText.top, false, false);
+				m_dontDeleteImage.Draw(hDC, *m_windowDpi, m_hWnd, rcText.left, rcText.top, false, false);
 				rcText.left += m_dontDeleteImage.ImageWidth() + m_windowDpi->Scale(2);
 			}
 			if (strSymbols.Find(_T("<shortcut>")) >= 0)
 			{
-				m_shortCutImage.Draw(&hDC, *m_windowDpi, m_hWnd, rcText.left, rcText.top, false, false);
+				m_shortCutImage.Draw(hDC, *m_windowDpi, m_hWnd, rcText.left, rcText.top, false, false);
 				rcText.left += m_shortCutImage.ImageWidth() + m_windowDpi->Scale(2);
 			}
 			if (drawInGroupIcon &&
 				strSymbols.Find(_T("<ingroup>")) >= 0)
 			{
-				m_inFolderImage.Draw(&hDC, *m_windowDpi, m_hWnd, rcText.left, rcText.top, false, false);
+				m_inFolderImage.Draw(hDC, *m_windowDpi, m_hWnd, rcText.left, rcText.top, false, false);
 				rcText.left += m_inFolderImage.ImageWidth() + m_windowDpi->Scale(2);
 			}
 			if (strSymbols.Find(_T("<qpastetext>")) >= 0)
@@ -387,12 +374,12 @@ LRESULT CQListCtrl::OnCustomdrawList(int, LPNMHDR pNMHDR, BOOL& bHandled)
 			}
 			if (strSymbols.Find(_T("<sticky>")) >= 0)
 			{
-				m_stickyImage.Draw(&hDC, *m_windowDpi, m_hWnd, rcText.left, rcText.top, false, false);
+				m_stickyImage.Draw(hDC, *m_windowDpi, m_hWnd, rcText.left, rcText.top, false, false);
 				rcText.left += m_stickyImage.ImageWidth() + m_windowDpi->Scale(2);
 			}
 		}
 
-		if (DrawRtfText(nItem, rcText, &hDC) == FALSE)
+		if (DrawRtfText(nItem, rcText, hDC) == FALSE)
 		{
 			auto highlightColor = CGetSetOptions::m_Theme.SearchTextHighlight();
 			if (m_searchText.GetLength() > 0 &&
@@ -402,7 +389,7 @@ LRESULT CQListCtrl::OnCustomdrawList(int, LPNMHDR pNMHDR, BOOL& bHandled)
 			}
 			else
 			{
-				hDC.DrawText(csText, rcText, DT_VCENTER | DT_EXPANDTABS | DT_NOPREFIX);
+				hDC.DrawText(csText, csText.GetLength(), rcText, DT_VCENTER | DT_EXPANDTABS | DT_NOPREFIX);
 			}
 		}
 
@@ -414,11 +401,6 @@ LRESULT CQListCtrl::OnCustomdrawList(int, LPNMHDR pNMHDR, BOOL& bHandled)
 			else
 				cs.Format(_T("%d"), firstTenNum);
 
-			CRect crClient;
-
-			GetWindowRect(crClient);
-			ScreenToClient(crClient);
-
 			CRect crHotKey = rcItem;
 
 			int extraFromClipWasPasted = 0;
@@ -429,20 +411,21 @@ LRESULT CQListCtrl::OnCustomdrawList(int, LPNMHDR pNMHDR, BOOL& bHandled)
 			crHotKey.left += m_windowDpi->Scale(1 + extraFromClipWasPasted);
 			crHotKey.top += m_windowDpi->Scale(1 + extraFromClipWasPasted);
 
-			HFONT hOldFont = (HFONT)hDC.SelectObject(m_SmallFont);
+			HFONT hOldFont = hDC.SelectFont(m_SmallFont);
 			COLORREF localOldTextColor = hDC.SetTextColor(CGetSetOptions::m_Theme.ListSmallQuickPasteIndexColor());
 
-			CPen pen(PS_SOLID, 0, CGetSetOptions::m_Theme.ListSmallQuickPasteIndexColor());
-			CPen* pOldPen = hDC.SelectObject(&pen);
+			CPen pen;
+			pen.CreatePen(PS_SOLID, 0, CGetSetOptions::m_Theme.ListSmallQuickPasteIndexColor());
+			HPEN hOldPen = hDC.SelectPen(pen);
 
-			hDC.DrawText(cs, crHotKey, DT_BOTTOM);
+			hDC.DrawText(cs, cs.GetLength(), crHotKey, DT_BOTTOM);
 
 			hDC.MoveTo(CPoint(rcItem.left + m_windowDpi->Scale(8 + extraFromClipWasPasted), rcItem.top));
 			hDC.LineTo(CPoint(rcItem.left + m_windowDpi->Scale(8 + extraFromClipWasPasted), rcItem.bottom));
 
-			hDC.SelectObject(hOldFont);
+			hDC.SelectFont(hOldFont);
 			hDC.SetTextColor(localOldTextColor);
-			hDC.SelectObject(pOldPen);
+			hDC.SelectPen(hOldPen);
 		}
 
 		if (OldColor > -1)
@@ -456,225 +439,8 @@ LRESULT CQListCtrl::OnCustomdrawList(int, LPNMHDR pNMHDR, BOOL& bHandled)
 
 	return 0;
 }
-	else if (CDDS_ITEMPREPAINT == pLVCD->nmcd.dwDrawStage)
-	{
-		LVITEM   rItem;
-		int      nItem = static_cast<int>(pLVCD->nmcd.dwItemSpec);
-		CDC*     pDC = CDC::FromHandle(pLVCD->nmcd.hdc);
-		COLORREF crBkgnd;
-		BOOL     bListHasFocus;
-		CRect    rcItem;
 
-		bListHasFocus = (GetSafeHwnd() == ::GetFocus());
-
-		// Get the image index and selected/focused state of the
-		// item being drawn.
-		ZeroMemory(&rItem, sizeof(LVITEM));
-		rItem.mask = LVIF_STATE;
-		rItem.iItem = nItem;
-		rItem.stateMask = LVIS_SELECTED | LVIS_FOCUSED;
-		GetItem(&rItem);
-
-		// Get the rect that bounds the text label.
-		GetItemRect(nItem, rcItem, LVIR_SELECTBOUNDS);
-
-		COLORREF OldColor = -1;
-		int nOldBKMode = -1;
-
-		CString csText;
-		LPTSTR lpszText = csText.GetBufferSetLength(CGetSetOptions::m_bDescTextSize);
-		GetItemText(nItem, 0, lpszText, CGetSetOptions::m_bDescTextSize);
-		csText.ReleaseBuffer();
-
-		// extract symbols
-		CString strSymbols;
-		int nSymEnd = csText.Find('|');
-		if (nSymEnd >= 0)
-		{
-			strSymbols = csText.Left(nSymEnd);
-			csText = csText.Mid(nSymEnd + 1);
-		}
-
-		// Draw the background of the list item.  Colors are selected 
-		// according to the item's state.
-		if (rItem.state & LVIS_SELECTED)
-		{
-			if (bListHasFocus)
-			{
-				crBkgnd = CGetSetOptions::m_Theme.ListBoxSelectedBG();
-				OldColor = pDC->SetTextColor(CGetSetOptions::m_Theme.ListBoxSelectedText());
-			}
-			else
-			{
-				crBkgnd = CGetSetOptions::m_Theme.ListBoxSelectedNoFocusBG();
-				OldColor = pDC->SetTextColor(CGetSetOptions::m_Theme.ListBoxSelectedNoFocusText());
-			}
-		}
-		else
-		{
-			//Shade alternating Rows
-			if ((nItem % 2) == 0)
-			{
-				crBkgnd = CGetSetOptions::m_Theme.ListBoxOddRowsBG();
-				OldColor = pDC->SetTextColor(CGetSetOptions::m_Theme.ListBoxOddRowsText());
-			}
-			else
-			{
-				crBkgnd = CGetSetOptions::m_Theme.ListBoxEvenRowsBG();
-				OldColor = pDC->SetTextColor(CGetSetOptions::m_Theme.ListBoxEvenRowsText());
-			}
-		}
-
-		pDC->FillSolidRect(rcItem, crBkgnd);
-		nOldBKMode = pDC->SetBkMode(TRANSPARENT);
-
-		CRect rcText = rcItem;
-		rcText.left += m_windowDpi->Scale(ROW_LEFT_BORDER);
-		rcText.top += m_windowDpi->Scale(1);
-		rcText.bottom -= m_windowDpi->Scale(1);
-
-		if (m_showIfClipWasPasted &&
-			strSymbols.GetLength() > 0 &&
-			strSymbols.Find(_T("<pasted>")) >= 0) //clip was pasted from ditto 
-		{
-			CRect pastedRect(rcItem);
-			pastedRect.left++;
-			pastedRect.right = pastedRect.left + m_windowDpi->Scale(2);
-
-			pDC->FillSolidRect(pastedRect, CGetSetOptions::m_Theme.ClipPastedColor());
-		}
-
-		// set firstTenNum to the first ten number (1-10) corresponding to
-		//  the current nItem.
-		// -1 means that nItem is not in the FirstTen block.
-		int firstTenNum = GetFirstTenNum(nItem);
-
-		if (m_bShowTextForFirstTenHotKeys && firstTenNum >= 0)
-		{
-			rcText.left += m_windowDpi->Scale(12);
-		}
-		else
-		{
-			rcText.left += m_windowDpi->Scale(3);
-		}
-
-		bool drawInGroupIcon = true;
-		// if we are inside a group, don't display the "in group" flag
-		if (theApp.m_GroupID > 0)
-		{
-			int nFlag = strSymbols.Find(_T("<ingroup>"));
-			if (nFlag >= 0)
-				drawInGroupIcon = false;
-		}
-
-		DrawCopiedColorCode(csText, rcText, pDC);
-
-		DrawBitMap(nItem, rcText, pDC, csText);
-
-		// draw the symbol box
-		if (strSymbols.GetLength() > 0)
-		{
-			if (strSymbols.Find(_T("<group>")) >= 0) //group 
-			{
-				m_groupFolder.Draw(pDC, *m_windowDpi, this, rcText.left, rcText.top, false, false);
-				rcText.left += m_groupFolder.ImageWidth() + m_windowDpi->Scale(2);
-			}
-			if (strSymbols.Find(_T("<noautodelete>")) >= 0) //don't auto delete
-			{
-				m_dontDeleteImage.Draw(pDC, *m_windowDpi, this, rcText.left, rcText.top, false, false);
-				rcText.left += m_dontDeleteImage.ImageWidth() + m_windowDpi->Scale(2);
-			}
-			if (strSymbols.Find(_T("<shortcut>")) >= 0) // has shortcut
-			{
-				m_shortCutImage.Draw(pDC, *m_windowDpi, this, rcText.left, rcText.top, false, false);
-				rcText.left += m_shortCutImage.ImageWidth() + m_windowDpi->Scale(2);
-			}
-			if (drawInGroupIcon &&
-				strSymbols.Find(_T("<ingroup>")) >= 0) // in group
-			{
-				m_inFolderImage.Draw(pDC, *m_windowDpi, this, rcText.left, rcText.top, false, false);
-				rcText.left += m_inFolderImage.ImageWidth() + m_windowDpi->Scale(2);
-			}
-			if (strSymbols.Find(_T("<qpastetext>")) >= 0) // has quick paste text
-			{
-			}
-			if (strSymbols.Find(_T("<sticky>")) >= 0) //sticky clip
-			{
-				m_stickyImage.Draw(pDC, *m_windowDpi, this, rcText.left, rcText.top, false, false);
-				rcText.left += m_stickyImage.ImageWidth() + m_windowDpi->Scale(2);
-			}
-		}
-
-		if (DrawRtfText(nItem, rcText, pDC) == FALSE)
-		{
-			auto highlightColor = CGetSetOptions::m_Theme.SearchTextHighlight();
-			//use unprintable characters so it doesn't find copied html to convert
-			if (m_searchText.GetLength() > 0 &&
-				FindNoCaseAndInsert(csText, m_searchText, StrF(_T("\x01\x04 color='#%02x%02x%02x'\x02"), GetRValue(highlightColor), GetGValue(highlightColor), GetBValue(highlightColor)), _T("\x01\x03\x04\x02"), m_linesPerRow) > 0)
-			{
-				DrawHTML(pDC->m_hDC, csText, csText.GetLength(), rcText, DT_VCENTER | DT_EXPANDTABS | DT_NOPREFIX);
-			}
-			else
-			{
-				pDC->DrawText(csText, rcText, DT_VCENTER | DT_EXPANDTABS | DT_NOPREFIX);
-			}
-		}
-
-		// Draw a focus rect around the item if necessary.
-		//if(bListHasFocus && (rItem.state & LVIS_FOCUSED))
-		//	pDC->DrawFocusRect(rcItem);
-
-		if (m_bShowTextForFirstTenHotKeys && firstTenNum >= 0)
-		{
-			CString cs;
-			if (firstTenNum == 10)
-				cs = "0";
-			else
-				cs.Format(_T("%d"), firstTenNum);
-
-			CRect crClient;
-
-			GetWindowRect(crClient);
-			ScreenToClient(crClient);
-
-			CRect crHotKey = rcItem;
-
-			int extraFromClipWasPaste = 0;
-			if (m_showIfClipWasPasted)
-				extraFromClipWasPaste = 3;
-
-			crHotKey.right = crHotKey.left + m_windowDpi->Scale(11);
-			crHotKey.left += m_windowDpi->Scale(1 + extraFromClipWasPaste);
-			crHotKey.top += m_windowDpi->Scale(1 + extraFromClipWasPaste);
-
-			HFONT hOldFont = (HFONT)pDC->SelectObject(m_SmallFont);
-			COLORREF localOldTextColor = pDC->SetTextColor(CGetSetOptions::m_Theme.ListSmallQuickPasteIndexColor());
-
-			CPen pen(PS_SOLID, 0, CGetSetOptions::m_Theme.ListSmallQuickPasteIndexColor());
-			CPen* pOldPen = pDC->SelectObject(&pen);
-
-			pDC->DrawText(cs, crHotKey, DT_BOTTOM);
-
-			pDC->MoveTo(CPoint(rcItem.left + m_windowDpi->Scale(8 + extraFromClipWasPaste), rcItem.top));
-			pDC->LineTo(CPoint(rcItem.left + m_windowDpi->Scale(8 + extraFromClipWasPaste), rcItem.bottom));
-
-			pDC->SelectObject(hOldFont);
-			pDC->SetTextColor(localOldTextColor);
-			pDC->SelectObject(pOldPen);
-		}
-
-		// restore the previous values		
-		if (OldColor > -1)
-			pDC->SetTextColor(OldColor);
-
-		if (nOldBKMode > -1)
-			pDC->SetBkMode(nOldBKMode);
-
-		*pResult = CDRF_SKIPDEFAULT;    // We've painted everything.
-	}
-}
-
-void CQListCtrl::DrawCopiedColorCode(CString& csText, CRect& rcText, CDC* pDC)
+void CQListCtrl::DrawCopiedColorCode(CString& csText, CRect& rcText, HDC hDC)
 {
 	if (CGetSetOptions::m_bDrawCopiedColorCode == FALSE)
 		return;
@@ -692,7 +458,7 @@ void CQListCtrl::DrawCopiedColorCode(CString& csText, CRect& rcText, CDC* pDC)
 			CRect pastedRect(rcText);
 			pastedRect.right = pastedRect.left + m_windowDpi->Scale(rcText.Height());
 
-			pDC->FillSolidRect(pastedRect, COLORREF(RGB(r, g, b)));
+			CDCHandle(hDC).FillSolidRect(pastedRect, RGB(r, g, b));
 
 			rcText.left += m_windowDpi->Scale(rcText.Height());
 			rcText.left += m_windowDpi->Scale(ROW_LEFT_BORDER);
@@ -718,7 +484,7 @@ void CQListCtrl::DrawCopiedColorCode(CString& csText, CRect& rcText, CDC* pDC)
 					CRect pastedRect(rcText);
 					pastedRect.right = pastedRect.left + m_windowDpi->Scale(rcText.Height());
 
-					pDC->FillSolidRect(pastedRect, COLORREF(RGB(r, g, b)));
+					CDCHandle(hDC).FillSolidRect(pastedRect, RGB(r, g, b));
 
 					rcText.left += m_windowDpi->Scale(rcText.Height());
 					rcText.left += m_windowDpi->Scale(ROW_LEFT_BORDER);
@@ -728,7 +494,7 @@ void CQListCtrl::DrawCopiedColorCode(CString& csText, CRect& rcText, CDC* pDC)
 	}
 }
 
-BOOL CQListCtrl::DrawRtfText(int nItem, CRect &crRect, CDC *pDC)
+BOOL CQListCtrl::DrawRtfText(int nItem, CRect &crRect, HDC hDC)
 {
 	if (CGetSetOptions::m_bDrawRTF == FALSE)
 		return FALSE;
@@ -751,9 +517,9 @@ BOOL CQListCtrl::DrawRtfText(int nItem, CRect &crRect, CDC *pDC)
 
 	if (m_rtfFormater.m_hWnd == NULL)
 	{
-		m_rtfFormater.Create(_T(""), _T(""), WS_CHILD | WS_VSCROLL |
-			WS_HSCROLL | ES_MULTILINE | ES_AUTOVSCROLL | ES_NOHIDESEL |
-			ES_AUTOHSCROLL, CRect(0, 0, 0, 0), this, -1);
+		m_rtfFormater.Create(m_hWnd, -1,
+			WS_CHILD | WS_VSCROLL | WS_HSCROLL | ES_MULTILINE | ES_AUTOVSCROLL | ES_NOHIDESEL | ES_AUTOHSCROLL,
+			0, CRect(0, 0, 0, 0));
 	}
 
 	if (m_pFormatter)
@@ -766,7 +532,7 @@ BOOL CQListCtrl::DrawRtfText(int nItem, CRect &crRect, CDC *pDC)
 		CComBSTR bStr(betterRTF);
 		m_pFormatter->put_RTFText(bStr);
 
-		m_pFormatter->Draw(pDC->m_hDC, crRect);
+		m_pFormatter->Draw(hDC, crRect);
 
 		bRet = TRUE;
 	}
@@ -777,7 +543,7 @@ BOOL CQListCtrl::DrawRtfText(int nItem, CRect &crRect, CDC *pDC)
 // DrawBitMap loads a DIB from the DB, draws a crRect thumbnail of the image
 //  to pDC and caches that thumbnail as a DIB in m_ThumbNails[ ItemID ].
 // ALL items are cached in m_ThumbNails (those without images are cached with NULL m_hgData)
-BOOL CQListCtrl::DrawBitMap(int nItem, CRect &crRect, CDC *pDC, const CString &csDescription)
+BOOL CQListCtrl::DrawBitMap(int nItem, CRect &crRect, HDC hDC, const CString &csDescription)
 {
 	if (CGetSetOptions::m_bDrawThumbnail == FALSE)
 		return FALSE;
@@ -785,12 +551,12 @@ BOOL CQListCtrl::DrawBitMap(int nItem, CRect &crRect, CDC *pDC, const CString &c
 	CClipFormatQListCtrl *format = GetItem_CF_DIB_ClipFormat(nItem);
 	if (format != NULL)
 	{
-		HGLOBAL smallImage = format->GetDibFittingToHeight(pDC->m_hDC, crRect.Height());
+		HGLOBAL smallImage = format->GetDibFittingToHeight(hDC, crRect.Height());
 		if (smallImage != NULL)
 		{
 			//Will return the width of the bitmap in nWidth
 			int nWidth = 0;
-			if (CBitmapHelper::DrawDIB(pDC->m_hDC, smallImage, crRect.left, crRect.top, nWidth))
+			if (CBitmapHelper::DrawDIB(hDC, smallImage, crRect.left, crRect.top, nWidth))
 			{
 				// adjust the rect so other information can be drawn next to the thumbnail
 				crRect.left += nWidth + 3;
@@ -817,51 +583,41 @@ void CQListCtrl::RefreshRow(int row)
 	RedrawItems(row, row);
 }
 
-LRESULT CQListCtrl::OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags, BOOL& bHandled)
+LRESULT CQListCtrl::OnSysKeyDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	CListCtrl::OnSysKeyDown(nChar, nRepCnt, nFlags);
+	bHandled = FALSE;
+	return 0;
 }
 
-BOOL CQListCtrl::OnEraseBkgnd(CDCHandle dc)
+LRESULT CQListCtrl::OnEraseBkgnd(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
+	CDCHandle dc((HDC)wParam);
 
 	CRect rect;
 	GetClientRect(&rect);
-	CBrush myBrush(CGetSetOptions::m_Theme.MainWindowBG());    // dialog background color
-	CBrush *pOld = pDC->SelectObject(&myBrush);
-	BOOL bRes = pDC->PatBlt(0, 0, rect.Width(), rect.Height(), PATCOPY);
-	pDC->SelectObject(pOld);    // restore old brush
-	return bRes;                       // CDialog::OnEraseBkgnd(pDC);
+	CBrush brush;
+	brush.CreateSolidBrush(CGetSetOptions::m_Theme.MainWindowBG());
+	HBRUSH hOldBrush = dc.SelectBrush(brush);
+	BOOL bRes = dc.PatBlt(0, 0, rect.Width(), rect.Height(), PATCOPY);
+	dc.SelectBrush(hOldBrush);
 
-	// Simply returning TRUE seems OK since we do custom item
-	//	painting.  However, there is a pixel buffer around the
-	//	border of this control (not within the item rects)
-	//	which becomes visually corrupt if it is not erased.
-
-	// In most cases, I do not notice the erasure, so I have kept
-	//	the call to CListCtrl::OnEraseBkgnd(pDC);
-
-	// However, for some reason, bulk erasure is very noticeable when
-	//	shift-scrolling the page to select a block of items, so
-	//	I made a special case for that:
-	//if(GetSelectedCount() >= 2)
-	//	return TRUE;
-	//return CListCtrl::OnEraseBkgnd(pDC);
+	return bRes;
 }
 
-LRESULT CQListCtrl::OnToolTipText(int id, LPNMHDR pNMHDR, BOOL& bHandled)
+LRESULT CQListCtrl::OnToolTipText(LPNMHDR pNMHDR)
 {
-	TOOLTIPTEXTA* pTTTA = (TOOLTIPTEXTA*)pNMHDR;
 	TOOLTIPTEXTW* pTTTW = (TOOLTIPTEXTW*)pNMHDR;
 	CString strTipText;
 
-	UINT_PTR nID = pNMHDR->idFrom;
+	LVHITTESTINFO hitTest = { };
+	POINT ptCursor = { GET_X_LPARAM(::GetMessagePos()), GET_Y_LPARAM(::GetMessagePos()) };
+	::ScreenToClient(m_hWnd, &ptCursor);
+	hitTest.pt = ptCursor;
 
-	if (nID == 0)
-	{
-		bHandled = FALSE;
+	int nID = (int)::SendMessage(m_hWnd, LVM_HITTEST, 0, (LPARAM)&hitTest);
+
+	if (nID < 0)
 		return 0;
-	}
 
 	::SendMessage(pNMHDR->hwndFrom, TTM_SETMAXTIPWIDTH, 0, 500);
 
@@ -870,61 +626,27 @@ LRESULT CQListCtrl::OnToolTipText(int id, LPNMHDR pNMHDR, BOOL& bHandled)
 		::SendMessage(pNMHDR->hwndFrom, TTM_SETDELAYTIME, TTDT_AUTOPOP, MAKELPARAM(CGetSetOptions::m_tooltipTimeout, 0));
 	}
 
-	// Use Item's name as the tool tip. Change this for something different.
-	// Like use its file size, etc.
-	GetToolTipText((int)nID - 1, strTipText);
+	GetToolTipText(nID, strTipText);
 
 	//Replace the tabs with spaces, the tooltip didn't like the \t s
 	strTipText.Replace(_T("\t"), _T("  "));
 
 	int nLength = strTipText.GetLength() + 2;
 
-#ifndef _UNICODE
-	if (pNMHDR->code == TTN_NEEDTEXTA)
+	if (pNMHDR->code == TTN_NEEDTEXTW)
 	{
-		if (m_pchTip != NULL)
-			delete m_pchTip;
+		int nLength = strTipText.GetLength() + 2;
 
-		m_pchTip = new TCHAR[nLength];
-		lstrcpyn(m_pchTip, strTipText, nLength - 1);
-		m_pchTip[nLength - 1] = 0;
-		pTTTW->lpszText = (WCHAR*)m_pchTip;
-	}
-	else
-	{
 		if (m_pwchTip != NULL)
 			delete m_pwchTip;
 
 		m_pwchTip = new WCHAR[nLength];
-		_mbstowcsz(m_pwchTip, strTipText, nLength - 1);
-		m_pwchTip[nLength - 1] = 0; // end of text
-		pTTTW->lpszText = (WCHAR*)m_pwchTip;
-	}
-#else
-	if (pNMHDR->code == TTN_NEEDTEXTA)
-	{
-		if (m_pchTip != NULL)
-			delete m_pchTip;
-
-		m_pchTip = new TCHAR[nLength];
-		STRNCPY(m_pchTip, strTipText, nLength - 1);
-		m_pchTip[nLength - 1] = 0; // end of text
-		pTTTW->lpszText = (LPTSTR)m_pchTip;
-	}
-	else
-	{
-		if (m_pwchTip != NULL)
-			delete m_pwchTip;
-
-		m_pwchTip = new WCHAR[nLength];
-		lstrcpyn(m_pwchTip, strTipText, nLength - 1);
+		::lstrcpynW(m_pwchTip, strTipText, nLength);
 		m_pwchTip[nLength - 1] = 0;
-		pTTTW->lpszText = (LPTSTR)m_pwchTip;
+		pTTTW->lpszText = m_pwchTip;
 	}
-#endif
-	*pResult = 0;
 
-	return TRUE;    // message was handled
+	return 0;
 }
 
 INT_PTR CQListCtrl::OnToolHitTest(CPoint point, TOOLINFO * pTI) const
@@ -957,25 +679,31 @@ INT_PTR CQListCtrl::OnToolHitTest(CPoint point, TOOLINFO * pTI) const
 	return -1;
 }
 
-LRESULT CQListCtrl::OnCreate(LPCREATESTRUCT lpCreateStruct)
+LRESULT CQListCtrl::OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	if (CListCtrl::OnCreate(lpCreateStruct) == -1)
-		return -1;
-
-	if (CGetSetOptions::m_tooltipTimeout > 0 ||
-		CGetSetOptions::m_tooltipTimeout == -1)
+	if (::IsWindow(m_toolTip.m_hWnd) == FALSE)
 	{
-		EnableToolTips();
+		m_toolTip.Create(m_hWnd, NULL, NULL,
+			WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | TTS_ALWAYSTIP | TTS_NOPREFIX);
+	}
+
+	if (CGetSetOptions::m_tooltipTimeout != 0)
+	{
+		m_toolTip.SetMaxTipWidth(500);
+		if (CGetSetOptions::m_tooltipTimeout > 0)
+			m_toolTip.SetDelayTime(TTDT_AUTOPOP, CGetSetOptions::m_tooltipTimeout * 1000);
+		m_toolTip.Activate(TRUE);
+		// one subclassed tool for the whole control, the item under the cursor is resolved on TTN_NEEDTEXT
+		m_toolTip.AddTool(m_hWnd, LPSTR_TEXTCALLBACK);
 	}
 	else
 	{
-		EnableToolTips(FALSE);
+		m_toolTip.Activate(FALSE);
 	}
 
-	//m_pToolTip = new CToolTipEx;
-	//m_pToolTip->Create(this);
-
-	//m_pToolTip->SetNotifyWnd(GetParent());
+	// This window is a superclass of SysListView32, so WM_CREATE has to reach the
+	// original list-view window proc as well, otherwise the control stays uninitialised.
+	bHandled = FALSE;
 
 	return 0;
 }
@@ -999,11 +727,11 @@ BOOL CQListCtrl::PreTranslateMessage(MSG* pMsg)
 		default:
 			if (a.RefId == CHotKey::PASTE_OPEN_CLIP)
 			{
-				GetParent()->SendMessage(NM_SELECT_DB_ID, a.Cmd, 0);
+				GetParent().SendMessage(NM_SELECT_DB_ID, a.Cmd, 0);
 			}
 			else if (a.RefId == CHotKey::MOVE_TO_GROUP)
 			{
-				GetParent()->SendMessage(NM_MOVE_TO_GROUP, a.Cmd, 0);
+				GetParent().SendMessage(NM_MOVE_TO_GROUP, a.Cmd, 0);
 			}
 		}
 
@@ -1030,7 +758,7 @@ BOOL CQListCtrl::PreTranslateMessage(MSG* pMsg)
 		break;
 	} // end switch(pMsg->message)
 
-	return CListCtrl::PreTranslateMessage(pMsg);
+	return FALSE;
 }
 
 BOOL CQListCtrl::HandleKeyDown(WPARAM wParam, LPARAM lParam)
@@ -1065,7 +793,7 @@ BOOL CQListCtrl::HandleKeyDown(WPARAM wParam, LPARAM lParam)
 
 		if (GetKeyState(VK_SHIFT) & 0x8000)
 		{
-			int pos = (int)GetFirstSelectedItemPosition();
+			int pos = GetNextItem(-1, LVNI_SELECTED) + 1;
 			if (pos >= 0 && pos < GetItemCount())
 			{
 				for (int i = 0; i < pos; i++)
@@ -1115,7 +843,7 @@ bool CQListCtrl::PostEventLoadedCheckDescription(int updatedRow)
 
 bool CQListCtrl::ShowFullDescription(bool bFromAuto, bool fromNextPrev)
 {
-	if (this->GetSelectedCount() == 0)
+	if (ListView_GetSelectedCount(m_hWnd) == 0)
 	{
 		return false;
 	}
@@ -1168,8 +896,8 @@ bool CQListCtrl::ShowFullDescription(bool bFromAuto, bool fromNextPrev)
 
 		m_pToolTip = new CToolTipEx;
 		m_pToolTip->Create(this);
-		m_toolTipHwnd = m_pToolTip->GetSafeHwnd();
-		m_pToolTip->SetNotifyWnd(GetParent());
+		m_toolTipHwnd = m_pToolTip->m_hWnd;
+		m_pToolTip->SetNotifyWnd(GetParent().m_hWnd);
 	}
 	else if (VALID_TOOLTIP)
 	{
@@ -1346,21 +1074,21 @@ bool CQListCtrl::ShowFullDescription(bool bFromAuto, bool fromNextPrev)
 
 void CQListCtrl::GetToolTipText(int nItem, CString &csText)
 {
-	CWnd* pParent = GetParent();
-	if (pParent && (pParent->GetSafeHwnd() != NULL))
+	CWindow pParent = GetParent();
+	if (pParent.m_hWnd != NULL)
 	{
 		CQListToolTipText info;
 		memset(&info, 0, sizeof(info));
 		info.hdr.code = NM_GETTOOLTIPTEXT;
-		info.hdr.hwndFrom = GetSafeHwnd();
-		info.hdr.idFrom = GetDlgCtrlID();
+		info.hdr.hwndFrom = m_hWnd;
+		info.hdr.idFrom = ::GetDlgCtrlID(m_hWnd);
 		info.lItem = nItem;
 		//plus 100 for extra info - shortcut and such
 		int maxCharacters = CGetSetOptions::GetMaxToolTipCharacters();
 		info.cchTextMax = min(maxCharacters, CGetSetOptions::m_bDescTextSize) + 200;
 		info.pszText = csText.GetBufferSetLength(info.cchTextMax);
 
-		pParent->SendMessage(WM_NOTIFY, (WPARAM)info.hdr.idFrom, (LPARAM)&info);
+		pParent.SendMessage(WM_NOTIFY, (WPARAM)info.hdr.idFrom, (LPARAM)&info);
 
 		csText.ReleaseBuffer();
 	}
@@ -1375,46 +1103,46 @@ DWORD CQListCtrl::GetItemData(int nItem)
 {
 	if ((GetStyle() & LVS_OWNERDATA))
 	{
-		CWnd* pParent = GetParent();
-		if (pParent && (pParent->GetSafeHwnd() != NULL))
+		CWindow pParent = GetParent();
+		if (pParent.m_hWnd != NULL)
 		{
 			LV_DISPINFO info;
 			memset(&info, 0, sizeof(info));
 			info.hdr.code = LVN_GETDISPINFO;
-			info.hdr.hwndFrom = GetSafeHwnd();
-			info.hdr.idFrom = GetDlgCtrlID();
+			info.hdr.hwndFrom = m_hWnd;
+			info.hdr.idFrom = ::GetDlgCtrlID(m_hWnd);
 
 			info.item.iItem = nItem;
 			info.item.lParam = -1;
 			info.item.mask = LVIF_PARAM;
 
-			pParent->SendMessage(WM_NOTIFY, (WPARAM)info.hdr.idFrom, (LPARAM)&info);
+			pParent.SendMessage(WM_NOTIFY, (WPARAM)info.hdr.idFrom, (LPARAM)&info);
 
 			return (DWORD)info.item.lParam;
 		}
 	}
 
-	return (DWORD)CListCtrl::GetItemData(nItem);
+	return (DWORD)WTL::CListViewCtrl::GetItemData(nItem);
 }
 
 CClipFormatQListCtrl* CQListCtrl::GetItem_CF_DIB_ClipFormat(int nItem)
 {
 	CClipFormatQListCtrl *format = NULL;
 
-	CWnd* pParent = GetParent();
-	if (pParent && (pParent->GetSafeHwnd() != NULL))
+	CWindow pParent = GetParent();
+	if (pParent.m_hWnd != NULL)
 	{
 		LV_DISPINFO info;
 		memset(&info, 0, sizeof(info));
 		info.hdr.code = LVN_GETDISPINFO;
-		info.hdr.hwndFrom = GetSafeHwnd();
-		info.hdr.idFrom = GetDlgCtrlID();
+		info.hdr.hwndFrom = m_hWnd;
+		info.hdr.idFrom = ::GetDlgCtrlID(m_hWnd);
 
 		info.item.iItem = nItem;
 		info.item.lParam = NULL;
 		info.item.mask = LVIF_CF_DIB;
 
-		pParent->SendMessage(WM_NOTIFY, (WPARAM)info.hdr.idFrom, (LPARAM)&info);
+		pParent.SendMessage(WM_NOTIFY, (WPARAM)info.hdr.idFrom, (LPARAM)&info);
 
 		if (info.item.lParam != NULL)
 		{
@@ -1429,20 +1157,20 @@ CClipFormatQListCtrl* CQListCtrl::GetItem_CF_RTF_ClipFormat(int nItem)
 {
 	CClipFormatQListCtrl *format = NULL;
 
-	CWnd* pParent = GetParent();
-	if (pParent && (pParent->GetSafeHwnd() != NULL))
+	CWindow pParent = GetParent();
+	if (pParent.m_hWnd != NULL)
 	{
 		LV_DISPINFO info;
 		memset(&info, 0, sizeof(info));
 		info.hdr.code = LVN_GETDISPINFO;
-		info.hdr.hwndFrom = GetSafeHwnd();
-		info.hdr.idFrom = GetDlgCtrlID();
+		info.hdr.hwndFrom = m_hWnd;
+		info.hdr.idFrom = ::GetDlgCtrlID(m_hWnd);
 
 		info.item.iItem = nItem;
 		info.item.lParam = NULL;
 		info.item.mask = LVIF_CF_RICHTEXT;
 
-		pParent->SendMessage(WM_NOTIFY, (WPARAM)info.hdr.idFrom, (LPARAM)&info);
+		pParent.SendMessage(WM_NOTIFY, (WPARAM)info.hdr.idFrom, (LPARAM)&info);
 
 		if (info.item.lParam != NULL)
 		{
@@ -1451,11 +1179,6 @@ CClipFormatQListCtrl* CQListCtrl::GetItem_CF_RTF_ClipFormat(int nItem)
 	}
 
 	return format;
-}
-
-void CQListCtrl::OnHScroll(int nSBCode, short nPos, CScrollBar pScrollBar)
-{
-	CListCtrl::OnHScroll(nSBCode, nPos, pScrollBar);
 }
 
 void CQListCtrl::DestroyAndCreateAccelerator(BOOL bCreate, CppSQLite3DB &db)
@@ -1500,31 +1223,29 @@ void CQListCtrl::LoadDittoCopyBufferHotkeys()
 	}
 }
 
-LRESULT CQListCtrl::OnKillFocus(CWnd* pNewWnd)
+LRESULT CQListCtrl::OnKillFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	CListCtrl::OnKillFocus(pNewWnd);
-
 	//if(FocusOnToolTip() == FALSE)
 		//m_pToolTip->Hide();
+	return 0;
 }
 
 HWND CQListCtrl::GetToolTipHWnd()
 {
 	if (VALID_TOOLTIP)
-		return m_pToolTip->GetSafeHwnd();
+		return m_pToolTip->m_hWnd;
 
 	return NULL;
 }
 
 BOOL CQListCtrl::SetItemCountEx(int iCount, DWORD dwFlags /* = 0 */)
 {
-	return CListCtrl::SetItemCountEx(iCount, dwFlags);
+	return (BOOL)::SendMessage(m_hWnd, LVM_SETITEMCOUNT, iCount, dwFlags);
 }
 
-LRESULT CQListCtrl::OnSelectionChange(int, LPNMHDR pNMHDR, BOOL& bHandled)
+LRESULT CQListCtrl::OnSelectionChange(LPNMHDR pNMHDR)
 {
 	NMLISTVIEW *pnmv = (NMLISTVIEW *)pNMHDR;
-	bHandled = FALSE;
 
 	if ((pnmv->uNewState == 3) ||
 		(pnmv->uNewState == 1))
@@ -1539,17 +1260,17 @@ LRESULT CQListCtrl::OnSelectionChange(int, LPNMHDR pNMHDR, BOOL& bHandled)
 			KillTimer(TIMER_SHOW_PROPERTIES);
 			SetTimer(TIMER_SHOW_PROPERTIES, 300, NULL);
 		}
-		if (GetSelectedCount() > 0)
+		if (ListView_GetSelectedCount(m_hWnd) > 0)
 			theApp.SetStatus(NULL, FALSE);
 	}
 
-	if (GetSelectedCount() == this->GetItemCount())
+	if (ListView_GetSelectedCount(m_hWnd) == this->GetItemCount())
 	{
 		if (m_allSelected == false)
 		{
 			Log(StrF(_T("List box Select All")));
 
-			GetParent()->SendMessage(NM_ALL_SELECTED, 0, 0);
+			GetParent().SendMessage(NM_ALL_SELECTED, 0, 0);
 			m_allSelected = true;
 		}
 	}
@@ -1558,10 +1279,13 @@ LRESULT CQListCtrl::OnSelectionChange(int, LPNMHDR pNMHDR, BOOL& bHandled)
 		Log(StrF(_T("List box REMOVED Select All")));
 		m_allSelected = false;
 	}
+
+	return 0;
 }
 
-void CQListCtrl::OnTimer(UINT_PTR nIDEvent)
+LRESULT CQListCtrl::OnTimer(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
+	UINT_PTR nIDEvent = (UINT_PTR)wParam;
 	//http://support.microsoft.com/kb/200054
 	//OnTimer() Is Not Called Repeatedly for a List Control
 	bool callBase = true;
@@ -1615,7 +1339,7 @@ void CQListCtrl::OnTimer(UINT_PTR nIDEvent)
 		if (MouseInScrollBarArea(crWindow, cursorPos))
 		{
 			m_timerToHideScrollAreaSet = true;
-			GetParent()->SendMessage(NM_SHOW_HIDE_SCROLLBARS, 1, 0);
+			GetParent().SendMessage(NM_SHOW_HIDE_SCROLLBARS, 1, 0);
 
 			//Start looking to hide the scroll bars
 			SetTimer(TIMER_HIDE_SCROL, 1000, NULL);
@@ -1629,9 +1353,9 @@ void CQListCtrl::OnTimer(UINT_PTR nIDEvent)
 	}
 
 	if (callBase)
-	{
-		CListCtrl::OnTimer(nIDEvent);
-	}
+		bHandled = FALSE;
+
+	return 0;
 }
 
 void CQListCtrl::SetLogFont(LOGFONT &font)
@@ -1643,44 +1367,29 @@ void CQListCtrl::SetLogFont(LOGFONT &font)
 	font.lfWeight = 600;
 	m_boldFont.CreateFontIndirect(&font);
 
-	SetFont(&m_Font);
+	SetFont(m_Font);
 }
 
-void CQListCtrl::OnVScroll(int nSBCode, short nPos, CScrollBar pScrollBar)
+LRESULT CQListCtrl::OnOdCacheHint(LPNMHDR pNMHDR)
 {
-	CListCtrl::OnVScroll(nSBCode, nPos, pScrollBar);
-}
+	NMLVCACHEHINT* pcachehint = (NMLVCACHEHINT*)pNMHDR;
 
-BOOL CQListCtrl::OnChildNotify(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pLResult)
-{
-	NMLVCACHEHINT* pcachehint = NULL;
-
-	if (message == WM_NOTIFY)
-	{
-		NMHDR* phdr = (NMHDR*)lParam;
-
-		switch (phdr->code)
-		{
-		case LVN_ODCACHEHINT:
-			pcachehint = (NMLVCACHEHINT*)phdr;
-
-			GetParent()->SendMessage(NM_FILL_REST_OF_LIST, pcachehint->iFrom, pcachehint->iTo);
-			return FALSE;
-		}
-	}
-
-	return CListCtrl::OnChildNotify(message, wParam, lParam, pLResult);
+	GetParent().SendMessage(NM_FILL_REST_OF_LIST, pcachehint->iFrom, pcachehint->iTo);
+	return 0;
 }
 
 BOOL CQListCtrl::OnItemDeleted(long lID)
 {
-	BOOL bRet2 = m_RTFData.RemoveKey(lID);
+	m_RTFData.RemoveKey(lID);
+	BOOL bRet2 = TRUE;
 
 	return (bRet2);
 }
 
-LRESULT CQListCtrl::OnMouseMove(UINT nFlags, CPoint point)
+LRESULT CQListCtrl::OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
+	UINT nFlags = (UINT)wParam;
+	CPoint point(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 	if (CGetSetOptions::m_showScrollBar == FALSE)
 	{
 		CPoint cursorPos;
@@ -1712,7 +1421,9 @@ LRESULT CQListCtrl::OnMouseMove(UINT nFlags, CPoint point)
 		}
 	}
 
-	CListCtrl::OnMouseMove(nFlags, point);
+	bHandled = FALSE;
+
+	return 0;
 }
 
 bool CQListCtrl::MouseInScrollBarArea(CRect crWindow, CPoint point)
@@ -1737,7 +1448,7 @@ bool CQListCtrl::MouseInScrollBarArea(CRect crWindow, CPoint point)
 
 void CQListCtrl::StopHideScrollBarTimer()
 {
-	GetParent()->SendMessage(NM_SHOW_HIDE_SCROLLBARS, 0, 0);
+	GetParent().SendMessage(NM_SHOW_HIDE_SCROLLBARS, 0, 0);
 
 	m_timerToHideScrollAreaSet = false;
 	KillTimer(TIMER_HIDE_SCROL);
@@ -1878,8 +1589,9 @@ void CQListCtrl::CreateSmallFont()
 	m_SmallFont = ::CreateFontIndirect(&lf);
 }
 
-LRESULT CQListCtrl::OnMouseHWheel(UINT nFlags, short zDelta, CPoint pt)
+LRESULT CQListCtrl::OnMouseHWheel(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
+	short zDelta = (short)HIWORD(wParam);
 	if (zDelta < 0)
 	{
 		this->SendMessage(WM_HSCROLL, SB_LINERIGHT, NULL);
@@ -1889,5 +1601,5 @@ LRESULT CQListCtrl::OnMouseHWheel(UINT nFlags, short zDelta, CPoint pt)
 		this->SendMessage(WM_HSCROLL, SB_LINELEFT, NULL);
 	}
 
-	//CListCtrl::OnMouseHWheel(nFlags, zDelta, pt);
+	return 0;
 }

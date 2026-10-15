@@ -89,8 +89,9 @@ public:
 	bool m_buttonDownOnCaption;
 
 	CRect m_crFullSizeWindow;
-	COleDateTime m_TimeMinimized;
-	COleDateTime m_TimeMaximized;
+	// seconds since epoch, set when the caption is collapsed so the hover
+	// timer can tell how long the window has been minimized
+	time_t m_TimeMinimized;
 
 
 	CDPI m_dpi;

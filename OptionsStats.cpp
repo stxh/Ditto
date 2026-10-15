@@ -43,7 +43,7 @@ COptionsStats::COptionsStats()
 // COptionsStats message handlers
 
 
-BOOL COptionsStats::OnInitDialog() 
+LRESULT COptionsStats::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) 
 {
 	// Convert time_t values to SYSTEMTIME for display
 	time_t totalDate = CGetSetOptions::GetTotalDate();
@@ -134,30 +134,30 @@ BOOL COptionsStats::OnInitDialog()
 	m_eDatabaseSize = szFileSize;
 
 	// Set the values to the controls
-	CWnd* pWnd = GetDlgItem(IDC_ALL_COPIES);
-	if (pWnd) pWnd->SetWindowText(m_eAllCopies);
+	CWindow pWnd = GetDlgItem(IDC_ALL_COPIES);
+	if (pWnd) pWnd.SetWindowText(m_eAllCopies);
 	pWnd = GetDlgItem(IDC_ALL_PASTES);
-	if (pWnd) pWnd->SetWindowText(m_eAllPastes);
+	if (pWnd) pWnd.SetWindowText(m_eAllPastes);
 	pWnd = GetDlgItem(IDC_EDIT_ALL_DATE);
-	if (pWnd) pWnd->SetWindowText(m_eAllDate);
+	if (pWnd) pWnd.SetWindowText(m_eAllDate);
 	pWnd = GetDlgItem(IDC_TRIP_COPIES);
-	if (pWnd) pWnd->SetWindowText(m_eTripCopies);
+	if (pWnd) pWnd.SetWindowText(m_eTripCopies);
 	pWnd = GetDlgItem(IDC_TRIP_DATE);
-	if (pWnd) pWnd->SetWindowText(m_eTripDate);
+	if (pWnd) pWnd.SetWindowText(m_eTripDate);
 	pWnd = GetDlgItem(IDC_TRIP_PASTES);
-	if (pWnd) pWnd->SetWindowText(m_eTripPastes);
+	if (pWnd) pWnd.SetWindowText(m_eTripPastes);
 	pWnd = GetDlgItem(IDC_SAVED_COPIES);
-	if (pWnd) pWnd->SetWindowText(m_eSavedCopies);
+	if (pWnd) pWnd.SetWindowText(m_eSavedCopies);
 	pWnd = GetDlgItem(IDC_SAVED_COPY_DATA);
-	if (pWnd) pWnd->SetWindowText(m_eSavedCopyData);
+	if (pWnd) pWnd.SetWindowText(m_eSavedCopyData);
 	pWnd = GetDlgItem(IDC_DATABASE_SIZE);
-	if (pWnd) pWnd->SetWindowText(m_eDatabaseSize);
+	if (pWnd) pWnd.SetWindowText(m_eDatabaseSize);
 	pWnd = GetDlgItem(IDC_CLIPS_SENT);
-	if (pWnd) pWnd->SetWindowText(m_eClipsSent);
+	if (pWnd) pWnd.SetWindowText(m_eClipsSent);
 	pWnd = GetDlgItem(IDC_CLIPS_RECIVED);
-	if (pWnd) pWnd->SetWindowText(m_eClipsRecieved);
+	if (pWnd) pWnd.SetWindowText(m_eClipsRecieved);
 	pWnd = GetDlgItem(IDC_LAST_STARTED);
-	if (pWnd) pWnd->SetWindowText(m_eLastStarted);
+	if (pWnd) pWnd.SetWindowText(m_eLastStarted);
 
 	theApp.m_Language.UpdateOptionStats(m_hWnd);
 	
@@ -175,12 +175,12 @@ LRESULT COptionsStats::OnResetCounts(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*
 	m_eTripPastes.Empty();
 
 	// Update the controls directly
-	CWnd* pWnd = GetDlgItem(IDC_TRIP_DATE);
-	if (pWnd) pWnd->SetWindowText(m_eTripDate);
+	CWindow pWnd = GetDlgItem(IDC_TRIP_DATE);
+	if (pWnd) pWnd.SetWindowText(m_eTripDate);
 	pWnd = GetDlgItem(IDC_TRIP_COPIES);
-	if (pWnd) pWnd->SetWindowText(m_eTripCopies);
+	if (pWnd) pWnd.SetWindowText(m_eTripCopies);
 	pWnd = GetDlgItem(IDC_TRIP_PASTES);
-	if (pWnd) pWnd->SetWindowText(m_eTripPastes);
+	if (pWnd) pWnd.SetWindowText(m_eTripPastes);
 
 	return 0;
 }
@@ -202,8 +202,8 @@ LRESULT COptionsStats::OnRemoveAll(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hW
 				m_eDatabaseSize.Format(_T("%d KB"), (buf.st_size/1024));
 				
 				// Update the control directly
-				CWnd* pWnd = GetDlgItem(IDC_DATABASE_SIZE);
-				if (pWnd) pWnd->SetWindowText(m_eDatabaseSize);
+				CWindow pWnd = GetDlgItem(IDC_DATABASE_SIZE);
+				if (pWnd) pWnd.SetWindowText(m_eDatabaseSize);
 			}
 		}
 	}

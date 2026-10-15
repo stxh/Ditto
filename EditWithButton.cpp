@@ -36,70 +36,73 @@ void CEditWithButton::PreSubclassWindow()
 	ResizeWindow();
 }
 
-BOOL CEditWithButton::PreTranslateMessage(MSG* pMsg)
+LRESULT CEditWithButton::OnKeyDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	if (pMsg->message == WM_KEYDOWN && 
-		CONTROL_PRESSED)
+	if (uMsg == WM_KEYDOWN && CONTROL_PRESSED)
 	{
-		switch (pMsg->wParam)
+		switch (wParam)
 		{
 		case 'Z':
 			Undo();
-			return TRUE;
+			bHandled = TRUE;
+			return 0;
 		case 'X':
 			Cut();
-			return TRUE;
+			bHandled = TRUE;
+			return 0;
 		case 'C':
 			Copy();
-			return TRUE;
+			bHandled = TRUE;
+			return 0;
 		case 'V':
 			Paste();
-			return TRUE;
+			bHandled = TRUE;
+			return 0;
 		case 'A':
 			SetSel(0, -1);
-			return TRUE;
+			bHandled = TRUE;
+			return 0;
 		}
 	}
 
-	switch(pMsg->message) 
+	if (wParam == VK_RETURN)
 	{
-	case WM_KEYDOWN:
+		CWindow pWnd = GetParent();
+		if (pWnd)
 		{
-			if(pMsg->wParam == VK_RETURN)
+			if (CGetSetOptions::m_bFindAsYouType)
 			{
-				CWindow pWnd = GetParent();
-				if(pWnd)
-				{
-					if(CGetSetOptions::m_bFindAsYouType)
-					{
-						pWnd.SendMessage(NM_SEARCH_ENTER_PRESSED, 0, 0);
-					}
-					else
-					{
-						pWnd.PostMessage(CB_SEARCH, 0, 0);
-					}
-				}
-
-				return TRUE;
-			}	
-			else if (pMsg->wParam == VK_DOWN ||
-					pMsg->wParam == VK_UP ||
-					pMsg->wParam == VK_F3 ||
-					pMsg->wParam == VK_PRIOR ||
-					pMsg->wParam == VK_NEXT)
-			{
-				CWindow pWnd = GetParent();
-				if(pWnd)
-				{
-					pWnd.SendMessage(CB_UPDOWN, pMsg->wParam, pMsg->lParam);
-					return TRUE;
-				}
+				pWnd.SendMessage(NM_SEARCH_ENTER_PRESSED, 0, 0);
 			}
-			break;
+			else
+			{
+				pWnd.PostMessage(CB_SEARCH, 0, 0);
+			}
+		}
+
+		bHandled = TRUE;
+		return 0;
+	}
+
+	if (wParam == VK_DOWN ||
+		wParam == VK_UP ||
+		wParam == VK_F3 ||
+		wParam == VK_PRIOR ||
+		wParam == VK_NEXT)
+	{
+		CWindow pWnd = GetParent();
+		if (pWnd)
+		{
+			pWnd.SendMessage(CB_UPDOWN, wParam, lParam);
+			bHandled = TRUE;
+			return 0;
 		}
 	}
 
-	return CEdit::PreTranslateMessage(pMsg);
+	InvalidateRect(NULL);
+
+	bHandled = FALSE;
+	return 0;
 }
 
 BOOL CEditWithButton::SetBitmaps(UINT iEmptyEdit, UINT iFilledEdit)
@@ -165,7 +168,7 @@ LRESULT CEditWithButton::OnEraseBkgnd(UINT uMsg, WPARAM wParam, LPARAM lParam, B
 {
 	CDCHandle dc = (HDC)wParam;
 	CSize sizeBitmap;
-	CBitmap* pOldBitmap = NULL;
+	HBITMAP pOldBitmap = NULL;
 	int iTextLength = GetWindowTextLength();
 
 	CRect size;
@@ -185,11 +188,11 @@ LRESULT CEditWithButton::OnEraseBkgnd(UINT uMsg, WPARAM wParam, LPARAM lParam, B
 
 	if (iTextLength == 0)
 	{
-		pOldBitmap = dcMemory.SelectObject(&m_bmpEmptyEdit);
+		pOldBitmap = dcMemory.SelectBitmap(m_bmpEmptyEdit);
 	}
 	else
 	{
-		pOldBitmap = dcMemory.SelectObject(&m_bmpFilledEdit);
+		pOldBitmap = dcMemory.SelectBitmap(m_bmpFilledEdit);
 	}
 
 	dc.BitBlt(0,0, 50, sizeBitmap.cy, dcMemory, 
@@ -204,7 +207,7 @@ LRESULT CEditWithButton::OnEraseBkgnd(UINT uMsg, WPARAM wParam, LPARAM lParam, B
 	dc.BitBlt(size.Width()-50, 0, 50, sizeBitmap.cy, dcMemory, 
 		sizeBitmap.cx-50, 0, SRCCOPY);
 
-	dcMemory.SelectObject(pOldBitmap);
+	dcMemory.SelectBitmap(pOldBitmap);
 
 	bHandled = TRUE;
 	return TRUE;
@@ -212,14 +215,6 @@ LRESULT CEditWithButton::OnEraseBkgnd(UINT uMsg, WPARAM wParam, LPARAM lParam, B
 
 LRESULT CEditWithButton::OnChar(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	bHandled = FALSE;
-	return 0;
-}
-
-LRESULT CEditWithButton::OnKeyDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
-{
-	InvalidateRect(NULL);
-
 	bHandled = FALSE;
 	return 0;
 }
@@ -244,7 +239,7 @@ LRESULT CEditWithButton::OnLButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BO
 	{
 		if ( (GetWindowTextLength() > 0) || m_bButtonExistsAlways)
 		{
-			CWindow pOwner = GetOwner();
+			CWindow pOwner = GetParent();
 			if (pOwner)
 			{
 				pOwner.SendMessage(m_iButtonClickedMessageId, 0, 0);
@@ -283,7 +278,7 @@ LRESULT CEditWithButton::OnSetCursor(UINT uMsg, WPARAM wParam, LPARAM lParam, BO
 
 LRESULT CEditWithButton::OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	LRESULT lRes = DefWindowProc(uMsg, wParam, lParam);
+	LRESULT lRes = m_pfnSuperWindowProc(m_hWnd, uMsg, wParam, lParam);
 	if (lRes == -1)
 		return -1;
 
@@ -295,7 +290,7 @@ LRESULT CEditWithButton::OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL&
 
 LRESULT CEditWithButton::OnSetFont(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	DefWindowProc(WM_SETFONT, wParam, lParam);
+	m_pfnSuperWindowProc(m_hWnd, WM_SETFONT, wParam, lParam);
 
 	ResizeWindow();
 
@@ -305,7 +300,7 @@ LRESULT CEditWithButton::OnSetFont(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL
 
 LRESULT CEditWithButton::OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	DefWindowProc(uMsg, wParam, lParam);
+	m_pfnSuperWindowProc(m_hWnd, uMsg, wParam, lParam);
 
 	ResizeWindow();
 

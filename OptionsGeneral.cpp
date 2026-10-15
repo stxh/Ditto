@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "CP_Main.h"
 #include "OptionsGeneral.h"
 #include "InternetUpdate.h"
@@ -29,12 +29,10 @@ LRESULT COptionsGeneral::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 {
 	m_brush.CreateSolidBrush(RGB(251, 251, 251));
 
-	m_pParent = (COptionsSheet*)GetParent();
-
 	m_cbLanguage.Attach(GetDlgItem(IDC_COMBO_LANGUAGE));
 	m_ePath.Attach(GetDlgItem(IDC_PATH));
-	m_eExpireAfter.Attach(GetDlgItem(IDC_EXPIRE_AFTER));
-	m_eMaxSavedCopies.Attach(GetDlgItem(IDC_MAX_SAVED_COPIES));
+	m_eExpireAfter.SubclassWindow(GetDlgItem(IDC_EXPIRE_AFTER));
+	m_eMaxSavedCopies.SubclassWindow(GetDlgItem(IDC_MAX_SAVED_COPIES));
 	m_btExpire.Attach(GetDlgItem(IDC_EXPIRE));
 	m_btRunOnStartup.Attach(GetDlgItem(IDC_START_ON_STARTUP));
 	m_copyAppInclude.Attach(GetDlgItem(IDC_EDIT_APP_COPY_INCLUDE));
@@ -390,7 +388,7 @@ LRESULT COptionsGeneral::OnCtlColor(UINT, WPARAM wParam, LPARAM, BOOL&)
 LRESULT COptionsGeneral::OnBnClickedButtonTheme(WORD, WORD, HWND, BOOL&)
 {
 	CDimWnd dim(this->GetParent().m_hWnd);
-	CTheme theme;
+	CDittoTheme theme;
 
 	CString csTheme;
 	m_cbTheme.GetLBText(m_cbTheme.GetCurSel(), csTheme);
@@ -454,7 +452,7 @@ LRESULT COptionsGeneral::OnBnClickedButtonFont(WORD, WORD, HWND, BOOL&)
 
 	m_LogFont.lfHeight = dpi.Scale(m_LogFont.lfHeight);
 
-	CFontDialog dlg(&m_LogFont, (CF_TTONLY | CF_SCREENFONTS), 0, this);
+	CFontDialog dlg(&m_LogFont, (CF_TTONLY | CF_SCREENFONTS), 0, m_hWnd);
 	if (dlg.DoModal() == IDOK)
 	{
 		memcpy(&m_LogFont, dlg.m_cf.lpLogFont, sizeof(LOGFONT));
@@ -540,7 +538,7 @@ void COptionsGeneral::FillThemes()
 	{
 		bCont = find.FindNextFile();
 
-		CTheme theme;
+		CDittoTheme theme;
 		if (theme.Load(find.GetFileTitle(), true, false))
 		{
 			if (theme.FileVersion() >= 2 && theme.FileVersion() < 100)

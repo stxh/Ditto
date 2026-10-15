@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <atlbase.h>
 #include <atlwin.h>
@@ -25,7 +25,7 @@ public:
 	LRESULT OnRepair(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnGetPath(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 
-	int OnApply() override;
+	int OnApply();
 
 private:
 	CEdit m_ePath;

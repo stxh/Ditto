@@ -15,7 +15,7 @@ LRESULT CAddType::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bH
 {
 	
 	::CheckDlgButton(m_hWnd, IDC_RADIO_CURRENT_TYPES, BST_CHECKED);
-	OnBnClickedRadioCurrentTypes();
+	ShowCurrentTypes();
 	
 	m_lbCandidateTypes.SetFocus();
 
@@ -73,6 +73,13 @@ LRESULT CAddType::OnBnClickedRadioPrimaryTypes(WORD wNotifyCode, WORD wID, HWND 
 
 LRESULT CAddType::OnBnClickedRadioCurrentTypes(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
+	ShowCurrentTypes();
+	bHandled = TRUE;
+	return 0;
+}
+
+void CAddType::ShowCurrentTypes()
+{
 	AddCurrentClipboardTypes();
 	::ShowWindow(::GetDlgItem(m_hWnd, IDC_LIST1), SW_SHOW);
 	::ShowWindow(::GetDlgItem(m_hWnd, IDC_EDIT1), SW_HIDE);
@@ -83,8 +90,6 @@ LRESULT CAddType::OnBnClickedRadioCurrentTypes(WORD wNotifyCode, WORD wID, HWND 
 		m_lbCandidateTypes.SetSel(0);
 
 	}
-	bHandled = TRUE;
-	return 0;
 }
 
 LRESULT CAddType::OnBnClickedRadioCustomType(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
@@ -97,6 +102,13 @@ LRESULT CAddType::OnBnClickedRadioCustomType(WORD wNotifyCode, WORD wID, HWND hW
 }
 
 LRESULT CAddType::OnBnClickedAdd(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
+{
+	AddSelectedTypes();
+	bHandled = TRUE;
+	return 0;
+}
+
+void CAddType::AddSelectedTypes()
 {
 	m_csSelectedTypes.RemoveAll();
 
@@ -127,14 +139,12 @@ LRESULT CAddType::OnBnClickedAdd(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL&
 	}
 
 	EndDialog(IDOK);
-	bHandled = TRUE;
-	return 0;
 }
 
 
 LRESULT CAddType::OnLbnDblclkList(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
-	OnBnClickedAdd();
+	AddSelectedTypes();
 	bHandled = TRUE;
 	return 0;
 }

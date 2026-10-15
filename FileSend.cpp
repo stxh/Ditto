@@ -169,7 +169,7 @@ BOOL CFileSend::SendFile(CString csFile)
 					FILETIME lastAccessTime;
 					FILETIME lastWriteTime;
 
-					if (GetFileTime(file, &creationTime, &lastAccessTime, &lastWriteTime))
+					if (GetFileTime(file.m_hFile, &creationTime, &lastAccessTime, &lastWriteTime))
 					{
 						Info.m_lParameter1 = lastWriteTime.dwLowDateTime;
 						Info.m_lParameter2 = lastWriteTime.dwHighDateTime;

@@ -50,6 +50,9 @@ public:
 	HWND m_MainhWnd;
 	CMainFrame* m_pMainFrame;
 	CNoDbFrameWnd* m_pNoDbMainFrame;
+	// The loop is created in InitInstance, once the module itself is initialised,
+	// and run by wWinMain. CMainFrame::OnCreate registers on it while it is created.
+	WTL::CMessageLoop* m_pLoop;
 	void AfterMainCreate();  // called after main window creation
 	void BeforeMainClose();  // called before main window close
 

@@ -112,7 +112,7 @@ void CGdiImageDrawer::Draw(HDC hScreenDC, CDPI &dpi, HWND hWnd, int posX, int po
 		
 	dcBk.CreateCompatibleDC(clDC);
 	bmp.CreateCompatibleBitmap(clDC, 1, 1);
-	dcBk.SelectObject(&bmp);
+	dcBk.SelectBitmap(bmp);
 	dcBk.BitBlt(0, 0, 1, 1, clDC, rectWithBorder.left-1, rectWithBorder.top, SRCCOPY);
 	
 	bmp.DeleteObject();		

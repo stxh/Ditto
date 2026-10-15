@@ -2,11 +2,17 @@
 
 #include <atlctrls.h>
 
-class CSearchEditBox : public WTL::CEdit
+class CSearchEditBox : public CWindowImpl<CSearchEditBox, WTL::CEdit>
 {
 public:
+	DECLARE_WND_SUPERCLASS(_T("DittoSearchEditBox"), GetWndClassName())
+
 	CSearchEditBox();
 	~CSearchEditBox();
 
-	BOOL PreTranslateMessage(MSG* pMsg);
+	BEGIN_MSG_MAP(CSearchEditBox)
+		MESSAGE_HANDLER(WM_KEYDOWN, OnKeyDown)
+	END_MSG_MAP()
+
+	LRESULT OnKeyDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 };

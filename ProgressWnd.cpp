@@ -1,21 +1,13 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
+#include "cp_main.h"
+#include "Options.h"
 #include "ProgressWnd.h"
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-#define IDC_CANCEL   10
-#define IDC_TEXT     11
-#define IDC_PROGRESS 12
-
-LPCTSTR szSection = _T("Settings");   
-LPCTSTR szEntryX  = _T("X");
-LPCTSTR szEntryY  = _T("Y");
-
 #define _CRT_NON_CONFORMING_SWPRINTFS 1
+
+LPCTSTR szSection = _T("Settings");
+LPCTSTR szEntryX  = _T("ProgressX");
+LPCTSTR szEntryY  = _T("ProgressY");
 
 /////////////////////////////////////////////////////////////////////////////
 // CProgressWnd
@@ -25,12 +17,12 @@ CProgressWnd::CProgressWnd()
     CommonConstruct();
 }
 
-CProgressWnd::CProgressWnd(CWnd* pParent, LPCTSTR pszTitle, BOOL bSmooth /* = FALSE */)
+CProgressWnd::CProgressWnd(HWND hWndParent, LPCTSTR pszTitle, BOOL bSmooth /* = FALSE */)
 {
     CommonConstruct();
     m_strTitle = pszTitle;
 
-    Create(pParent, pszTitle, bSmooth);
+    Create(hWndParent, pszTitle, bSmooth);
 }
 
 void CProgressWnd::CommonConstruct()
@@ -46,70 +38,61 @@ void CProgressWnd::CommonConstruct()
     m_strCancelLabel = _T(" Cancel ");
     m_bCancelled     = FALSE;
     m_bModal         = FALSE;
+    m_hWndParent     = NULL;
 
     m_bPersistantPosition = TRUE;   // saves and restores position automatically
 }
 
 CProgressWnd::~CProgressWnd()
 {
-    DestroyWindow();
+    if (::IsWindow(m_hWnd))
+        DestroyWindow();
 }
 
-BOOL CProgressWnd::Create(CWnd* pParent, LPCTSTR pszTitle, BOOL bSmooth /* = FALSE */)
+BOOL CProgressWnd::Create(HWND hWndParent, LPCTSTR pszTitle, BOOL bSmooth /* = FALSE */)
 {
-    BOOL bSuccess;
-
-	m_strTitle = pszTitle;
-    // Register window class
-    CString csClassName = AfxRegisterWndClass(CS_OWNDC|CS_HREDRAW|CS_VREDRAW,
-                                              ::LoadCursor(NULL, IDC_APPSTARTING),
-                                              CBrush(::GetSysColor(COLOR_BTNFACE)));
+    m_strTitle = pszTitle;
+    m_hWndParent = hWndParent;
 
     // Get the system window message font for use in the cancel button and text area
     NONCLIENTMETRICS ncm;
     ncm.cbSize = sizeof(NONCLIENTMETRICS);
-    VERIFY(SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0));
-    m_font.CreateFontIndirect(&(ncm.lfMessageFont)); 
+    ::SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0);
+    m_font.CreateFontIndirect(&(ncm.lfMessageFont));
 
-    // If no parent supplied then try and get a pointer to it anyway
-    if (!pParent)
-        pParent = AfxGetMainWnd();
+    if (!::IsWindow(hWndParent))
+        hWndParent = ::GetActiveWindow();
 
     // Create popup window
-    //bSuccess = CreateEx(WS_EX_DLGMODALFRAME|WS_EX_TOPMOST, // Extended style
-	bSuccess = CreateEx(WS_EX_DLGMODALFRAME,
-                        csClassName,                       // Classname
-                        pszTitle,                          // Title
-                        WS_POPUP|WS_BORDER|WS_CAPTION,     // style
-                        0,0,                               // position - updated soon.
-                        390,130,                           // Size - updated soon
-                        pParent->GetSafeHwnd(),            // handle to parent
-                        0,                                 // No menu
-                        NULL);    
-    if (!bSuccess) return FALSE;
+    HWND hWnd = Create(hWndParent,
+                        CRect(0, 0, 390, 130),           // position/size - updated soon
+                        pszTitle,                         // Title
+                        WS_POPUP | WS_BORDER | WS_CAPTION,
+                        WS_EX_DLGMODALFRAME);
+    if (hWnd == NULL) return FALSE;
 
     // Now create the controls
-    CRect TempRect(0,0,10,10);
+    CRect TempRect(0, 0, 10, 10);
 
-    bSuccess = m_Text.Create(_T(""), WS_CHILD|WS_VISIBLE|SS_NOPREFIX|SS_LEFTNOWORDWRAP,
-                             TempRect, this, IDC_TEXT);
-    if (!bSuccess) return FALSE;
+    if (!m_Text.Create(m_hWnd, TempRect, _T(""),
+                       WS_CHILD | WS_VISIBLE | SS_NOPREFIX | SS_LEFTNOWORDWRAP,
+                       0, PROGRESS_IDC_TEXT))
+        return FALSE;
 
-    DWORD dwProgressStyle = WS_CHILD|WS_VISIBLE;
-#ifdef PBS_SMOOTH    
+    DWORD dwProgressStyle = WS_CHILD | WS_VISIBLE;
     if (bSmooth)
-       dwProgressStyle |= PBS_SMOOTH;
-#endif
-    bSuccess = m_wndProgress.Create(dwProgressStyle,TempRect, this, IDC_PROGRESS);
-    if (!bSuccess) return FALSE;
+        dwProgressStyle |= PBS_SMOOTH;
 
-    bSuccess = m_CancelButton.Create(m_strCancelLabel, 
-                                   WS_CHILD|WS_VISIBLE|WS_TABSTOP| BS_PUSHBUTTON, 
-                                     TempRect, this, IDC_CANCEL);
-    if (!bSuccess) return FALSE;
+    if (!m_wndProgress.Create(m_hWnd, TempRect, NULL, dwProgressStyle, 0, PROGRESS_IDC_PROGRESS))
+        return FALSE;
 
-    m_CancelButton.SetFont(&m_font, TRUE);
-    m_Text.SetFont(&m_font, TRUE);
+    if (!m_CancelButton.Create(m_hWnd, TempRect, m_strCancelLabel,
+                               WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON,
+                               0, PROGRESS_IDC_CANCEL))
+        return FALSE;
+
+    m_CancelButton.SetFont(m_font, TRUE);
+    m_Text.SetFont(m_font, TRUE);
 
     // Resize the whole thing according to the number of text lines, desired window
     // width and current font.
@@ -119,23 +102,21 @@ BOOL CProgressWnd::Create(CWnd* pParent, LPCTSTR pszTitle, BOOL bSmooth /* = FAL
     if (m_bPersistantPosition)
         GetPreviousSettings();
     else
-        CenterWindow();
+        CenterOnParent();
 
     Show();
 
     return TRUE;
 }
 
-BOOL CProgressWnd::GoModal(LPCTSTR pszTitle /*=_T("Progress")"*/, BOOL bSmooth /*=FALSE*/)
+BOOL CProgressWnd::GoModal(LPCTSTR pszTitle /*=_T("Progress")*/, BOOL bSmooth /*=FALSE*/)
 {
-    CWnd *pMainWnd = AfxGetMainWnd();
-
-    if (!::IsWindow(m_hWnd) && !Create(pMainWnd, pszTitle, bSmooth))
+    if (!::IsWindow(m_hWnd) && !Create(m_hWndParent, pszTitle, bSmooth))
         return FALSE;
 
     // Disable main window
-    if (pMainWnd)
-        pMainWnd->EnableWindow(FALSE);
+    if (::IsWindow(m_hWndParent))
+        ::EnableWindow(m_hWndParent, FALSE);
 
     // Re-enable this window
     EnableWindow(TRUE);
@@ -144,42 +125,45 @@ BOOL CProgressWnd::GoModal(LPCTSTR pszTitle /*=_T("Progress")"*/, BOOL bSmooth /
 
     return TRUE;
 }
-    
+
 void CProgressWnd::SetWindowSize(int nNumTextLines, int nWindowWidth /*=390*/)
 {
     int nMargin = 10;
     CSize EdgeSize(::GetSystemMetrics(SM_CXEDGE), ::GetSystemMetrics(SM_CYEDGE));
 
     CRect TextRect, CancelRect, ProgressRect;
-    CSize CancelSize;
+    CSize CancelSize(0, 0);
 
     // Set up a default size for the text area in case things go wrong
-    TextRect.SetRect(nMargin,nMargin, nWindowWidth-2*nMargin, 100+2*nMargin);
+    TextRect.SetRect(nMargin, nMargin, nWindowWidth - 2 * nMargin, 100 + 2 * nMargin);
 
     // Get DrawText to tell us how tall the text area will be (while we're at
     // it, we'll see how big the word "Cancel" is)
-    CDC* pDC = GetDC();
-    if (pDC) {
-        CFont* pOldFont = pDC->SelectObject(&m_font);
+    CDCHandle dc = GetDC();
+    if (dc) {
+        HFONT hOldFont = dc.SelectFont(m_font);
         CString str = _T("M");
-        for (int i = 0; i < nNumTextLines-1; i++) str += _T("\nM");
-        pDC->DrawText(str, TextRect, DT_CALCRECT|DT_NOCLIP|DT_NOPREFIX);
+        for (int i = 0; i < nNumTextLines - 1; i++) str += _T("\nM");
+        dc.DrawText(str, str.GetLength(), TextRect, DT_CALCRECT | DT_NOCLIP | DT_NOPREFIX);
         TextRect.right = TextRect.left + nWindowWidth;
-        CancelSize = pDC->GetTextExtent(m_strCancelLabel + _T("  ")) +
-                                             CSize(EdgeSize.cx*4, EdgeSize.cy*3);
-        pDC->SelectObject(pOldFont);
-        ReleaseDC(pDC);
-    }
-    
-    // Work out how big (and where) the cancel button should be
-    CancelRect.SetRect(TextRect.right-CancelSize.cx, TextRect.bottom+nMargin, 
-                       TextRect.right, TextRect.bottom+nMargin + CancelSize.cy);
 
+        CString strCancel = m_strCancelLabel + _T("  ");
+        CSize textSize(0, 0);
+        dc.GetTextExtent(strCancel, strCancel.GetLength(), &textSize);
+        CancelSize.cx = textSize.cx + EdgeSize.cx * 4;
+        CancelSize.cy = textSize.cy + EdgeSize.cy * 3;
+
+        dc.SelectFont(hOldFont);
+        ReleaseDC(dc);
+    }
+
+    // Work out how big (and where) the cancel button should be
+    CancelRect.SetRect(TextRect.right - CancelSize.cx, TextRect.bottom + nMargin,
+                       TextRect.right, TextRect.bottom + nMargin + CancelSize.cy);
 
     // Work out how big (and where) the progress control should be
-    ProgressRect.SetRect(TextRect.left, CancelRect.top + EdgeSize.cy, 
-                         CancelRect.left-nMargin, CancelRect.bottom - EdgeSize.cy);
-
+    ProgressRect.SetRect(TextRect.left, CancelRect.top + EdgeSize.cy,
+                         CancelRect.left - nMargin, CancelRect.bottom - EdgeSize.cy);
 
     // Resize the main window to fit the controls
     CSize ClientSize(nMargin + TextRect.Width() + nMargin,
@@ -187,8 +171,8 @@ void CProgressWnd::SetWindowSize(int nNumTextLines, int nWindowWidth /*=390*/)
 
     CRect WndRect, ClientRect;
     GetWindowRect(WndRect); GetClientRect(ClientRect);
-    WndRect.right = WndRect.left + WndRect.Width()-ClientRect.Width()+ClientSize.cx;
-    WndRect.bottom = WndRect.top + WndRect.Height()-ClientRect.Height()+ClientSize.cy;
+    WndRect.right = WndRect.left + WndRect.Width() - ClientRect.Width() + ClientSize.cx;
+    WndRect.bottom = WndRect.top + WndRect.Height() - ClientRect.Height() + ClientSize.cy;
     MoveWindow(WndRect);
 
     // Now reposition the controls...
@@ -197,20 +181,20 @@ void CProgressWnd::SetWindowSize(int nNumTextLines, int nWindowWidth /*=390*/)
     m_Text.MoveWindow(TextRect);
 }
 
-void CProgressWnd::Clear() 
+void CProgressWnd::Clear()
 { 
     SetText(_T(""));
     SetPos(0);
     m_bCancelled = FALSE; 
     m_nPrevPos = 0;
 
-    if (::IsWindow(GetSafeHwnd()))
+    if (::IsWindow(m_hWnd))
         UpdateWindow();
 }
 
-void CProgressWnd::Hide()  
+void CProgressWnd::Hide()
 { 
-    if (!::IsWindow(GetSafeHwnd())) 
+    if (!::IsWindow(m_hWnd)) 
         return;
 
     if (IsWindowVisible())
@@ -220,33 +204,25 @@ void CProgressWnd::Hide()
     }
 }
 
-void CProgressWnd::Show()  
+void CProgressWnd::Show()
 { 
-    if (!::IsWindow(GetSafeHwnd()))
+    if (!::IsWindow(m_hWnd))
         return;
 
     if (!IsWindowVisible())
     {
         ModifyStyle(0, WS_VISIBLE);
         ShowWindow(SW_SHOWNA);
-        RedrawWindow(NULL,NULL,RDW_ERASE|RDW_FRAME|RDW_INVALIDATE);
+        RedrawWindow(NULL, NULL, RDW_ERASE | RDW_FRAME | RDW_INVALIDATE);
     }
 }
 
-void CProgressWnd::SetRange(int nLower, int nUpper, int nStep /* = 1 */)    
+void CProgressWnd::SetRange(int nLower, int nUpper, int nStep /* = 1 */)
 {
-    if (!::IsWindow(GetSafeHwnd())) 
+    if (!::IsWindow(m_hWnd)) 
         return;
 
- #ifdef PBM_SETRANGE32
-    ASSERT(-0x7FFFFFFF <= nLower && nLower <= 0x7FFFFFFF);
-    ASSERT(-0x7FFFFFFF <= nUpper && nUpper <= 0x7FFFFFFF);
-    m_wndProgress.SendMessage(PBM_SETRANGE32, (WPARAM) nLower, (LPARAM) nUpper);
-#else
-    ASSERT(0 <= nLower && nLower <= 65535);
-    ASSERT(0 <= nUpper && nUpper <= 65535);
-    m_wndProgress.SetRange(nLower, nUpper);
-#endif
+    m_wndProgress.SetRange32(nLower, nUpper);
 
     m_nMaxValue = nUpper;
     m_nMinValue = nLower;
@@ -257,7 +233,7 @@ void CProgressWnd::SetRange(int nLower, int nUpper, int nStep /* = 1 */)
 
 int CProgressWnd::OffsetPos(int nPos)
 { 
-    if (!::IsWindow(GetSafeHwnd())) 
+    if (!::IsWindow(m_hWnd)) 
         return m_nPrevPos;
 
     Show();
@@ -265,9 +241,9 @@ int CProgressWnd::OffsetPos(int nPos)
     return SetPos(m_nPrevPos + nPos);  
 }
 
-int CProgressWnd::StepIt()                
+int CProgressWnd::StepIt()
 {
-    if (!::IsWindow(GetSafeHwnd())) 
+    if (!::IsWindow(m_hWnd)) 
         return m_nPrevPos;
 
     Show();
@@ -279,48 +255,31 @@ int CProgressWnd::SetStep(int nStep)
 {
     int nOldStep = m_nStep;
     m_nStep = nStep;
-    if (!::IsWindow(GetSafeHwnd())) 
+    if (!::IsWindow(m_hWnd)) 
         return nOldStep;
 
     return m_wndProgress.SetStep(nStep); 
 }
 
-int CProgressWnd::SetPos(int nPos)                    
+int CProgressWnd::SetPos(int nPos)
 {
-#ifdef PBM_SETRANGE32
-    ASSERT(-0x7FFFFFFF <= nPos && nPos <= 0x7FFFFFFF);
-#else
-    ASSERT(0 <= nPos && nPos <= 65535);
-#endif
-
-    if (!::IsWindow(GetSafeHwnd())) 
+    if (!::IsWindow(m_hWnd)) 
         return m_nPrevPos;
 
     Show();
 
-    CString strTitle;
-//  int nPercentage;
-    
     m_nPrevPos = nPos;
 
-//    if (m_nMaxValue > m_nMinValue)
-//        nPercentage = (nPos*100)/(m_nMaxValue - m_nMinValue);
-//    else
-//        nPercentage = 0;
+    CString strTitle;
+    strTitle.Format(_T("%s"), m_strTitle);
+    SetWindowText(strTitle);
 
-//    if (nPercentage != m_nPrevPercent) 
-//    {
-//        m_nPrevPercent = nPercentage;
-//        strTitle.Format(_T("%s [%d%%]"),m_strTitle,nPercentage);
-		strTitle.Format(_T("%s"),m_strTitle);
-        SetWindowText(strTitle);
-//    }
     return m_wndProgress.SetPos(nPos);        
 }
 
 void CProgressWnd::SetText(LPCTSTR fmt, ...)
 {
-    if (!::IsWindow(GetSafeHwnd())) 
+    if (!::IsWindow(m_hWnd)) 
         return;
 
     va_list args;
@@ -333,45 +292,53 @@ void CProgressWnd::SetText(LPCTSTR fmt, ...)
     m_Text.SetWindowText(buffer);
 }
 
-BEGIN_MESSAGE_MAP(CProgressWnd, CWnd)
-    //{{AFX_MSG_MAP(CProgressWnd)
-    ON_WM_ERASEBKGND()
-	//}}AFX_MSG_MAP
-    ON_BN_CLICKED(IDC_CANCEL, OnCancel)
-END_MESSAGE_MAP()
-
-
 /////////////////////////////////////////////////////////////////////////////
 // CProgressWnd message handlers
 
-BOOL CProgressWnd::OnEraseBkgnd(CDC* pDC) 
+LRESULT CProgressWnd::OnEraseBkgnd(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& bHandled)
 {
-    // Fill background with Catchment background colour
-    CBrush backBrush(GetSysColor(COLOR_BTNFACE));
-    CBrush* pOldBrush = pDC->SelectObject(&backBrush);
+    CDCHandle dc((HDC)wParam);
+
+    // Fill background with the dialog face colour
+    CBrush backBrush;
+    backBrush.CreateSolidBrush(GetSysColor(COLOR_BTNFACE));
+    HBRUSH hOldBrush = dc.SelectBrush(backBrush);
+
     CRect rect;
-    pDC->GetClipBox(&rect);     // Erase the area needed
-    pDC->PatBlt(rect.left, rect.top, rect.Width(), rect.Height(), PATCOPY);
-    pDC->SelectObject(pOldBrush);
+    dc.GetClipBox(&rect);       // Erase the area needed
+    dc.PatBlt(rect.left, rect.top, rect.Width(), rect.Height(), PATCOPY);
+
+    dc.SelectBrush(hOldBrush);
 
     return TRUE;
 }
 
-void CProgressWnd::OnCancel() 
+LRESULT CProgressWnd::OnClose(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
+{
+    DestroyWindow();
+    return 0;
+}
+
+LRESULT CProgressWnd::OnCancelClick(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+{
+    OnCancel();
+    return 0;
+}
+
+void CProgressWnd::OnCancel()
 {
     m_bCancelled = TRUE;
     Hide();
 
     if (m_bModal)
-        SendMessage(WM_CLOSE);
+        DestroyWindow();
 
-    CWnd *pWnd = AfxGetMainWnd();
-    if (pWnd && ::IsWindow(pWnd->m_hWnd))
-        pWnd->SetForegroundWindow();
+    if (::IsWindow(m_hWndParent))
+        ::SetForegroundWindow(m_hWndParent);
 }
 
 
-BOOL CProgressWnd::DestroyWindow() 
+BOOL CProgressWnd::DestroyWindow()
 {
     if (m_bPersistantPosition)
         SaveCurrentSettings();
@@ -379,13 +346,18 @@ BOOL CProgressWnd::DestroyWindow()
     if (m_bModal)
     {
         m_bModal = FALSE;
-        CWnd *pMainWnd = AfxGetMainWnd();
 
-        if (pMainWnd)
-            pMainWnd->EnableWindow(TRUE);
+        if (::IsWindow(m_hWndParent))
+            ::EnableWindow(m_hWndParent, TRUE);
     }
-	
-	return CWnd::DestroyWindow();
+
+    HWND hWnd = m_hWnd;
+    m_hWnd = NULL;
+    m_Text.Detach();
+    m_wndProgress.Detach();
+    m_CancelButton.Detach();
+
+    return ::DestroyWindow(hWnd);
 }
 
 void CProgressWnd::PeekAndPump(BOOL bCancelOnESCkey /*= TRUE*/)
@@ -394,12 +366,18 @@ void CProgressWnd::PeekAndPump(BOOL bCancelOnESCkey /*= TRUE*/)
         SetFocus();
 
     MSG msg;
-    while (!m_bCancelled && ::PeekMessage(&msg, NULL,0,0,PM_NOREMOVE)) 
+    while (!m_bCancelled && ::PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
     {
+        if (msg.message == WM_QUIT)
+        {
+            ::PostQuitMessage(0);
+            return;
+        }
+
+        // Cancel button disabled if modal, so we fake it.
         if (bCancelOnESCkey && (msg.message == WM_CHAR) && (msg.wParam == VK_ESCAPE))
             OnCancel();
 
-        // Cancel button disabled if modal, so we fake it.
         if (m_bModal && (msg.message == WM_LBUTTONUP))
         {
             CRect rect;
@@ -407,61 +385,70 @@ void CProgressWnd::PeekAndPump(BOOL bCancelOnESCkey /*= TRUE*/)
             if (rect.PtInRect(msg.pt))
                 OnCancel();
         }
-  
-        if (!AfxGetApp()->PumpMessage()) 
-        {
-            ::PostQuitMessage(0);
-            return;
-        } 
+
+        ::TranslateMessage(&msg);
+        ::DispatchMessage(&msg);
     }
 }
 
-// Retores the previous window size from the registry
+// Restores the previous window size from the settings
 void CProgressWnd::GetPreviousSettings()
 {
-    int x = AfxGetApp()->GetProfileInt(szSection, szEntryX, -1);
-    int y = AfxGetApp()->GetProfileInt(szSection, szEntryY, -1);
+    int x = (int)CGetSetOptions::GetProfileLong(szEntryX, -1);
+    int y = (int)CGetSetOptions::GetProfileLong(szEntryY, -1);
 
     if (x >= 0 && x < GetSystemMetrics(SM_CXSCREEN) &&
         y >= 0 && y < GetSystemMetrics(SM_CYSCREEN))
     {
-        SetWindowPos(NULL, x,y, 0,0, SWP_NOSIZE|SWP_NOZORDER);
+        SetWindowPos(NULL, x, y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
     }
     else
-        CenterWindow();
+        CenterOnParent();
 }
 
-// Saves the current window position registry
+// Saves the current window position to the settings
 void CProgressWnd::SaveCurrentSettings()
 {   
-    if (!IsWindow(m_hWnd))
+    if (!::IsWindow(m_hWnd))
         return;
 
     CRect rect;
     GetWindowRect(rect);
 
-    AfxGetApp()->WriteProfileInt(szSection, szEntryX, rect.left);
-    AfxGetApp()->WriteProfileInt(szSection, szEntryY, rect.top);
+    CGetSetOptions::SetProfileLong(szEntryX, rect.left);
+    CGetSetOptions::SetProfileLong(szEntryY, rect.top);
+}
+
+void CProgressWnd::CenterOnParent()
+{
+    CRect rcWnd;
+    GetWindowRect(&rcWnd);
+
+    RECT rcParent = { 0 };
+    if (::IsWindow(m_hWndParent))
+        ::GetWindowRect(m_hWndParent, &rcParent);
+    else
+        ::SystemParametersInfo(SPI_GETWORKAREA, 0, &rcParent, 0);
+
+    int x = rcParent.left + ((rcParent.right - rcParent.left) - rcWnd.Width()) / 2;
+    int y = rcParent.top + ((rcParent.bottom - rcParent.top) - rcWnd.Height()) / 2;
+
+    SetWindowPos(NULL, x, y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
 }
 
 void CProgressWnd::HideCancel()
 {
 	m_CancelButton.ShowWindow(SW_HIDE);
-	UpdateData(FALSE);
 }
 
 void CProgressWnd::ShowCancel()
 {
 	m_CancelButton.ShowWindow(SW_SHOW);
-	UpdateData(FALSE);
 }
 
 void CProgressWnd::SetTitleText(CString csTitle)
 {
 	m_strTitle = csTitle;
 	
-	CString title;
-	title.Format(_T("%s"),m_strTitle);
-	
-	SetWindowText(title);
+	SetWindowText(m_strTitle);
 }

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "CP_Main.h"
 #include "OptionsQuickPaste.h"
 #include ".\optionsquickpaste.h"
@@ -29,8 +29,8 @@ LRESULT COptionsQuickPaste::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 	m_btDefaultButton.Attach(GetDlgItem(IDC_BUTTON_DEFAULT_FAULT));
 	m_btFont.Attach(GetDlgItem(IDC_BUTTON_FONT));
 	m_btShowText.Attach(GetDlgItem(IDC_SHOW_TEXT_FOR_FIRST_TEN_HOT_KEYS));
-	m_eLinesPerRow.Attach(GetDlgItem(IDC_LINES_ROW));
-	m_eTransparencyPercent.Attach(GetDlgItem(IDC_TRANS_PERC));
+	m_eLinesPerRow.SubclassWindow(GetDlgItem(IDC_LINES_ROW));
+	m_eTransparencyPercent.SubclassWindow(GetDlgItem(IDC_TRANS_PERC));
 	m_btEnableTransparency.Attach(GetDlgItem(IDC_TRANSPARENCY));
 	m_btDescShowLeadingWhiteSpace.Attach(GetDlgItem(IDC_DESC_SHOW_LEADING_WHITESPACE));
 	m_PromptForDelete.Attach(GetDlgItem(IDC_CHECK_PROMPT_DELETE_CLIP));
@@ -40,8 +40,6 @@ LRESULT COptionsQuickPaste::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 	m_showInTaskBar.Attach(GetDlgItem(IDC_CHECK_SHOW_IN_TASKBAR));
 	m_diffPathEditBox.Attach(GetDlgItem(IDC_EDIT_DIFF_PATH));
 
-	m_pParent = (COptionsSheet *)GetParent();
-	
 	m_btEnableTransparency.SetCheck(CGetSetOptions::GetEnableTransparency());
 	m_eTransparencyPercent.SetNumber(CGetSetOptions::GetTransparencyPercent());
 	m_eLinesPerRow.SetNumber(CGetSetOptions::GetLinesPerRow());
@@ -70,12 +68,12 @@ LRESULT COptionsQuickPaste::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 	if(CGetSetOptions::GetFont(m_LogFont))
 	{		
 		m_Font.CreateFontIndirect(&m_LogFont);
-		m_btFont.SetFont(&m_Font);
+		m_btFont.SetFont(m_Font);
 	}
 	else
 	{
-		CFont *ft =	m_btFont.GetFont();
-		ft->GetLogFont(&m_LogFont);
+		WTL::CFont font(m_btFont.GetFont());
+		font.GetLogFont(&m_LogFont);
 	}
 
 	m_diffPathEditBox.SetWindowText(CGetSetOptions::GetDiffApp());
@@ -168,7 +166,7 @@ int COptionsQuickPaste::OnApply()
 
 LRESULT COptionsQuickPaste::OnButtonFont(WORD, WORD, HWND, BOOL&) 
 {
-	CFontDialog dlg(&m_LogFont, (CF_TTONLY | CF_SCREENFONTS), 0, this);
+	CFontDialog dlg(&m_LogFont, (CF_TTONLY | CF_SCREENFONTS), 0, m_hWnd);
 	if(dlg.DoModal() == IDOK)
 	{	
 		m_Font.DeleteObject();
@@ -177,7 +175,7 @@ LRESULT COptionsQuickPaste::OnButtonFont(WORD, WORD, HWND, BOOL&)
 
 		m_Font.CreateFontIndirect(&m_LogFont);
 
-		m_btFont.SetFont(&m_Font);
+		m_btFont.SetFont(m_Font);
 
 		CString cs;
 		cs.Format(_T("Font - %s"), m_LogFont.lfFaceName);
@@ -188,8 +186,9 @@ LRESULT COptionsQuickPaste::OnButtonFont(WORD, WORD, HWND, BOOL&)
 
 LRESULT COptionsQuickPaste::OnButtonDefaultFault(WORD, WORD, HWND, BOOL&) 
 {
-	CFont *ft =	m_btDefaultButton.GetFont();
-	ft->GetLogFont(&m_LogFont);
+	HFONT hFont = m_btDefaultButton.GetFont();
+	if (hFont != NULL)
+		::GetObject(hFont, sizeof(LOGFONT), &m_LogFont);
 
 	memset(&m_LogFont, 0, sizeof(m_LogFont));
 
@@ -201,7 +200,7 @@ LRESULT COptionsQuickPaste::OnButtonDefaultFault(WORD, WORD, HWND, BOOL&)
 	m_Font.DeleteObject();
 	m_Font.CreateFontIndirect(&m_LogFont);
 
-	m_btFont.SetFont(&m_Font);
+	m_btFont.SetFont(m_Font);
 
 	CString cs;
 	cs.Format(_T("Font - %s"), m_LogFont.lfFaceName);
@@ -224,7 +223,7 @@ void COptionsQuickPaste::FillThemes()
 	{
 		bCont = find.FindNextFile();
 
-		CTheme theme;
+		CDittoTheme theme;
 		if (theme.Load(find.GetFileTitle(), true, false))
 		{
 			if (theme.FileVersion() >= 2 && theme.FileVersion() < 100)
@@ -249,7 +248,7 @@ void COptionsQuickPaste::FillThemes()
 
 LRESULT COptionsQuickPaste::OnBnClickedButtonTheme(WORD, WORD, HWND, BOOL&)
 {
-	CTheme theme;
+	CDittoTheme theme;
 
 	CString csTheme;
 	m_cbTheme.GetLBText(m_cbTheme.GetCurSel(), csTheme);

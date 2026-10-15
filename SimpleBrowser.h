@@ -10,8 +10,12 @@
 #include <atlctl.h>
 #include "mshtml.h"
 
-class SimpleBrowser : public ATL::CWindow, public IDispatch {
+class SimpleBrowser : public ATL::CWindowImpl<SimpleBrowser>, public IDispatch {
 public:
+	// Upstream registered this class at run-time through MFC's AfxRegisterWndClass,
+	// which defaults to the arrow cursor and a COLOR_WINDOW background brush.
+	DECLARE_WND_CLASS_EX(_T("DittoSimpleBrowser"), CS_HREDRAW | CS_VREDRAW, COLOR_WINDOW)
+
 	SimpleBrowser();
 	virtual ~SimpleBrowser();
 
@@ -95,7 +99,7 @@ public:
 	                   CStringArray &names,
 	                   CStringArray &values);
 
-	void PostNcDestroy();
+	void OnFinalMessage(HWND hWnd);
 
 protected:
 	LRESULT OnSize(UINT, WPARAM, LPARAM, BOOL&);
@@ -123,7 +127,7 @@ protected:
     END_MSG_MAP()
 
 private:
-    CWindow                 _BrowserWindow;
+    ATL::CAxWindow           _BrowserWindow;
 	IWebBrowser2			*_Browser;
 	bool					_Ready;
     IDispatch               *_BrowserDispatch;

@@ -226,12 +226,6 @@
     <ClCompile Include="StdAfx.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="SystemTray.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="TabCtrl.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
     <ClCompile Include="Shared\TextConvert.cpp">
       <Filter>source</Filter>
     </ClCompile>
@@ -283,9 +277,6 @@
     <ClCompile Include="GdiImageDrawer.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="MyDropTarget.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
     <ClCompile Include="UAC_Helper.cpp">
       <Filter>source</Filter>
     </ClCompile>
@@ -299,9 +290,6 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="ClipCompare.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="QRCodeViewer.cpp">
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="DrawHTML.C">
@@ -677,12 +665,6 @@
     <ClInclude Include="RulerRichEditCtrl\StdGrfx.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="SystemTray.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="TabCtrl.h">
-      <Filter>header</Filter>
-    </ClInclude>
     <ClInclude Include="Shared\TextConvert.h">
       <Filter>header</Filter>
     </ClInclude>
@@ -731,9 +713,6 @@
     <ClInclude Include="GdiImageDrawer.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="MyDropTarget.h">
-      <Filter>header</Filter>
-    </ClInclude>
     <ClInclude Include="UAC_Thread.h">
       <Filter>header</Filter>
     </ClInclude>
@@ -747,9 +726,6 @@
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="ClipCompare.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="QRCodeViewer.h">
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="DrawHTML.h">

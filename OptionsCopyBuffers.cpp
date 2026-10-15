@@ -21,8 +21,6 @@ COptionsCopyBuffers::~COptionsCopyBuffers()
 
 BOOL COptionsCopyBuffers::OnInitDialog(HWND hWndFocus, LPARAM lParam)
 {
-	BOOL bRet = CPropertyPageImpl<COptionsCopyBuffers>::OnInitDialog(hWndFocus, lParam);
-
 	m_CopyBuffer1.Attach(GetDlgItem(IDC_COPY_1));
 	m_PasteBuffer1.Attach(GetDlgItem(IDC_PASTE_1));
 	m_CutBuffer1.Attach(GetDlgItem(IDC_CUT_1));
@@ -75,7 +73,7 @@ BOOL COptionsCopyBuffers::OnInitDialog(HWND hWndFocus, LPARAM lParam)
 
 	theApp.m_Language.UpdateOptionCopyBuffers(m_hWnd);
 
-	return bRet;
+	return TRUE;
 }
 
 int COptionsCopyBuffers::OnApply()

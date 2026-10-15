@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <atlbase.h>
 #include <atlcom.h>
@@ -63,15 +63,16 @@ public:
 
 typedef CMap<long, long, CClipFormat, CClipFormat&> CMapIDtoCF;
 
-class CQListCtrl : public WTL::CListViewCtrl
+class CQListCtrl : public ATL::CWindowImpl<CQListCtrl, WTL::CListViewCtrl>
 {
 public:
+	DECLARE_WND_SUPERCLASS(_T("Ditto_QListCtrl"), GetWndClassName())
+
 	CQListCtrl();
 
 public:
 	INT_PTR OnToolHitTest(CPoint point, TOOLINFO * pTI) const;
 	BOOL PreTranslateMessage(MSG* pMsg);
-	BOOL OnChildNotify(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pLResult);
 
 public:
 	virtual ~CQListCtrl();
@@ -143,10 +144,12 @@ public:
 
 protected:
 	BOOL GetClipData(int nItem, CClipFormat &Clip);
-	BOOL DrawBitMap(int nItem, CRect &crRect, CDC *pDC, const CString &csDescription);
+	BOOL DrawBitMap(int nItem, CRect &crRect, HDC hDC, const CString &csDescription);
+	void MeasureItem(LPMEASUREITEMSTRUCT lpMeasureItemStruct);
+	void DrawCopiedColorCode(CString &csText, CRect &rcText, HDC hDC);
 	void LoadDittoCopyBufferHotkeys();
 	bool MouseInScrollBarArea(CRect crWindow, CPoint point);
-	BOOL DrawRtfText(int nItem, CRect &crRect, CDC *pDC);
+	BOOL DrawRtfText(int nItem, CRect &crRect, HDC hDC);
 	void StopHideScrollBarTimer();
 		
 	WCHAR *m_pwchTip;
@@ -156,6 +159,7 @@ protected:
 	CMapIDtoCF m_RTFData;
 	CToolTipEx *m_pToolTip;
 	HWND m_toolTipHwnd;
+	WTL::CToolTipCtrl m_toolTip;
 	CFont m_Font;
 	CFont m_boldFont;
 	IFormattedTextDraw *m_pFormatter;
@@ -174,4 +178,37 @@ protected:
 	CAccels *m_pToolTipActions;
 	CRichEditCtrlEx m_rtfFormater;
 	CDPI *m_windowDpi;
+
+	// message handlers
+	LRESULT OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnTimer(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnMouseHWheel(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnSysKeyDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnEraseBkgnd(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnKillFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnMeasureItem(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnKeydown(LPNMHDR pNMHDR);
+	LRESULT OnCustomdrawList(LPNMHDR pNMHDR);
+	LRESULT OnSelectionChange(LPNMHDR pNMHDR);
+	LRESULT OnToolTipText(LPNMHDR pNMHDR);
+	LRESULT OnOdCacheHint(LPNMHDR pNMHDR);
+
+	BEGIN_MSG_MAP(CQListCtrl)
+		MESSAGE_HANDLER(WM_CREATE, OnCreate)
+		MESSAGE_HANDLER(WM_TIMER, OnTimer)
+		MESSAGE_HANDLER(WM_MOUSEMOVE, OnMouseMove)
+		MESSAGE_HANDLER(WM_MOUSEHWHEEL, OnMouseHWheel)
+		MESSAGE_HANDLER(WM_SYSKEYDOWN, OnSysKeyDown)
+		MESSAGE_HANDLER(WM_ERASEBKGND, OnEraseBkgnd)
+		MESSAGE_HANDLER(WM_KILLFOCUS, OnKillFocus)
+		// Notifications reach QPasteWnd first, which reflects them back to this control.
+		REFLECTED_NOTIFY_CODE_HANDLER_EX(LVN_KEYDOWN, OnKeydown)
+		REFLECTED_NOTIFY_CODE_HANDLER_EX(NM_CUSTOMDRAW, OnCustomdrawList)
+		REFLECTED_NOTIFY_CODE_HANDLER_EX(LVN_ITEMCHANGED, OnSelectionChange)
+		REFLECTED_NOTIFY_CODE_HANDLER_EX(LVN_ODCACHEHINT, OnOdCacheHint)
+		MESSAGE_HANDLER(OCM_MEASUREITEM, OnMeasureItem)
+		// The tooltip is owned by this control, so its notifications come directly.
+		NOTIFY_CODE_HANDLER_EX(TTN_NEEDTEXTW, OnToolTipText)
+	END_MSG_MAP()
 };

@@ -37,11 +37,33 @@ public:
 	
 	
 
+// Edit control that asks the dialog to run the search when Enter is pressed.
+class CSearchEnterEdit : public ATL::CWindowImpl<CSearchEnterEdit, WTL::CEdit>
+{
+public:
+	DECLARE_WND_SUPERCLASS(_T("Ditto_DeleteSearchEdit"), GetWndClassName())
+
+	BEGIN_MSG_MAP(CSearchEnterEdit)
+		MESSAGE_HANDLER(WM_KEYDOWN, OnKeyDown)
+	END_MSG_MAP()
+
+	LRESULT OnKeyDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+	{
+		if (wParam == VK_RETURN)
+		{
+			::SendMessage(GetParent().m_hWnd, WM_COMMAND, MAKEWPARAM(IDC_BUTTON_SEARCH, BN_CLICKED), 0);
+			return 0;
+		}
+
+		bHandled = FALSE;
+		return 0;
+	}
+};
+
 class CDeleteClipData : public CDialogImpl<CDeleteClipData>
 {
 public:
 	CDeleteClipData(HWND hParent = NULL);   // standard constructor
-	CDeleteClipData(CWnd* pParent = NULL); // legacy constructor for compatibility
 	virtual ~CDeleteClipData();
 
 	void SetNotifyWnd(HWND hWnd);
@@ -50,7 +72,8 @@ public:
 	enum { IDD = IDD_DELETE_CLIP_DATA };
 
 protected:
-	void DoDataExchange(); // Custom DDX implementation
+	void SetDbSize();
+	void ReadFilterState();
 
 	// WTL Message Map
 	BEGIN_MSG_MAP(CDeleteClipData)
@@ -75,6 +98,7 @@ protected:
 
 	CDialogResizer m_Resize;
 	CListViewCtrl	m_List;
+	CSearchEnterEdit m_searchEdit;
 	HWND m_hWndParent;
 	CShowTaskBarIcon m_showTaskbar;
 	std::vector<CDeleteData> m_data;
@@ -127,5 +151,4 @@ public:
 	LRESULT OnBnClickedCheckLastUseDate(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnBnClickedCheckDataFormat(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnLvnColumnclickList2(int idCtrl, LPNMHDR pNMHDR, BOOL& bHandled);
-	BOOL PreTranslateMessage(MSG* pMsg);
 };

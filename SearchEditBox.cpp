@@ -10,61 +10,60 @@ CSearchEditBox::~CSearchEditBox()
 {
 }
 
-BOOL CSearchEditBox::PreTranslateMessage(MSG* pMsg)
+LRESULT CSearchEditBox::OnKeyDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	switch(pMsg->message)
+	if (wParam == VK_RETURN)
 	{
-		case WM_KEYDOWN:
+		CWindow pWnd = GetParent();
+		if (pWnd)
 		{
-			if(pMsg->wParam == VK_RETURN)
+			if (CGetSetOptions::m_bFindAsYouType)
 			{
-				CWnd* pWnd = GetParent();
-				if(pWnd)
-				{
-					if(CGetSetOptions::m_bFindAsYouType)
-					{
-						pWnd->SendMessage(NM_SEARCH_ENTER_PRESSED, 0, 0);
-					}
-					else
-					{
-						pWnd->PostMessage(CB_SEARCH, 0, 0);
-					}
-				}
+				pWnd.SendMessage(NM_SEARCH_ENTER_PRESSED, 0, 0);
+			}
+			else
+			{
+				pWnd.PostMessage(CB_SEARCH, 0, 0);
+			}
+		}
 
-				return TRUE;
-			}
-			else if(pMsg->wParam == VK_DOWN ||
-					pMsg->wParam == VK_UP ||
-					pMsg->wParam == VK_F3)
+		bHandled = TRUE;
+		return 0;
+	}
+
+	if (wParam == VK_DOWN ||
+		wParam == VK_UP ||
+		wParam == VK_F3)
+	{
+		if (CGetSetOptions::m_bFindAsYouType)
+		{
+			CWindow pWnd = GetParent();
+			if (pWnd)
 			{
-				if(CGetSetOptions::m_bFindAsYouType)
-				{
-					CWnd* pWnd = GetParent();
-					if(pWnd)
-					{
-						pWnd->SendMessage(CB_UPDOWN, pMsg->wParam, pMsg->lParam);
-						return TRUE;
-					}
-				}
+				pWnd.SendMessage(CB_UPDOWN, wParam, lParam);
+				bHandled = TRUE;
+				return 0;
 			}
-			else if(pMsg->wParam == 'C' && CONTROL_PRESSED ||
-					pMsg->wParam == 'X' && CONTROL_PRESSED ||
-					pMsg->wParam == VK_DELETE)
-			{
-				LONG lEditSel = GetSel();
-				if(LOWORD(lEditSel) == HIWORD(lEditSel))
-				{
-					CWnd* pWnd = GetParent();
-					if(pWnd)
-					{
-						pWnd->SendMessage(CB_UPDOWN, pMsg->wParam, pMsg->lParam);
-						return TRUE;
-					}
-				}
-			}
-			break;
 		}
 	}
 
-	return CEdit::PreTranslateMessage(pMsg);
+	if ((wParam == 'C' && CONTROL_PRESSED) ||
+		(wParam == 'X' && CONTROL_PRESSED) ||
+		wParam == VK_DELETE)
+	{
+		LONG lEditSel = GetSel();
+		if (LOWORD(lEditSel) == HIWORD(lEditSel))
+		{
+			CWindow pWnd = GetParent();
+			if (pWnd)
+			{
+				pWnd.SendMessage(CB_UPDOWN, wParam, lParam);
+				bHandled = TRUE;
+				return 0;
+			}
+		}
+	}
+
+	bHandled = FALSE;
+	return 0;
 }

@@ -1,4 +1,4 @@
-// DeleteClipData.cpp : implementation file
+﻿// DeleteClipData.cpp : implementation file
 //
 
 #include "stdafx.h"
@@ -6,6 +6,7 @@
 #include "DeleteClipData.h"
 #include "Misc.h"
 #include "ProgressWnd.h"
+#include <atlctrlx.h>
 #include <algorithm>
 
 
@@ -37,26 +38,17 @@ CDeleteClipData::CDeleteClipData(HWND hParent)
 	m_hWndParent = hParent;
 }
 
-CDeleteClipData::CDeleteClipData(CWnd* pParent) // legacy constructor for compatibility
-	: CDeleteClipData(pParent ? pParent->GetSafeHwnd() : NULL)
-{
-}
-
 CDeleteClipData::~CDeleteClipData()
 {
 }
 
 
-void CDeleteClipData::DoDataExchange() // Custom DDX implementation
-{
-	// Manual data exchange - this function is kept for compatibility
-	// but in WTL we handle this manually or through manual control updates
-}
-
 BOOL CDeleteClipData::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	// Initialize the list control
 	m_List.Attach(GetDlgItem(IDC_LIST2));
+	m_clipboardFomatCombo.Attach(GetDlgItem(IDC_COMBO_DATA_FORMAT));
+	m_searchEdit.SubclassWindow(GetDlgItem(IDC_EDIT_CLIP_TITLE));
 
 	theApp.m_Language.UpdateDeleteClipData(m_hWnd);
 
@@ -79,6 +71,9 @@ BOOL CDeleteClipData::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL
 
 	SetDbSize();
 
+	::SetDlgItemText(m_hWnd, IDC_STATIC_SELECTED_SIZE, m_selectedSize);
+	::SetDlgItemText(m_hWnd, IDC_STATIC_SELECTED_COUNT, m_selectedCount);
+
 	return TRUE;
 }
 
@@ -91,12 +86,45 @@ void CDeleteClipData::SetDbSize()
 	StrFormatByteSize(size, szFileSize, MAX_FILE_SIZE_BUFFER);
 
 	m_databaseSize = szFileSize;
-	UpdateData(0);
+	::SetDlgItemText(m_hWnd, IDC_STATIC_DB_SIZE, m_databaseSize);
+}
+
+void CDeleteClipData::ReadFilterState()
+{
+	m_clipTitle = _T("");
+	GetDlgItemText(IDC_EDIT_CLIP_TITLE, m_clipTitle);
+
+	m_filterByClipTitle = (::IsDlgButtonChecked(m_hWnd, IDC_CHECK_CLIP_TITLE) == BST_CHECKED);
+	m_filterByCreatedDate = (::IsDlgButtonChecked(m_hWnd, IDC_CHECK_CREATE_DATE) == BST_CHECKED);
+	m_filterByLastUsedDate = (::IsDlgButtonChecked(m_hWnd, IDC_CHECK_LAST_USE_DATE) == BST_CHECKED);
+	m_filterByClipboardFormat = (::IsDlgButtonChecked(m_hWnd, IDC_CHECK_DATA_FORMAT) == BST_CHECKED);
+
+	static const int dateCtrls[] =
+	{
+		IDC_DATE_CREATE_START, IDC_DATE_CREATE_END, IDC_TIME_CREATE_START, IDC_TIME_CREATE_END,
+		IDC_DATE_USE_START, IDC_DATE_USE_END, IDC_TIME_USE_START, IDC_TIME_USE_END
+	};
+	SYSTEMTIME *values[] =
+	{
+		&m_createdDateStart, &m_createdDateEnd, &m_createdTimeStart, &m_createdTimeEnd,
+		&m_usedDateStart, &m_usedDateEnd, &m_usedTimeStart, &m_usedTimeEnd
+	};
+
+	for (int i = 0; i < 8; i++)
+	{
+		HWND hPicker = ::GetDlgItem(m_hWnd, dateCtrls[i]);
+		if (hPicker == NULL)
+			continue;
+
+		SYSTEMTIME st = *values[i];
+		if (::SendMessage(hPicker, DTM_GETSYSTEMTIME, 0, reinterpret_cast<LPARAM>(&st)) == GDT_VALID)
+			*values[i] = st;
+	}
 }
 
 void CDeleteClipData::InitListCtrlCols()
 {
-	m_List.SetExtendedStyle(LVS_EX_FULLROWSELECT);
+	m_List.SetExtendedListViewStyle(LVS_EX_FULLROWSELECT);
 
 	m_List.InsertColumn(0, theApp.m_Language.GetDeleteClipDataString("Title", "Title"), LVCFMT_LEFT, 350);
 	m_List.InsertColumn(1, theApp.m_Language.GetDeleteClipDataString("QuickPasteText", "Quick Paste Text"), LVCFMT_LEFT, 200);
@@ -189,39 +217,44 @@ void CDeleteClipData::SetNotifyWnd(HWND hWnd)
 	m_hWndParent = hWnd;
 }
 
-void CDeleteClipData::OnClose()
+LRESULT CDeleteClipData::OnClose(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	if (m_applyingDelete)
 	{
-		return;
+		return 0;
 	}
 	DestroyWindow();
+	return 0;
 }
 
-void CDeleteClipData::OnSize(UINT nType, int cx, int cy)
+LRESULT CDeleteClipData::OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	CDialog::OnSize(nType, cx, cy);
+	m_Resize.MoveControls(CSize(LOWORD(lParam), HIWORD(lParam)));
 
-	m_Resize.MoveControls(CSize(cx, cy));
+	bHandled = FALSE;
+	return 0;
 }
 
-void CDeleteClipData::OnNcDestroy()
+LRESULT CDeleteClipData::OnNcDestroy(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	CDialog::OnNcDestroy();
 	::PostMessage(m_hWndParent, WM_DELETE_CLIPS_CLOSED, 0, 0);
+
+	bHandled = FALSE;
+	return 0;
 }
 
 // CDeleteClipData message handlers
 
 
-void CDeleteClipData::OnBnClickedButtonSearch()
+LRESULT CDeleteClipData::OnBnClickedButtonSearch(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
 	FilterItems();
+	return 0;
 }
 
 void CDeleteClipData::FilterItems()
 {
-	UpdateData();
+	ReadFilterState();
 
 	//First search the already filtered text, see if we need to add them back in
 	std::vector<int> filteredRowsToDelete;
@@ -302,10 +335,13 @@ bool CDeleteClipData::MatchesFilter(CDeleteData *pdata)
 
 	if (m_filterByCreatedDate)
 	{		
-		CTime dateStart = CTime(m_createdDateStart.GetYear(), m_createdDateStart.GetMonth(), m_createdDateStart.GetDay(), m_createdTimeStart.GetHour(), m_createdTimeStart.GetMinute(), m_createdTimeStart.GetSecond());
-		CTime dateEnd = CTime(m_createdDateEnd.GetYear(), m_createdDateEnd.GetMonth(), m_createdDateEnd.GetDay(), m_createdTimeEnd.GetHour(), m_createdTimeEnd.GetMinute(), m_createdTimeEnd.GetSecond());
+		COleDateTime dateStart(m_createdDateStart.wYear, m_createdDateStart.wMonth, m_createdDateStart.wDay,
+			m_createdTimeStart.wHour, m_createdTimeStart.wMinute, m_createdTimeStart.wSecond);
+		COleDateTime dateEnd(m_createdDateEnd.wYear, m_createdDateEnd.wMonth, m_createdDateEnd.wDay,
+			m_createdTimeEnd.wHour, m_createdTimeEnd.wMinute, m_createdTimeEnd.wSecond);
+		COleDateTime created(pdata->m_createdDateTime);
 
-		if (pdata->m_createdDateTime >= dateStart && pdata->m_createdDateTime <= dateEnd)
+		if (created >= dateStart && created <= dateEnd)
 		{
 			return true;
 		}
@@ -317,10 +353,13 @@ bool CDeleteClipData::MatchesFilter(CDeleteData *pdata)
 
 	if (m_filterByLastUsedDate)
 	{
-		CTime dateStart = CTime(m_usedDateStart.GetYear(), m_usedDateStart.GetMonth(), m_usedDateStart.GetDay(), m_usedTimeStart.GetHour(), m_usedTimeStart.GetMinute(), m_usedTimeStart.GetSecond());
-		CTime dateEnd = CTime(m_usedDateEnd.GetYear(), m_usedDateEnd.GetMonth(), m_usedDateEnd.GetDay(), m_usedTimeEnd.GetHour(), m_usedTimeEnd.GetMinute(), m_usedTimeEnd.GetSecond());
+		COleDateTime dateStart(m_usedDateStart.wYear, m_usedDateStart.wMonth, m_usedDateStart.wDay,
+			m_usedTimeStart.wHour, m_usedTimeStart.wMinute, m_usedTimeStart.wSecond);
+		COleDateTime dateEnd(m_usedDateEnd.wYear, m_usedDateEnd.wMonth, m_usedDateEnd.wDay,
+			m_usedTimeEnd.wHour, m_usedTimeEnd.wMinute, m_usedTimeEnd.wSecond);
+		COleDateTime used(pdata->m_lastUsedDateTime);
 
-		if (pdata->m_lastUsedDateTime >= dateStart && pdata->m_lastUsedDateTime <= dateEnd)
+		if (used >= dateStart && used <= dateEnd)
 		{
 			return true;
 		}
@@ -333,9 +372,11 @@ bool CDeleteClipData::MatchesFilter(CDeleteData *pdata)
 	if (m_filterByClipboardFormat)
 	{
 		CString str1;
-		int n = m_clipboardFomatCombo.GetLBTextLen(m_clipboardFomatCombo.GetCurSel());
-		m_clipboardFomatCombo.GetLBText(m_clipboardFomatCombo.GetCurSel(), str1.GetBuffer(n));
-		str1.ReleaseBuffer();
+		int nSel = m_clipboardFomatCombo.GetCurSel();
+		if (nSel == CB_ERR)
+			return true;
+
+		m_clipboardFomatCombo.GetLBText(nSel, str1);
 
 		if (pdata->m_clipboardFormat == str1)
 		{
@@ -351,10 +392,9 @@ bool CDeleteClipData::MatchesFilter(CDeleteData *pdata)
 	return true;
 }
 
-void CDeleteClipData::OnLvnKeydownList2(NMHDR *pNMHDR, LRESULT *pResult)
+LRESULT CDeleteClipData::OnLvnKeydownList2(int idCtrl, LPNMHDR pNMHDR, BOOL& bHandled)
 {
 	LPNMLVKEYDOWN pLVKeyDow = reinterpret_cast<LPNMLVKEYDOWN>(pNMHDR);
-	// TODO: Add your control notification handler code here
 
 	switch(pLVKeyDow->wVKey)
 	{
@@ -362,28 +402,20 @@ void CDeleteClipData::OnLvnKeydownList2(NMHDR *pNMHDR, LRESULT *pResult)
 		this->ApplyDelete();
 		break;
 	}
-	*pResult = 0;
+	return 0;
 }
 
-void CDeleteClipData::OnLvnItemchangedList2(NMHDR *pNMHDR, LRESULT *pResult)
+LRESULT CDeleteClipData::OnLvnItemchangedList2(int idCtrl, LPNMHDR pNMHDR, BOOL& bHandled)
 {
-	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
-	
-	POSITION pos = m_List.GetFirstSelectedItemPosition();
 	__int64 selectedDataSize = 0;
 	int selectedCount = 0;
 
-	if (pos != NULL)
+	for (int row = m_List.GetNextItem(-1, LVNI_SELECTED); row != -1; row = m_List.GetNextItem(row, LVNI_SELECTED))
 	{
-		while (pos)
+		if(row >= 0 && row < (int)m_data.size())
 		{
-			INT_PTR row = m_List.GetNextSelectedItem(pos);
-
-			if(row >= 0 && row < (INT_PTR)m_data.size())
-			{
-				selectedDataSize += m_data[row].m_dataSize;
-				selectedCount++;
-			}
+			selectedDataSize += m_data[row].m_dataSize;
+			selectedCount++;
 		}
 	}
 
@@ -398,13 +430,14 @@ void CDeleteClipData::OnLvnItemchangedList2(NMHDR *pNMHDR, LRESULT *pResult)
 
 	m_selectedCount = count;
 
-	UpdateData(0);
+	::SetDlgItemText(m_hWnd, IDC_STATIC_SELECTED_SIZE, m_selectedSize);
+	::SetDlgItemText(m_hWnd, IDC_STATIC_SELECTED_COUNT, m_selectedCount);
 
-	*pResult = 0;
+	return 0;
 }
 
 
-void CDeleteClipData::OnHdnGetdispinfoList2(NMHDR *pNMHDR, LRESULT *pResult)
+LRESULT CDeleteClipData::OnHdnGetdispinfoList2(int idCtrl, LPNMHDR pNMHDR, BOOL& bHandled)
 {
 	LPNMHDDISPINFO pDispInfo = reinterpret_cast<LPNMHDDISPINFO>(pNMHDR);	
 	
@@ -417,16 +450,16 @@ void CDeleteClipData::OnHdnGetdispinfoList2(NMHDR *pNMHDR, LRESULT *pResult)
 		}
 	}
 
-	*pResult = 0;
+	return 0;
 }
 
 
-void CDeleteClipData::OnLvnGetdispinfoList2(NMHDR *pNMHDR, LRESULT *pResult)
+LRESULT CDeleteClipData::OnLvnGetdispinfoList2(int idCtrl, LPNMHDR pNMHDR, BOOL& bHandled)
 {
 	NMLVDISPINFO *pDispInfo = reinterpret_cast<NMLVDISPINFO*>(pNMHDR);
 	if (pDispInfo->item.mask & LVIF_TEXT)
 	{
-		if (pDispInfo->item.iItem >= 0 && pDispInfo->item.iItem < m_data.size())
+		if (pDispInfo->item.iItem >= 0 && pDispInfo->item.iItem < (int)m_data.size())
 		{
 			switch (pDispInfo->item.iSubItem)
 			{
@@ -444,14 +477,14 @@ void CDeleteClipData::OnLvnGetdispinfoList2(NMHDR *pNMHDR, LRESULT *pResult)
 				break;
 				case 2:
 				{
-					  COleDateTime dtTime(m_data[pDispInfo->item.iItem].m_createdDateTime.GetTime());
+					  COleDateTime dtTime(m_data[pDispInfo->item.iItem].m_createdDateTime);
 					  lstrcpyn(pDispInfo->item.pszText, dtTime.Format(), pDispInfo->item.cchTextMax);
 					  pDispInfo->item.pszText[pDispInfo->item.cchTextMax - 1] = '\0';
 				}
 				break;
 				case 3:
 				{	
-					  COleDateTime dtTime(m_data[pDispInfo->item.iItem].m_lastUsedDateTime.GetTime());
+					  COleDateTime dtTime(m_data[pDispInfo->item.iItem].m_lastUsedDateTime);
 					  lstrcpyn(pDispInfo->item.pszText, dtTime.Format(), pDispInfo->item.cchTextMax);
 					  pDispInfo->item.pszText[pDispInfo->item.cchTextMax - 1] = '\0';
 				}
@@ -475,21 +508,23 @@ void CDeleteClipData::OnLvnGetdispinfoList2(NMHDR *pNMHDR, LRESULT *pResult)
 			}
 		}
 	}
-	*pResult = 0;
+	return 0;
 }
 
 
-void CDeleteClipData::OnBnClickedCheckClipTitle()
+LRESULT CDeleteClipData::OnBnClickedCheckClipTitle(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
-	UpdateData();
+	m_filterByClipTitle = (::IsDlgButtonChecked(m_hWnd, IDC_CHECK_CLIP_TITLE) == BST_CHECKED);
 	::EnableWindow(::GetDlgItem(m_hWnd, IDC_EDIT_CLIP_TITLE), m_filterByClipTitle);	
 	::SetFocus(::GetDlgItem(m_hWnd, IDC_EDIT_CLIP_TITLE));
+	return 0;
 }
 
 
-void CDeleteClipData::OnBnClickedButtonApply()
+LRESULT CDeleteClipData::OnBnClickedButtonApply(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
 	ApplyDelete();
+	return 0;
 }
 
 void CDeleteClipData::ApplyDelete()
@@ -497,7 +532,7 @@ void CDeleteClipData::ApplyDelete()
 	if (m_applyingDelete)
 		return;
 
-	if (MessageBox(_T("Delete selected items?  This cannot be undone!"), _T(""), MB_YESNO | MB_ICONWARNING) == IDYES)
+	if (::MessageBox(m_hWnd, _T("Delete selected items?  This cannot be undone!"), _T(""), MB_YESNO | MB_ICONWARNING) == IDYES)
 	{
 		m_List.EnableWindow(FALSE);
 		m_applyingDelete = true;
@@ -509,20 +544,15 @@ void CDeleteClipData::ApplyDelete()
 		{
 			theApp.m_db.execDML(_T("PRAGMA auto_vacuum = 2"));
 
-			POSITION pos = m_List.GetFirstSelectedItemPosition();
 			std::vector<int> rowsToDelete;
 
-			if (pos != NULL)
+			for (int row = m_List.GetNextItem(-1, LVNI_SELECTED); row != -1; row = m_List.GetNextItem(row, LVNI_SELECTED))
 			{
-				while (pos)
-				{
-					int row = m_List.GetNextSelectedItem(pos);
-					rowsToDelete.push_back(row);
-				}
+				rowsToDelete.push_back(row);
 			}
 
 			CProgressWnd progress;
-			progress.Create(this, _T("Deleting clip items"), TRUE);
+			progress.Create(m_hWnd, _T("Deleting clip items"), TRUE);
 			progress.SetRange(0, (int)rowsToDelete.size() + 4);
 			progress.SetText(_T("Deleting selected items"));
 			progress.SetStep(1);
@@ -604,58 +634,63 @@ void CDeleteClipData::ApplyDelete()
 	}
 }
 
-void CDeleteClipData::OnBnClickedCancel()
+LRESULT CDeleteClipData::OnBnClickedCancel(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
 	if (m_applyingDelete)
 	{
 		m_cancelDelete = true;
-		return;
+		return 0;
 	}
 	DestroyWindow();
+	return 0;
 }
 
 
-void CDeleteClipData::OnTimer(UINT_PTR nIDEvent)
+LRESULT CDeleteClipData::OnTimer(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	switch(nIDEvent)
+	switch(wParam)
 	{
 	case 1:
 		LoadItems();
-		KillTimer(1);
+		::KillTimer(m_hWnd, 1);
 		break;
 	}
 
-	CDialog::OnTimer(nIDEvent);
+	bHandled = FALSE;
+	return 0;
 }
 
 
-void CDeleteClipData::OnBnClickedCheckCreateDate()
+LRESULT CDeleteClipData::OnBnClickedCheckCreateDate(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
-	UpdateData();
+	m_filterByCreatedDate = (::IsDlgButtonChecked(m_hWnd, IDC_CHECK_CREATE_DATE) == BST_CHECKED);
 	::EnableWindow(::GetDlgItem(m_hWnd, IDC_DATE_CREATE_START), m_filterByCreatedDate);
 	::EnableWindow(::GetDlgItem(m_hWnd, IDC_TIME_CREATE_START), m_filterByCreatedDate);
 	::EnableWindow(::GetDlgItem(m_hWnd, IDC_DATE_CREATE_END), m_filterByCreatedDate);
 	::EnableWindow(::GetDlgItem(m_hWnd, IDC_TIME_CREATE_END), m_filterByCreatedDate);
 	::SetFocus(::GetDlgItem(m_hWnd, IDC_DATE_CREATE_START));	
+	return 0;
 }
 
 
-void CDeleteClipData::OnBnClickedCheckLastUseDate()
+LRESULT CDeleteClipData::OnBnClickedCheckLastUseDate(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
-	UpdateData();
+	m_filterByLastUsedDate = (::IsDlgButtonChecked(m_hWnd, IDC_CHECK_LAST_USE_DATE) == BST_CHECKED);
 	::EnableWindow(::GetDlgItem(m_hWnd, IDC_DATE_USE_START), m_filterByLastUsedDate);
 	::EnableWindow(::GetDlgItem(m_hWnd, IDC_TIME_USE_START), m_filterByLastUsedDate);
 	::EnableWindow(::GetDlgItem(m_hWnd, IDC_DATE_USE_END), m_filterByLastUsedDate);
 	::EnableWindow(::GetDlgItem(m_hWnd, IDC_TIME_USE_END), m_filterByLastUsedDate);
 	::SetFocus(::GetDlgItem(m_hWnd, IDC_DATE_USE_START));
+	return 0;
 }
 
 
-void CDeleteClipData::OnBnClickedCheckDataFormat()
+LRESULT CDeleteClipData::OnBnClickedCheckDataFormat(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
-	UpdateData();
+	m_filterByClipboardFormat = (::IsDlgButtonChecked(m_hWnd, IDC_CHECK_DATA_FORMAT) == BST_CHECKED);
 	::EnableWindow(::GetDlgItem(m_hWnd, IDC_COMBO_DATA_FORMAT), m_filterByClipboardFormat);
 	::SetFocus(::GetDlgItem(m_hWnd, IDC_COMBO_DATA_FORMAT));
+	return 0;
 }
 
 static bool SortByTitleDesc(const CDeleteData& a1, const CDeleteData& a2)
@@ -714,7 +749,7 @@ static bool SortByDataSizeAsc(const CDeleteData& a1, const CDeleteData& a2)
 }
 
 bool desc = true;
-void CDeleteClipData::OnLvnColumnclickList2(NMHDR *pNMHDR, LRESULT *pResult)
+LRESULT CDeleteClipData::OnLvnColumnclickList2(int idCtrl, LPNMHDR pNMHDR, BOOL& bHandled)
 {
 	HD_NOTIFY *phdn = (HD_NOTIFY *)pNMHDR;
 
@@ -762,20 +797,5 @@ void CDeleteClipData::OnLvnColumnclickList2(NMHDR *pNMHDR, LRESULT *pResult)
 
 	m_List.SetItemCountEx((int)m_data.size(), 0);
 
-	*pResult = 0;
-}
-
-
-BOOL CDeleteClipData::PreTranslateMessage(MSG* pMsg)
-{
-	if (pMsg->message == WM_KEYDOWN)
-	{
-		if (pMsg->wParam == VK_RETURN)
-		{
-			FilterItems();
-			return TRUE;                // Do not process further
-		}
-	}
-
-	return CDialog::PreTranslateMessage(pMsg);
+	return 0;
 }

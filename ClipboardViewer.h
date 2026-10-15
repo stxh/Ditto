@@ -12,6 +12,7 @@
 
 class CClipboardViewer : public CWindowImpl<CClipboardViewer>
 {
+public:
 	DECLARE_WND_CLASS(_T("Ditto_ClipboardViewer"))
 
 // Construction

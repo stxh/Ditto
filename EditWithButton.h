@@ -9,8 +9,11 @@
 
 // CEditWithButton
 
-class CEditWithButton : public CEdit
+class CEditWithButton : public CWindowImpl<CEditWithButton, CEdit>
 {
+public:
+	DECLARE_WND_SUPERCLASS(_T("DittoEditWithButton"), GetWndClassName())
+
 protected:
 	CBitmap m_bmpEmptyEdit;
 	CBitmap m_bmpFilledEdit;
@@ -30,8 +33,7 @@ public:
 
 	CEditWithButton();
 	virtual ~CEditWithButton();
-	virtual void PreSubclassWindow( );
-	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	virtual void PreSubclassWindow();
 
 protected:
 

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "NumberEdit.h"
 #include "OptionsSheet.h"
@@ -30,7 +30,9 @@ public:
 	LRESULT OnBnClickedButtonTheme(WORD, WORD, HWND, BOOL&);
 	LRESULT OnBnClickedButtonDiffBrowse(WORD, WORD, HWND, BOOL&);
 	
-	int OnApply() override;
+	int OnApply();
+
+	void SetParentSheet(COptionsSheet* pParent)	{ m_pParent = pParent; }
 
 private:
 	COptionsSheet *m_pParent;

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <afxtempl.h>
-
 #define SHEET_CLASSNAME		_T("_TabCtrlClass_")
 #define SHEET_CLASSTYLE		(CS_DBLCLKS)
 

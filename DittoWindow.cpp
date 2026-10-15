@@ -8,6 +8,7 @@ CDittoWindow::CDittoWindow(void)
 {
 	m_captionBorderWidth = m_dpi.Scale(25);
 
+	m_TimeMinimized = 0;
 	m_borderSize = 2;
 	m_bMouseOverChevron = false;
 	m_bMouseDownOnChevron = false;
@@ -774,7 +775,7 @@ void CDittoWindow::MinMaxWindow(CWindow *pWnd, long lOption)
 				m_crFullSizeWindow.top, m_captionBorderWidth,
 				m_crFullSizeWindow.Height());
 			m_bMinimized = true;
-			m_TimeMinimized = COleDateTime::GetCurrentTime();
+			m_TimeMinimized = ::time(NULL);
 		}
 		else
 		{
@@ -785,7 +786,6 @@ void CDittoWindow::MinMaxWindow(CWindow *pWnd, long lOption)
 
 			m_crFullSizeWindow.SetRectEmpty();
 			m_bMinimized = false;
-			m_TimeMaximized = COleDateTime::GetCurrentTime();
 			::SetForegroundWindow(pWnd->m_hWnd);
 		}
 	}
@@ -798,7 +798,7 @@ void CDittoWindow::MinMaxWindow(CWindow *pWnd, long lOption)
 				m_crFullSizeWindow.top, m_captionBorderWidth,
 				m_crFullSizeWindow.Height());
 			m_bMinimized = true;
-			m_TimeMinimized = COleDateTime::GetCurrentTime();
+			m_TimeMinimized = ::time(NULL);
 		}
 		else
 		{
@@ -809,7 +809,6 @@ void CDittoWindow::MinMaxWindow(CWindow *pWnd, long lOption)
 
 			m_crFullSizeWindow.SetRectEmpty();
 			m_bMinimized = false;
-			m_TimeMaximized = COleDateTime::GetCurrentTime();
 			::SetForegroundWindow(pWnd->m_hWnd);
 		}
 	}
@@ -823,7 +822,7 @@ void CDittoWindow::MinMaxWindow(CWindow *pWnd, long lOption)
 				m_crFullSizeWindow.Width(),
 				m_captionBorderWidth);
 			m_bMinimized = true;
-			m_TimeMinimized = COleDateTime::GetCurrentTime();
+			m_TimeMinimized = ::time(NULL);
 		}
 		else
 		{
@@ -834,7 +833,6 @@ void CDittoWindow::MinMaxWindow(CWindow *pWnd, long lOption)
 
 			m_crFullSizeWindow.SetRectEmpty();
 			m_bMinimized = false;
-			m_TimeMaximized = COleDateTime::GetCurrentTime();
 			::SetForegroundWindow(pWnd->m_hWnd);
 		}
 	}
@@ -848,7 +846,7 @@ void CDittoWindow::MinMaxWindow(CWindow *pWnd, long lOption)
 				m_crFullSizeWindow.Width(),
 				m_captionBorderWidth);
 			m_bMinimized = true;
-			m_TimeMinimized = COleDateTime::GetCurrentTime();
+			m_TimeMinimized = ::time(NULL);
 		}
 		else
 		{
@@ -860,7 +858,6 @@ void CDittoWindow::MinMaxWindow(CWindow *pWnd, long lOption)
 
 			m_crFullSizeWindow.SetRectEmpty();
 			m_bMinimized = false;
-			m_TimeMaximized = COleDateTime::GetCurrentTime();
 			::SetForegroundWindow(pWnd->m_hWnd);
 		}
 	}

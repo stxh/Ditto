@@ -35,7 +35,7 @@ LRESULT COptionsKeyBoard::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 	m_CustomeKeysHelp.SubclassWindow(GetDlgItem(IDC_STATIC_CUSTOM_KEYS));
 	m_CustomeKeysHelp.SetHyperLink(_T("https://github.com/sabrogden/Ditto/wiki/Custom-Key-Strokes"));
 
-	m_pParent = (COptionsSheet *)GetParent();
+	m_pParent = NULL;
 
 	theApp.m_pDittoHotKey->CopyToCtrl(m_HotKey, m_hWnd, IDC_CHECK_WIN_DITTO);
 	theApp.m_pDittoHotKey2->CopyToCtrl(m_HotKey2, m_hWnd, IDC_CHECK_WIN_DITTO2);
@@ -69,16 +69,6 @@ LRESULT COptionsKeyBoard::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 	theApp.m_Language.UpdateOptionShortcuts(m_hWnd);	
 		
 	return 0;
-}
-
-int COptionsKeyBoard::OnWizardNext() 
-{
-	return 0;
-}
-
-BOOL COptionsKeyBoard::OnWizardFinish() 
-{
-	return TRUE;
 }
 
 int COptionsKeyBoard::OnApply()

@@ -1,10 +1,10 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "cp_main.h"
 #include "OptionFriends.h"
 #include "FriendDetails.h"
 #include "DimWnd.h"
 
-#define EMPTRY_STRING "----"
+#define EMPTRY_STRING _T("----")
 
 COptionFriends::COptionFriends()
 {
@@ -27,9 +27,9 @@ LRESULT COptionFriends::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 	m_SendRecieve.Attach(GetDlgItem(IDC_CHECK_LOG_SEND_RECIEVE));
 	m_List.Attach(GetDlgItem(IDC_LIST));
 
-	m_pParent = (COptionsSheet *)GetParent();
+	m_pParent = (COptionsSheet *)GetParent().m_hWnd;
 	
-	m_List.SetExtendedStyle(LVS_EX_FULLROWSELECT);
+	m_List.SetExtendedListViewStyle(LVS_EX_FULLROWSELECT);
 	InitListCtrlCols();
 
 	InsertItems();
@@ -62,20 +62,20 @@ LRESULT COptionFriends::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 int COptionFriends::OnApply() 
 {
 	CSendClients client;
+	CString csCell;
 	for (int i = 0; i < MAX_SEND_CLIENTS; i++)
 	{
-		if(m_List.GetItemText(i, 1) == "X")
+		m_List.GetItemText(i, 1, csCell);
+		if (csCell == _T("X"))
 			client.bSendAll = TRUE;
 		else
 			client.bSendAll = FALSE;
 
-		client.csIP = m_List.GetItemText(i, 2);
-		if(client.csIP == EMPTRY_STRING)
-			client.csIP = "";
-		
-		client.csDescription = m_List.GetItemText(i, 3);
-		if(client.csDescription == EMPTRY_STRING)
-			client.csDescription = "";
+		m_List.GetItemText(i, 2, csCell);
+		client.csIP = (csCell == EMPTRY_STRING) ? _T("") : csCell;
+
+		m_List.GetItemText(i, 3, csCell);
+		client.csDescription = (csCell == EMPTRY_STRING) ? _T("") : csCell;
 
 		CGetSetOptions::SetSendClients(client, i);
 	}
@@ -146,7 +146,7 @@ void COptionFriends::InsertItems()
 
 //-------------------------------------------------------------------
 		if(CGetSetOptions::m_SendClients[i].bSendAll)
-			strItem = "X";
+			strItem = _T("X");
 		else
 			strItem = EMPTRY_STRING;
 
@@ -188,21 +188,20 @@ BOOL COptionFriends::EditItem(int nItem)
 {
 	CDimWnd dim(this->GetParent().m_hWnd);
 
-	CFriendDetails dlg(this);
+	CFriendDetails dlg;
 
-	if(m_List.GetItemText(nItem, 1) == "X")
+	CString csCell;
+	if(m_List.GetItemText(nItem, 1, csCell) > 0 && csCell == _T("X"))
 		dlg.m_checkSendAll = TRUE;
 	else
 		dlg.m_checkSendAll = FALSE;
 
-	dlg.m_csIP = m_List.GetItemText(nItem, 2);
-	if(dlg.m_csIP == EMPTRY_STRING)
-		dlg.m_csIP = "";
-	dlg.m_csDescription = m_List.GetItemText(nItem, 3);
-	if(dlg.m_csDescription == EMPTRY_STRING)
-		dlg.m_csDescription = "";
+	m_List.GetItemText(nItem, 2, csCell);
+	dlg.m_csIP = (csCell == EMPTRY_STRING) ? _T("") : csCell;
+	m_List.GetItemText(nItem, 3, csCell);
+	dlg.m_csDescription = (csCell == EMPTRY_STRING) ? _T("") : csCell;
 
-	if(dlg.DoModal() == IDOK)
+	if(dlg.DoModal(m_hWnd) == IDOK)
 	{
 		if(dlg.m_checkSendAll)
 		{
@@ -231,9 +230,9 @@ LRESULT COptionFriends::OnKeydownList(int, LPNMHDR pnmh, BOOL&)
 			int nItem = m_List.GetNextItem(-1, LVNI_SELECTED);
 			if(nItem >= 0)
 			{
-				m_List.SetItemText(nItem, 1, _T(EMPTRY_STRING));
-				m_List.SetItemText(nItem, 2, _T(EMPTRY_STRING));
-				m_List.SetItemText(nItem, 3, _T(EMPTRY_STRING));
+				m_List.SetItemText(nItem, 1, EMPTRY_STRING);
+				m_List.SetItemText(nItem, 2, EMPTRY_STRING);
+				m_List.SetItemText(nItem, 3, EMPTRY_STRING);
 			}
 		}
 		break;

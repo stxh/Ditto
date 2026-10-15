@@ -1,4 +1,4 @@
-#if !defined(AFX_OPTIONSSHEET_H__D8A13849_DBC6_4CD6_A981_E572ECDC2E94__INCLUDED_)
+﻿#if !defined(AFX_OPTIONSSHEET_H__D8A13849_DBC6_4CD6_A981_E572ECDC2E94__INCLUDED_)
 #define AFX_OPTIONSSHEET_H__D8A13849_DBC6_4CD6_A981_E572ECDC2E94__INCLUDED_
 
 #if _MSC_VER > 1000
@@ -15,7 +15,7 @@ class CQuickPasteKeyboard;
 class COptionsUtilities;
 class COptionsStats;
 class COptionsTypes;
-class COptionAbout;
+class CAbout;
 class COptionFriends;
 class COptionsCopyBuffers;
 class CQuickPasteShortCut;
@@ -52,7 +52,7 @@ protected:
 	COptionsUtilities* m_pUtilites;
 	COptionsStats* m_pStats;
 	COptionsTypes* m_pTypes;
-	COptionAbout* m_pAbout;
+	CAbout* m_pAbout;
 	COptionFriends* m_pFriends;
 	COptionsCopyBuffers* m_pCopyBuffers;
 	CQuickPasteKeyboard* m_pQuickPasteShortCuts;

@@ -185,9 +185,9 @@ public:
   BOOL Create(_In_ CWindow* pNotifyWnd, _In_ UINT uID, _In_ LPCTSTR pszTooltipText, _In_ LPCTSTR pszBalloonText, _In_ LPCTSTR pszBalloonCaption, _In_ UINT nTimeout, _In_ BalloonStyle style, _In_ HICON* phIcons, _In_ int nNumIcons, _In_ DWORD dwDelay, _In_ UINT nNotifyMessage, _In_ UINT uMenuID = 0, _In_ BOOL bNoSound = FALSE, _In_ BOOL bLargeIcon = FALSE, _In_ BOOL bRealtime = FALSE, _In_opt_ HICON hBalloonIcon = NULL, _In_ BOOL bQuietTime = FALSE, _In_ BOOL bShow = TRUE);
 #endif //#ifdef _AFX
 
-  BOOL RemoveTaskbarIcon(CWnd* pWnd);
-  void MinimiseToTray(CWnd* pWnd);
-  void MaximiseFromTray(CWnd* pWnd);
+  BOOL RemoveTaskbarIcon(HWND hWnd);
+  void MinimiseToTray(HWND hWnd);
+  void MaximiseFromTray(HWND hWnd);
 
 //Sets or gets the Tooltip text
   BOOL   SetTooltipText(_In_ LPCTSTR pszTooltipText);

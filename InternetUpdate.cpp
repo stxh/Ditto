@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "cp_main.h"
 #include "InternetUpdate.h"
-#include <afxinet.h>
 #include "ProgressWnd.h"
 #include "io.h"
 

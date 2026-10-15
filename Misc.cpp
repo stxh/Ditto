@@ -722,7 +722,7 @@ long NewGroupID(int parentID, CString text)
 	{
 		//sqlite doesn't like single quotes ' replace them with double ''
 		if(text.IsEmpty())
-			text = time.Format("NewGroup %y/%m/%d %H:%M:%S");
+			text = time.Format(_T("NewGroup %y/%m/%d %H:%M:%S"));
 		text.Replace(_T("'"), _T("''"));
 
 		CString cs;

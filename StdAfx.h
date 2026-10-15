@@ -68,7 +68,12 @@ using namespace Gdiplus;
 #endif
 
 #ifndef VERIFY
+// MFC's VERIFY always evaluates its argument; only the check itself is debug-only.
+#ifdef _DEBUG
 #define VERIFY(expr) ATLASSERT(expr)
+#else
+#define VERIFY(expr) ((void)(expr))
+#endif
 #endif
 
 #ifndef TRACE

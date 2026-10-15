@@ -40,8 +40,14 @@ CClipboardViewer::~CClipboardViewer()
 // CClipboardViewer message handlers
 void CClipboardViewer::Create()
 {
-	CWindowImpl<CClipboardViewer>::Create(NULL, CRect(-1, -1, -1, -1),
-		_T("Ditto Clipboard Viewer"), 0, 0, 0);
+	// WS_POPUP keeps this a hidden top-level window: WTL reads dwStyle == 0 as
+	// "use the traits default", which for CDefaultWinTraits is WS_CHILD|WS_VISIBLE
+	// and then fails because there is no parent window.
+	HWND hWnd = CWindowImpl<CClipboardViewer>::Create(NULL, CRect(-1, -1, -1, -1),
+		_T("Ditto Clipboard Viewer"), WS_POPUP, 0);
+
+	if(hWnd == NULL)
+		Log(StrF(_T("Error creating the clipboard viewer window, err = %d"), ::GetLastError()));
 
 	if(m_connectOnStartup)
 	{
@@ -70,7 +76,8 @@ void CClipboardViewer::Connect()
 			{
 				Log(_T("Connecting to clipboard with function AddClipboardFormatListener"));
 				useSetClipboardWnd = false;
-				addListener(m_hWnd);				
+				if(!addListener(m_hWnd))
+					Log(StrF(_T("Error AddClipboardFormatListener, err = %d"), ::GetLastError()));
 			}
 		}
 	}

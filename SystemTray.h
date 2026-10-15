@@ -45,7 +45,6 @@
 #define WM_TRAY_MENU_MOUSE_MOVE	WM_USER + 216
 
 // #include <afxwin.h>
-#include <afxtempl.h>
 #include <afxdisp.h>    // COleDateTime
 
 #include "TrayWnd.h"

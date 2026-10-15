@@ -6,8 +6,9 @@
 #include <atlbase.h>
 #include <atlwin.h>
 #include <atlctl.h>
-#include <SHDocVw.h>
+#include <exdispid.h>
 #include "comdef.h"
+#include "SimpleBrowser.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -17,8 +18,12 @@ static char THIS_FILE[] = __FILE__;
 
 #define Unused(parameter) ((void)(parameter))
 
-static CComModule _Module;
-ATL::CComModule& _AtlModule = _Module;
+// The Internet Explorer WebBrowser control: {8856F961-340A-11D0-A96B-00C04FD705A2},
+// ProgID "Shell.Explorer". It used to be referenced through a generated SHDocVw.h, which
+// came from importing the type library; the ProgID is resolved by the ActiveX host instead.
+// DIID_DWebBrowserEvents2 and CLSID_WebBrowser are declared by exdispid.h and defined in
+// uuid.lib, which ATL links in.
+static const LPCTSTR WEBBROWSER_PROGID = _T("Shell.Explorer");
 
 ///////////////////////////////////////////////////////////////////////////
 // IDispatch Implementation for Browser Events
@@ -232,44 +237,37 @@ void SimpleBrowser::_DisconnectEvents()
 	_dwCookie = 0;
 }
 
-BOOL SimpleBrowser::Create(DWORD dwStyle, 
-                           const RECT& rect, 
-                           HWND hParentWnd, 
+BOOL SimpleBrowser::Create(DWORD dwStyle,
+                           const RECT& rect,
+                           HWND hParentWnd,
 						   UINT nID)
 {
-    BOOL results = TRUE;
-
 	_Ready      = false;
 	
     _Browser	= NULL;
 
-    CWindow *window = this;
-	results = window->Create(ATL::AtlRegisterWndClass(CS_HREDRAW | CS_VREDRAW),
-	                         NULL,
-							 dwStyle,
-							 rect,
-							 hParentWnd,
-							 nID);
-    if (!results) return FALSE;
+	RECT create_rect = rect;
+    if (CWindowImpl<SimpleBrowser>::Create(hParentWnd, &create_rect, _T(""), dwStyle, 0, (HMENU)(UINT_PTR)nID) == NULL)
+		return FALSE;
 
 	CRect browser_window_rect(0,0,(rect.right - rect.left),(rect.bottom - rect.top));
 
-    results = _BrowserWindow.CreateControl(CLSID_WebBrowser,
-                                           NULL,
-                                           (WS_VISIBLE | WS_TABSTOP),
-                                           browser_window_rect,
-                                           this,
-                                           nID);
-    if (!results) {
+	// The WebBrowser control lives inside an ATL ActiveX container window.
+	if (_BrowserWindow.Create(m_hWnd, browser_window_rect, NULL,
+		(WS_CHILD | WS_VISIBLE | WS_TABSTOP), 0, nID) == NULL) {
         DestroyWindow();
         return FALSE;
     }
 
-    LPUNKNOWN unknown = _BrowserWindow.GetControlUnknown();
+	if (FAILED(_BrowserWindow.CreateControl(WEBBROWSER_PROGID))) {
+        _BrowserWindow.DestroyWindow();
+        DestroyWindow();
+        return FALSE;
+    }
 
-    HRESULT hr = unknown->QueryInterface(IID_IWebBrowser2,(void **)&_Browser);
+    HRESULT hr = _BrowserWindow.QueryControl(IID_IWebBrowser2,(void **)&_Browser);
     if (SUCCEEDED(hr)) {
-        hr = unknown->QueryInterface(IID_IDispatch,(void **)&_BrowserDispatch);
+        hr = _BrowserWindow.QueryControl(IID_IDispatch,(void **)&_BrowserDispatch);
     }
 
     if (!SUCCEEDED(hr)) {
@@ -294,21 +292,22 @@ BOOL SimpleBrowser::CreateFromControl(HWND hParentWnd, UINT nID, DWORD dwStyle)
 	if (hParentWnd == NULL) return FALSE;
 
 	CWindow parentWnd(hParentWnd);
-	CWnd *control = parentWnd.GetDlgItem(nID);
+	CWindow control = parentWnd.GetDlgItem(nID);
 
 	if (control != NULL) {
 		CRect rect;
-		control->GetWindowRect(&rect);
+		control.GetWindowRect(&rect);
 		parentWnd.ScreenToClient(&rect);
-		control->DestroyWindow();
+		control.DestroyWindow();
 		result = Create(dwStyle, rect, hParentWnd, nID);
 	}
 
 	return result;
 }
 
-void SimpleBrowser::PostNcDestroy()
+void SimpleBrowser::OnFinalMessage(HWND hWnd)
 {
+	Unused(hWnd);
 	_DisconnectEvents();
 
 	if (_Browser != NULL) {
@@ -323,8 +322,6 @@ void SimpleBrowser::PostNcDestroy()
 	
 	_Ready		= false;
 	_Content	= _T("");
-	
-	CWindow::PostNcDestroy();
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -682,9 +679,6 @@ BOOL SimpleBrowser::PreTranslateMessage(MSG *pMsg)
 			result = (hr == S_OK ? TRUE : FALSE);
 			OleInPlaceActiveObject->Release();
 		}
-	}
-	else {
-		result = CWindow::PreTranslateMessage(pMsg);
 	}
 
 	return result;

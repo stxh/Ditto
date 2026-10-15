@@ -8,7 +8,7 @@
 #define FORCE_MIN				2
 #define FORCE_MAX				3
 
-class CWndEx : public CWindowImpl<CWndEx, CWindow, CNullTraits>
+class CWndEx : public CWindowImpl<CWndEx, CWindow, CNullTraits>, public WTL::CMessageFilter
 {
 public:
 	DECLARE_WND_CLASS_EX(_T("QPasteClass"), CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW, COLOR_WINDOW)
@@ -19,6 +19,7 @@ public:
 public:
 	virtual BOOL Create(const CRect& crStart, CWindow* pParentWnd);
 	BOOL PreTranslateMessage(MSG* pMsg);
+	bool IsMsgForThisWindowTree(MSG* pMsg);
 
 public:
 	void InvalidateNc();
@@ -46,6 +47,7 @@ protected:
 
 public:
 	int OnCreate(LPCREATESTRUCT lpCreateStruct);
+	void OnDestroy();
 	LRESULT OnNcPaint(HRGN hRgn);
 	LRESULT OnNcCalcSize(BOOL bCalcValidRects, LPARAM lpncsp);
 	LRESULT OnNcHitTest(CPoint point);
@@ -63,6 +65,7 @@ public:
 
 	BEGIN_MSG_MAP_EX(CWndEx)
 		MSG_WM_CREATE(OnCreate)
+		MSG_WM_DESTROY(OnDestroy)
 		MSG_WM_NCPAINT(OnNcPaint)
 		MSG_WM_NCCALCSIZE(OnNcCalcSize)
 		MSG_WM_NCHITTEST(OnNcHitTest)

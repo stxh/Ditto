@@ -24,20 +24,16 @@ CNumberEdit::~CNumberEdit()
 }
 
 
-BEGIN_MESSAGE_MAP(CNumberEdit, CEdit)
-	//{{AFX_MSG_MAP(CNumberEdit)
-	ON_WM_CHAR()
-	//}}AFX_MSG_MAP
-END_MESSAGE_MAP()
-
 /////////////////////////////////////////////////////////////////////////////
 // CNumberEdit message handlers
 
-void CNumberEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags) 
+LRESULT CNumberEdit::OnChar(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
+	UINT nChar = static_cast<UINT>(wParam);
+
 	//Only allow the number 0 - 9 and a the backspace to go through
 	if(((nChar < '0') || (nChar > '9')) && (nChar != VK_BACK))
-		return;
+		return 0;
 
 	CString csText;
 	GetWindowText(csText);
@@ -47,7 +43,7 @@ void CNumberEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 	GetSel(nStartChar, nEndChar);
 
 	//Set the new number
-	CEdit::OnChar(nChar, nRepCnt, nFlags);
+	LRESULT lResult = DefWindowProc(uMsg, wParam, lParam);
 	
 	//If its not valid set it back to the old number
 	if(!ValidateNumber(GetNumberD()))
@@ -55,6 +51,8 @@ void CNumberEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 		SetWindowText(csText);
 		SetSel(nStartChar, nEndChar);
 	}
+
+	return lResult;
 }
 
 BOOL CNumberEdit::ValidateNumber(double dNumber)

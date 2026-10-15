@@ -2678,6 +2678,29 @@ void CQPasteWnd::SetKeyModiferState(bool bActive)
 
 BOOL CQPasteWnd::PreTranslateMessage(MSG *pMsg)
 {
+	if (!IsMsgForThisWindowTree(pMsg))
+	{
+		return FALSE;
+	}
+
+	// MFC ran the focused control's PreTranslateMessage before walking up to this window.
+	HWND hFocus = ::GetFocus();
+	if (hFocus != NULL)
+	{
+		if (hFocus == m_lstHeader.m_hWnd && m_lstHeader.PreTranslateMessage(pMsg))
+		{
+			return TRUE;
+		}
+		if (hFocus == m_search.m_hWnd && m_search.PreTranslateMessage(pMsg))
+		{
+			return TRUE;
+		}
+		if (hFocus == m_GroupTree.m_hWnd && m_GroupTree.PreTranslateMessage(pMsg))
+		{
+			return TRUE;
+		}
+	}
+
 	switch (pMsg->message)
 	{
 	case WM_MBUTTONUP:
@@ -5965,6 +5988,8 @@ void CQPasteWnd::FillMainTable(CMainTable &table, CppSQLite3Query &q)
 
 void CQPasteWnd::OnDestroy()
 {
+	CWndEx::OnDestroy();
+
 	CGetSetOptions::SetPastSearchXml(m_search.SavePastSearches());
 
 	m_thread.Stop();

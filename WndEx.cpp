@@ -52,7 +52,7 @@ BOOL CWndEx::Create(const CRect& crStart, CWindow* pParentWnd)
 
 	CRect rc = crStart;
 	return CWindowImpl<CWndEx, CWindow, CNullTraits>::Create(hWndParent, &rc,
-		_T("Quick Paste"), WS_POPUP, 0, 0U, NULL);
+		_T("Quick Paste"), WS_POPUP, 0, 0U, NULL) != NULL;
 }
 
 int CWndEx::OnCreate(LPCREATESTRUCT lpCreateStruct) 
@@ -81,8 +81,38 @@ int CWndEx::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	r.SetRect(ptLT, ptRB);
 	r.InflateRect(m_DittoWindow.m_dpi.Scale(25), m_DittoWindow.m_dpi.Scale(25));
 	m_toolTip.AddTool(m_hWnd, _T("Ditto"), &r, 1);
-	
+
+	theApp.GetMessageLoop()->AddMessageFilter(this);
+
 	return 0;
+}
+
+void CWndEx::OnDestroy()
+{
+	theApp.GetMessageLoop()->RemoveMessageFilter(this);
+}
+
+// The message loop calls every filter for every message, while MFC only reached a
+// window through the focused control's parent chain.  Rebuild that restriction here.
+bool CWndEx::IsMsgForThisWindowTree(MSG* pMsg)
+{
+	if (!::IsWindow(m_hWnd))
+	{
+		return false;
+	}
+
+	HWND hWnd = ::GetFocus();
+	if (hWnd == NULL)
+	{
+		hWnd = pMsg->hwnd;
+	}
+
+	while (hWnd != NULL && hWnd != m_hWnd)
+	{
+		hWnd = ::GetParent(hWnd);
+	}
+
+	return hWnd == m_hWnd;
 }
 
 bool CWndEx::SetCaptionColorActive(BOOL bPersistant, BOOL ConnectedToClipboard)
@@ -173,8 +203,7 @@ void CWndEx::OnNcMouseMove(UINT nHitTest, CPoint point)
 
 	if((m_bMaxSetTimer == false) && m_DittoWindow.m_bMinimized)
 	{
-		COleDateTimeSpan sp = COleDateTime::GetCurrentTime() - m_DittoWindow.m_TimeMinimized;
-		if(sp.GetTotalSeconds() >= m_lDelayMaxSeconds)
+		if(::time(NULL) - m_DittoWindow.m_TimeMinimized >= m_lDelayMaxSeconds)
 		{
 			SetTimer(TIMER_AUTO_MAX, CGetSetOptions::GetTimeBeforeExpandWindow(), NULL);
 			m_bMaxSetTimer = true;
@@ -184,6 +213,11 @@ void CWndEx::OnNcMouseMove(UINT nHitTest, CPoint point)
 
 BOOL CWndEx::PreTranslateMessage(MSG* pMsg) 
 {
+	if (!IsMsgForThisWindowTree(pMsg))
+	{
+		return FALSE;
+	}
+
 	m_toolTip.RelayEvent(pMsg);
 	m_DittoWindow.DoPreTranslateMessage(pMsg);
 	

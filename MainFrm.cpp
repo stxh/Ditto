@@ -18,12 +18,6 @@
 #include "DeleteClipData.h"
 #include "DatabaseUtilities.h"
 
-static UINT indicators[] =
-{
-    ID_SEPARATOR,
-    ID_INDICATOR_CAPS, ID_INDICATOR_NUM, ID_INDICATOR_SCRL,
-};
-
 /////////////////////////////////////////////////////////////////////////////
 // CMainFrame construction/destruction
 
@@ -47,12 +41,7 @@ CMainFrame::~CMainFrame()
 
 int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
-    if(CFrameWindowImpl<CMainFrame>::OnCreate(lpCreateStruct) == -1)
-    {
-        return -1;
-    }
-
-    CMessageLoop* pLoop = _Module.GetMessageLoop();
+    CMessageLoop* pLoop = theApp.GetMessageLoop();
     ATLASSERT(pLoop != NULL);
     pLoop->AddMessageFilter(this);
     pLoop->AddIdleHandler(this);
@@ -82,7 +71,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
         m_trayIcon.SetBalloonDetails(msg, _T("Ditto"), CTrayNotifyIcon::BalloonStyle::Info, CGetSetOptions::GetBalloonTimeout());
     }
 
-    theApp.m_Language.UpdateTrayIconRightClickMenu(&m_trayIcon.GetMenu());
+    theApp.m_Language.UpdateTrayIconRightClickMenu(m_trayIcon.GetMenu());
 
 #ifndef _DEBUG
     if(!(CGetSetOptions::GetShowIconInSysTray()))
@@ -126,41 +115,6 @@ LRESULT CMainFrame::OnTrayNotification(UINT uMsg, WPARAM wParam, LPARAM lParam, 
     }
 
     m_trayIcon.OnTrayNotification(wParam, lParam);
-    return 0;
-}
-BOOL CMainFrame::PreCreateWindow(CREATESTRUCT &cs)
-{
-    if(cs.hMenu != NULL)
-    {
-        ::DestroyMenu(cs.hMenu); // delete menu if loaded
-        cs.hMenu = NULL; // no menu for this window
-    }
-
-    if(!CFrameWindowImpl<CMainFrame>::PreCreateWindow(cs))
-    {
-        return FALSE;
-    }
-
-    WNDCLASS wc;
-    wc.style = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW;
-    wc.lpfnWndProc = ::DefWindowProc;
-    wc.cbClsExtra = 0;
-    wc.cbWndExtra = 0;
-    wc.hInstance = _Module.GetModuleInstance();
-    wc.hIcon = NULL;
-    wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-    wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
-    wc.lpszMenuName = NULL;
-    wc.lpszClassName = _T("Ditto");
-
-    // Create the QPaste window class
-    if(!::RegisterClass(&wc))
-    {
-        return FALSE;
-    }
-
-    cs.lpszClass = wc.lpszClassName;
-
     return 0;
 }
 /////////////////////////////////////////////////////////////////////////////// CMainFrame message handlers
@@ -339,7 +293,7 @@ LRESULT CMainFrame::OnHotKey(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHan
 	}
 	else if(theApp.m_pSaveClipboard && wParam == theApp.m_pSaveClipboard->m_Atom)
 	{
-		OnFirstSavecurrentclipboard();
+		SaveCurrentClipboard();
 	}
 	else if (theApp.m_pCopyAndSaveClipboard && wParam == theApp.m_pCopyAndSaveClipboard->m_Atom)
 	{
@@ -352,7 +306,7 @@ LRESULT CMainFrame::OnHotKey(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHan
 		Sleep(delay);
 
 		Log(StrF(_T("Copy and save clipboard, saving clipboard")));
-		OnFirstSavecurrentclipboard();
+		SaveCurrentClipboard();
 
 		Log(StrF(_T("END of copy and save clipboard")));
 	}
@@ -1043,7 +997,7 @@ LRESULT CMainFrame::OnOpenCloseWindow(UINT uMsg, WPARAM wParam, LPARAM lParam, B
 }
 void CMainFrame::OnDestroy()
 {
-    CMessageLoop* pLoop = _Module.GetMessageLoop();
+    CMessageLoop* pLoop = theApp.GetMessageLoop();
     ATLASSERT(pLoop != NULL);
     pLoop->RemoveMessageFilter(this);
     pLoop->RemoveIdleHandler(this);
@@ -1090,7 +1044,7 @@ LRESULT CMainFrame::OnFirstGlobalhotkeys(WORD wNotifyCode, WORD wID, HWND hWndCt
             CAlphaBlend tran;
             tran.SetTransparent(m_hWnd, 0, 1);
             pGlobalClips->SetNotifyWnd(m_hWnd);
-            pGlobalClips->Create(IDD_GLOBAL_CLIPS, NULL);
+            pGlobalClips->Create(NULL);
             pGlobalClips->ShowWindow(SW_SHOW);
             m_pGlobalClips = pGlobalClips->m_hWnd;
         }
@@ -1143,7 +1097,7 @@ LRESULT CMainFrame::OnOptionsClosed(UINT uMsg, WPARAM wParam, LPARAM lParam, BOO
     }
 
     m_trayIcon.SetMenu(NULL, IDR_MENU);
-    theApp.m_Language.UpdateTrayIconRightClickMenu(&m_trayIcon.GetMenu());
+    theApp.m_Language.UpdateTrayIconRightClickMenu(m_trayIcon.GetMenu());
 
     if(CGetSetOptions::GetShowIconInSysTray())
     {
@@ -1210,7 +1164,7 @@ LRESULT CMainFrame::OnFirstDeleteclipdata(WORD wNotifyCode, WORD wID, HWND hWndC
             CAlphaBlend tran;
             tran.SetTransparent(m_hWnd, 0, 1);
             pDeleteClips->SetNotifyWnd(m_hWnd);
-            pDeleteClips->Create(IDD_DELETE_CLIP_DATA, NULL);
+            pDeleteClips->Create(NULL);
             pDeleteClips->ShowWindow(SW_SHOW);
             m_pDeleteClips = pDeleteClips->m_hWnd;
         }
@@ -1219,34 +1173,15 @@ LRESULT CMainFrame::OnFirstDeleteclipdata(WORD wNotifyCode, WORD wID, HWND hWndC
 }
 LRESULT CMainFrame::OnSaveClipboardMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-    Log(_T("Start Saving the current clipboard to the database"));
-    CClip* pClip = new CClip;
-    if(pClip)
-    {
-        CClipTypes* pTypes = theApp.LoadTypesFromDB();
-        if(pTypes)
-        {
-            if(pClip->LoadFromClipboard(pTypes, false, _T("")))
-            {
-                Log(_T("Loaded clips from the clipboard, sending message to save to the db"));
-                ::PostMessage(m_hWnd, WM_CLIPBOARD_COPIED, (WPARAM)pClip, 0);
-            }
-            else
-            {
-                Log(_T("Failed to load clips from the clipboard, not saving to db"));
-                delete pClip;
-                pClip = NULL;
-            }
-        }
-        else
-        {
-            Log(_T("Failed to load supported types from the db, not saving to the db"));
-        }
-    }
-    Log(_T("End Saving the current clipboard to the database"));
+    SaveCurrentClipboard();
     return 0;
 }
 LRESULT CMainFrame::OnFirstSavecurrentclipboard(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
+{
+	SaveCurrentClipboard();
+	return 0;
+}
+void CMainFrame::SaveCurrentClipboard()
 {
 	Log(_T("Start Saving the current clipboard to the database"));
 	CClip* pClip = new CClip;
@@ -1273,7 +1208,6 @@ LRESULT CMainFrame::OnFirstSavecurrentclipboard(WORD wNotifyCode, WORD wID, HWND
 		}
 	}
 	Log(_T("Start Saving the current clipboard to the database"));
-	return 0;
 }
 LRESULT CMainFrame::OnReAddTaskBarIcon(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
