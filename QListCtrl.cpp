@@ -679,7 +679,7 @@ INT_PTR CQListCtrl::OnToolHitTest(CPoint point, TOOLINFO * pTI) const
 	return -1;
 }
 
-LRESULT CQListCtrl::OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+void CQListCtrl::ApplyToolTipSettings()
 {
 	if (::IsWindow(m_toolTip.m_hWnd) == FALSE)
 	{
@@ -691,7 +691,7 @@ LRESULT CQListCtrl::OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHan
 	{
 		m_toolTip.SetMaxTipWidth(500);
 		if (CGetSetOptions::m_tooltipTimeout > 0)
-			m_toolTip.SetDelayTime(TTDT_AUTOPOP, CGetSetOptions::m_tooltipTimeout * 1000);
+			m_toolTip.SetDelayTime(TTDT_AUTOPOP, CGetSetOptions::m_tooltipTimeout);
 		m_toolTip.Activate(TRUE);
 		// one subclassed tool for the whole control, the item under the cursor is resolved on TTN_NEEDTEXT
 		m_toolTip.AddTool(m_hWnd, LPSTR_TEXTCALLBACK);
@@ -700,6 +700,11 @@ LRESULT CQListCtrl::OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHan
 	{
 		m_toolTip.Activate(FALSE);
 	}
+}
+
+LRESULT CQListCtrl::OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+{
+	ApplyToolTipSettings();
 
 	// This window is a superclass of SysListView32, so WM_CREATE has to reach the
 	// original list-view window proc as well, otherwise the control stays uninitialised.

@@ -6,7 +6,8 @@ LRESULT COptionsUtilities::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM
 {
 	m_ePath.Attach(GetDlgItem(IDC_PATH));
 	m_ePath.SetWindowText(CGetSetOptions::GetDBPath(FALSE));
-	return 0;
+	// TRUE: no focus set here, let the dialog manager select the first control.
+	return TRUE;
 }
 
 LRESULT COptionsUtilities::OnCompactDB(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/)

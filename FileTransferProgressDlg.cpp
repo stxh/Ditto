@@ -18,7 +18,8 @@ LRESULT CFileTransferProgressDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/,
 
 	::SetWindowPos(m_hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE|SWP_NOMOVE|SWP_SHOWWINDOW);
 
-	return 0;
+	// TRUE: no focus set here, let the dialog manager select the first control.
+	return TRUE;
 }
 
 LRESULT CFileTransferProgressDlg::OnCancel(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/)

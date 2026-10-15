@@ -118,7 +118,8 @@ LRESULT COptionsGeneral::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 	CString csPath = CGetSetOptions::GetDBPath(false);
 	m_ePath.SetWindowText(csPath);
 
-	return 0;
+	// TRUE: no focus set here, let the dialog manager select the first control.
+	return TRUE;
 }
 
 #define NO_MATCH	-2

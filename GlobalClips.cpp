@@ -17,7 +17,8 @@ LRESULT GlobalClips::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPa
 
 	LoadItems();
 
-	return 0;
+	// TRUE: no focus set here, let the dialog manager select the first control.
+	return TRUE;
 }
 
 void GlobalClips::LoadItems()

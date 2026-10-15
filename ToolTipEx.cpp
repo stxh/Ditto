@@ -973,7 +973,9 @@ void CToolTipEx::OnActivate(UINT nState, BOOL bMinimized, HWND hWndOther)
 	{		
         if (::IsWindow(m_hWndNotify))
         {
-            ::SendMessage(m_hWndNotify, NM_INACTIVE_TOOLTIPWND, 0, 0);
+            // async, as upstream did: we are inside WM_ACTIVATE and the notify window
+            // may hide/destroy this tooltip in response.
+            ::PostMessage(m_hWndNotify, NM_INACTIVE_TOOLTIPWND, 0, 0);
         }
     }
 }
@@ -1084,6 +1086,7 @@ void CToolTipEx::OnNcLButtonUp(UINT nHitTest, CPoint point)
 		break;
 	case BUTTON_CHEVRON:
 		m_DittoWindow.MinMaxWindow(this, SWAP_MIN_MAX);
+		::RedrawWindow(m_hWnd, NULL, NULL, RDW_FRAME | RDW_INVALIDATE);
 		break;
 	}
 

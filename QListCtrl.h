@@ -74,6 +74,7 @@ public:
 public:
 	INT_PTR OnToolHitTest(CPoint point, TOOLINFO * pTI) const;
 	BOOL PreTranslateMessage(MSG* pMsg);
+	void ApplyToolTipSettings();
 
 public:
 	virtual ~CQListCtrl();

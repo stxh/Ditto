@@ -58,7 +58,8 @@ LRESULT CQuickPasteKeyboard::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 
 	theApp.m_Language.UpdateOptionQuickPasteKeyboard(m_hWnd);
 
-	return 0;
+	// TRUE: no focus set here, let the dialog manager select the first control.
+	return TRUE;
 }
 
 void CQuickPasteKeyboard::InitListCtrlCols()

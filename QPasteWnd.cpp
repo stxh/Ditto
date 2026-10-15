@@ -5082,6 +5082,8 @@ LRESULT CQPasteWnd::OnPostOptions(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL&
 
 	SetCurrentTransparency();
 
+	m_lstHeader.ApplyToolTipSettings();
+
 	return 1;
 }
 
@@ -5540,7 +5542,7 @@ LRESULT CQPasteWnd::OnFindItem(int idCtrl, LPNMHDR pNMHDR, BOOL& bHandled)
 		//return 0;
 	}
 
-	return 0;
+	return -1; // Default action.
 }
 
 void CQPasteWnd::OnNcLButtonDblClk(UINT nHitTest, CPoint point)
@@ -8064,9 +8066,9 @@ void CQPasteWnd::UpdateMenuCommands(HMENU hMenu)
 
 LRESULT CQPasteWnd::OnInitMenuPopup(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	HMENU hPopup = ::GetSubMenu((HMENU)wParam, LOWORD(lParam));
-
-	UpdateMenuCommands(hPopup != NULL ? hPopup : (HMENU)wParam);
+	// MFC updated the items of the menu that is about to open (wParam), not the submenu
+	// at the menu bar position carried in lParam - cascading menus get their own message.
+	UpdateMenuCommands((HMENU)wParam);
 
 	bHandled = FALSE;
 	return 0;
