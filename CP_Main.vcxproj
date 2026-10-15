@@ -548,8 +548,7 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <!-- AdvGeneral.cpp - DISABLED: Waiting for WTL reimplementation of CMFCPropertyGridCtrl -->
-    <!-- <ClCompile Include="AdvGeneral.cpp" /> -->
+    <ClCompile Include="AdvGeneral.cpp" />
     <ClCompile Include="AutoSendToClientThread.cpp" />
     <ClCompile Include="BitmapHelper.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
@@ -1587,6 +1586,7 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="OptionsCopyBuffers.cpp" />
+    <ClCompile Include="PropGrid.cpp" />
     <ClCompile Include="OptionsGeneral.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">Disabled</Optimization>
@@ -2695,8 +2695,7 @@
   <ItemGroup>
     <ClInclude Include="Accels.h" />
     <ClInclude Include="ActionEnums.h" />
-    <!-- AdvGeneral.h - DISABLED: Waiting for WTL reimplementation -->
-    <!-- <ClInclude Include="AdvGeneral.h" /> -->
+    <ClInclude Include="AdvGeneral.h" />
     <ClInclude Include="AlphaBlend.h" />
     <ClInclude Include="ArrayEx.h" />
     <ClInclude Include="AutoSendToClientThread.h" />
@@ -2812,6 +2811,7 @@
     <ClInclude Include="OptionFriends.h" />
     <ClInclude Include="Options.h" />
     <ClInclude Include="OptionsCopyBuffers.h" />
+    <ClInclude Include="PropGrid.h" />
     <ClInclude Include="OptionsGeneral.h" />
     <ClInclude Include="OptionsKeyBoard.h" />
     <ClInclude Include="OptionsQuickPaste.h" />

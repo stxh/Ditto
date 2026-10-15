@@ -552,7 +552,7 @@
 #define IDC_COPY_5                      2119
 #define IDC_STATIC_GROUP_SEARCH         2120
 #define IDC_WIN_COPY_5                  2120
-#define IDC_MFCPROPERTYGRID1            2121
+#define IDC_ADV_GRID                    2121
 #define IDC_PASTE_5                     2121
 #define IDC_STATIC_DIFF                 2122
 #define IDC_WIN_PASTE_5                 2122

@@ -154,6 +154,12 @@
     <ClCompile Include="OptionsCopyBuffers.cpp">
       <Filter>source</Filter>
     </ClCompile>
+    <ClCompile Include="AdvGeneral.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="PropGrid.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
     <ClCompile Include="OptionsGeneral.cpp">
       <Filter>source</Filter>
     </ClCompile>
@@ -582,6 +588,12 @@
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="OptionsCopyBuffers.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="AdvGeneral.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="PropGrid.h">
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="OptionsGeneral.h">

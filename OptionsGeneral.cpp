@@ -6,6 +6,7 @@
 #include <Mmsystem.h>
 #include "Path.h"
 #include "DimWnd.h"
+#include "AdvGeneral.h"
 #include <atlctrlx.h>
 
 using namespace nsPath;
@@ -375,7 +376,11 @@ LRESULT COptionsGeneral::OnButtonAbout(WORD, WORD, HWND, BOOL&)
 
 LRESULT COptionsGeneral::OnBnClickedButtonAdvanced(WORD, WORD, HWND, BOOL&)
 {
-	MessageBox(_T("Advanced Options - Coming Soon!\nThis feature will be reimplemented in a future update."), _T("Ditto"), MB_OK | MB_ICONINFORMATION);
+	CDimWnd dim(this->GetParent().m_hWnd);
+
+	CAdvGeneral adv;
+	adv.DoModal(m_hWnd);
+
 	return 0;
 }
 

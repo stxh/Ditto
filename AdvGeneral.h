@@ -1,34 +1,45 @@
 #pragma once
 
 #include "DialogResizer.h"
+#include "PropGrid.h"
 
-class CAdvGeneral : public CDialogEx
+// Advanced Options.  The MFC build drove this page with CMFCPropertyGridCtrl;
+// WTL has no equivalent, so the rows live in CPropGrid instead.
+class CAdvGeneral : public CDialogImpl<CAdvGeneral>
 {
-
 public:
-	CAdvGeneral(CWnd* pParent = NULL);   // standard constructor
-	virtual ~CAdvGeneral();
-
-// Dialog Data
 	enum { IDD = IDD_ADV_OPTIONS };
 
+	CAdvGeneral();
+
+	BEGIN_MSG_MAP(CAdvGeneral)
+		MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
+		MESSAGE_HANDLER(WM_SIZE, OnSize)
+		MESSAGE_HANDLER(WM_GETMINMAXINFO, OnGetMinMaxInfo)
+		MESSAGE_HANDLER(WM_NCLBUTTONDOWN, OnNcLButtonDown)
+		COMMAND_ID_HANDLER(IDOK, OnOK)
+		COMMAND_ID_HANDLER(IDCANCEL, OnCancel)
+		COMMAND_ID_HANDLER(IDC_BT_COMPACT_AND_REPAIR, OnBnClickedBtCompactAndRepair)
+		COMMAND_ID_HANDLER(IDC_BUTTON_COPY_SCRIPTS, OnBnClickedButtonCopyScripts)
+		COMMAND_ID_HANDLER(IDC_BUTTON_PASTE_SCRIPTS, OnBnClickedButtonPasteScripts)
+	END_MSG_MAP()
+
+	LRESULT OnInitDialog(UINT, WPARAM, LPARAM, BOOL&);
+	LRESULT OnSize(UINT, WPARAM, LPARAM, BOOL&);
+	LRESULT OnGetMinMaxInfo(UINT, WPARAM, LPARAM, BOOL&);
+	LRESULT OnNcLButtonDown(UINT, WPARAM, LPARAM, BOOL&);
+	LRESULT OnOK(WORD, WORD, HWND, BOOL&);
+	LRESULT OnCancel(WORD, WORD, HWND, BOOL&);
+	LRESULT OnBnClickedBtCompactAndRepair(WORD, WORD, HWND, BOOL&);
+	LRESULT OnBnClickedButtonCopyScripts(WORD, WORD, HWND, BOOL&);
+	LRESULT OnBnClickedButtonPasteScripts(WORD, WORD, HWND, BOOL&);
+
+private:
+	void AddTrueFalse(LPCTSTR szName, BOOL bValue, int nSettingId);
+	void BuildGrid();
+	void ApplySettings();
+
+	CPropGrid m_grid;
 	CDialogResizer m_Resize;
 	bool m_mouseDownOnCaption;
-
-protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-
-	void AddTrueFalse(CMFCPropertyGridProperty * pGroupTest, CString desc, BOOL value, int settingId);
-
-	DECLARE_MESSAGE_MAP()
-public:
-	CMFCPropertyGridCtrl m_propertyGrid;
-	virtual BOOL OnInitDialog();
-	afx_msg void OnBnClickedOk();
-	afx_msg void OnSize(UINT nType, int cx, int cy);
-	afx_msg void OnBnClickedBtCompactAndRepair();
-	afx_msg void OnBnClickedButtonCopyScripts();
-	afx_msg void OnBnClickedButtonPasteScripts2();
-	afx_msg void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
-	afx_msg void OnNcLButtonDown(UINT nHitTest, CPoint point);
 };
