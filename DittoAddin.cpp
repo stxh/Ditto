@@ -4,7 +4,8 @@
 #include "shared/TextConvert.h"
 
 CDittoAddin::CDittoAddin() :
-	m_hModule(NULL)
+	m_hModule(NULL),
+	m_SupportedFunctions(NULL)
 {
 }
 
@@ -58,6 +59,12 @@ bool CDittoAddin::DoLoad(LPCTSTR lpszDllName, CDittoInfo DittoInfo)
 
 void CDittoAddin::Cleanup()
 {
+	// The add-in allocated these strings through its own string manager, and
+	// releasing them calls back into that module, so drop them before unloading.
+	m_DittoAddinInfo.m_Name.Empty();
+	m_PrePasteFunctions.clear();
+	m_SupportedFunctions = NULL;
+
 	if(m_hModule)
 	{
 		// release resources to the dll
