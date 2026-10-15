@@ -49,12 +49,7 @@ to maintain a single distribution point for the source code.
 #pragma message("CTrayNotifyIcon as of v1.51 requires ATL support to implement its functionality. If your project is MFC only, then you need to update it to include ATL support")
 #endif //#ifndef __ATLWIN_H__
 
-#ifndef _AFX
-#ifndef __ATLMISC_H__
-#pragma message("To avoid this message, please put atlmisc.h (part of WTL) in your pre compiled header (normally stdafx.h)")
-#include <atlmisc.h> //If you do want to use CTrayNotifyIcon independent of MFC, then you need to download and install WTL from http://sourceforge.net/projects/wtl
-#endif //#ifndef __ATLMISC_H__
-#endif //#ifndef _AFX
+#include <atlmisc.h>
 
 #include "TrayWnd.h"
 
@@ -66,11 +61,7 @@ class CTRAYNOTIFYICON_EXT_CLASS CTrayNotifyIcon : public CWindowImpl<CTrayNotify
 {
 public:
 //Enums / Typedefs
- #ifndef _AFX
-  typedef _CSTRING_NS::CString String;
-#else
-  typedef CString String;
-#endif //#ifndef _AFX
+  typedef ATL::CString String;
 
   enum BalloonStyle
   {
@@ -169,21 +160,12 @@ public:
   virtual ~CTrayNotifyIcon();
 
 //Create the tray icon
-#ifdef _AFX
-  BOOL Create(_In_ CWnd* pNotifyWnd, _In_ UINT uID, _In_ LPCTSTR pszTooltipText, _In_ HICON hIcon, _In_ UINT nNotifyMessage, _In_ UINT uMenuID = 0, _In_ BOOL bShow = TRUE);
-  BOOL Create(_In_ CWnd* pNotifyWnd, _In_ UINT uID, _In_ LPCTSTR pszTooltipText, _In_ CBitmap* pBitmap, _In_ UINT nNotifyMessage, _In_ UINT uMenuID = 0, _In_ BOOL bShow = TRUE);
-  BOOL Create(_In_ CWnd* pNotifyWnd, _In_ UINT uID, _In_ LPCTSTR pszTooltipText, _In_ HICON* phIcons, _In_ int nNumIcons, _In_ DWORD dwDelay, _In_ UINT nNotifyMessage, _In_ UINT uMenuID = 0, _In_ BOOL bShow = TRUE);
-  BOOL Create(_In_ CWnd* pNotifyWnd, _In_ UINT uID, _In_ LPCTSTR pszTooltipText, _In_ LPCTSTR pszBalloonText, _In_ LPCTSTR pszBalloonCaption, _In_ UINT nTimeout, _In_ BalloonStyle style, _In_ HICON hIcon, _In_ UINT nNotifyMessage, _In_ UINT uMenuID = 0, _In_ BOOL bNoSound = FALSE, _In_ BOOL bLargeIcon = FALSE, _In_ BOOL bRealtime = FALSE, _In_opt_ HICON hBalloonIcon = NULL, _In_ BOOL bQuietTime = FALSE, _In_ BOOL bShow = TRUE);
-  BOOL Create(_In_ CWnd* pNotifyWnd, _In_ UINT uID, _In_ LPCTSTR pszTooltipText, _In_ LPCTSTR pszBalloonText, _In_ LPCTSTR pszBalloonCaption, _In_ UINT nTimeout, _In_ BalloonStyle style, _In_ CBitmap* pBitmap, _In_ UINT nNotifyMessage, _In_ UINT uMenuID = 0, _In_ BOOL bNoSound = FALSE, _In_ BOOL bLargeIcon = FALSE, _In_ BOOL bRealtime = FALSE, _In_opt_ HICON hBalloonIcon = NULL, _In_ BOOL bQuietTime = FALSE, _In_ BOOL bShow = TRUE);
-  BOOL Create(_In_ CWnd* pNotifyWnd, _In_ UINT uID, _In_ LPCTSTR pszTooltipText, _In_ LPCTSTR pszBalloonText, _In_ LPCTSTR pszBalloonCaption, _In_ UINT nTimeout, _In_ BalloonStyle style, _In_ HICON* phIcons, _In_ int nNumIcons, _In_ DWORD dwDelay, _In_ UINT nNotifyMessage, _In_ UINT uMenuID = 0, _In_ BOOL bNoSound = FALSE, _In_ BOOL bLargeIcon = FALSE, _In_ BOOL bRealtime = FALSE, _In_opt_ HICON hBalloonIcon = NULL, _In_ BOOL bQuietTime = FALSE, _In_ BOOL bShow = TRUE);
-#else
   BOOL Create(_In_ CWindow* pNotifyWnd, _In_ UINT uID, _In_ LPCTSTR pszTooltipText, _In_ HICON hIcon, _In_ UINT nNotifyMessage, _In_ UINT uMenuID = 0, _In_ BOOL bShow = TRUE);
   BOOL Create(_In_ CWindow* pNotifyWnd, _In_ UINT uID, _In_ LPCTSTR pszTooltipText, _In_ CBitmap* pBitmap, _In_ UINT nNotifyMessage, _In_ UINT uMenuID = 0, _In_ BOOL bShow = TRUE);
   BOOL Create(_In_ CWindow* pNotifyWnd, _In_ UINT uID, _In_ LPCTSTR pszTooltipText, _In_ HICON* phIcons, _In_ int nNumIcons, _In_ DWORD dwDelay, _In_ UINT nNotifyMessage, _In_ UINT uMenuID = 0, _In_ BOOL bShow = TRUE);
   BOOL Create(_In_ CWindow* pNotifyWnd, _In_ UINT uID, _In_ LPCTSTR pszTooltipText, _In_ LPCTSTR pszBalloonText, _In_ LPCTSTR pszBalloonCaption, _In_ UINT nTimeout, _In_ BalloonStyle style, _In_ HICON hIcon, _In_ UINT nNotifyMessage, _In_ UINT uMenuID = 0, _In_ BOOL bNoSound = FALSE, _In_ BOOL bLargeIcon = FALSE, _In_ BOOL bRealtime = FALSE, _In_opt_ HICON hBalloonIcon = NULL, _In_ BOOL bQuietTime = FALSE, _In_ BOOL bShow = TRUE);
   BOOL Create(_In_ CWindow* pNotifyWnd, _In_ UINT uID, _In_ LPCTSTR pszTooltipText, _In_ LPCTSTR pszBalloonText, _In_ LPCTSTR pszBalloonCaption, _In_ UINT nTimeout, _In_ BalloonStyle style, _In_ CBitmap* pBitmap, _In_ UINT nNotifyMessage, _In_ UINT uMenuID = 0, _In_ BOOL bNoSound = FALSE, _In_ BOOL bLargeIcon = FALSE, _In_ BOOL bRealtime = FALSE, _In_opt_ HICON hBalloonIcon = NULL, _In_ BOOL bQuietTime = FALSE, _In_ BOOL bShow = TRUE);
   BOOL Create(_In_ CWindow* pNotifyWnd, _In_ UINT uID, _In_ LPCTSTR pszTooltipText, _In_ LPCTSTR pszBalloonText, _In_ LPCTSTR pszBalloonCaption, _In_ UINT nTimeout, _In_ BalloonStyle style, _In_ HICON* phIcons, _In_ int nNumIcons, _In_ DWORD dwDelay, _In_ UINT nNotifyMessage, _In_ UINT uMenuID = 0, _In_ BOOL bNoSound = FALSE, _In_ BOOL bLargeIcon = FALSE, _In_ BOOL bRealtime = FALSE, _In_opt_ HICON hBalloonIcon = NULL, _In_ BOOL bQuietTime = FALSE, _In_ BOOL bShow = TRUE);
-#endif //#ifdef _AFX
 
   BOOL RemoveTaskbarIcon(HWND hWnd);
   void MinimiseToTray(HWND hWnd);
@@ -207,13 +189,8 @@ public:
   BOOL UsingAnimatedIcon() const;
 
 //Sets or gets the window to send notification messages to
-#ifdef _AFX
-  BOOL SetNotificationWnd(_In_ CWnd* pNotifyWnd);
-  CWnd* GetNotificationWnd() const;
-#else
   BOOL SetNotificationWnd(_In_ CWindow* pNotifyWnd);
   CWindow* GetNotificationWnd() const;
-#endif //#ifdef _AFX
 
 //Modification of the tray icons
   BOOL Delete(_In_ BOOL bCloseHelperWindow = TRUE);
@@ -283,11 +260,7 @@ protected:
   NOTIFYICONDATA_4     m_NotifyIconData;
   BOOL                 m_bCreated;
   BOOL                 m_bHidden;
-#ifdef _AFX
-  CWnd*                m_pNotificationWnd;
-#else
   CWindow*             m_pNotificationWnd;
-#endif //#ifdef _AFX
   CMenu                m_Menu;
   UINT                 m_nDefaultMenuItem;
   BOOL                 m_bDefaultMenuItemByPos;

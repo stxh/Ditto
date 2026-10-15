@@ -61,30 +61,11 @@ CAlphaBlend::CAlphaBlend(HWND hWnd, int nOpactiy)
 	SetOpacity(nOpactiy);
 }
 
-CAlphaBlend::CAlphaBlend(CWnd *pWnd, int nOpacity)
-{
-	m_hWnd = NULL;
-	m_nOpacity = 0;
-	m_bTransparent = false;
-
-	SetWindowHandle(pWnd);
-	SetOpacity(nOpacity);
-}
-
 BOOL CAlphaBlend::SetWindowHandle(HWND hWnd)
 {
 	if (::IsWindow(hWnd)) m_hWnd = hWnd;
 	else return false;
 
-	return true;
-}
-
-BOOL CAlphaBlend::SetWindowHandle(CWnd *pWnd)
-{
-	if (pWnd && ::IsWindow(pWnd->m_hWnd)) 
-		m_hWnd = pWnd->m_hWnd;
-	else 
-		return false;
 	return true;
 }
 

@@ -41,12 +41,10 @@ class CAlphaBlend
 public:
 	CAlphaBlend();
 	CAlphaBlend(HWND hWnd, int nOpacity=220);
-	CAlphaBlend(CWnd *pWnd, int nOpacity=220);
 	virtual ~CAlphaBlend();
 
 	//// SET DATA MEMBERS ////
 	BOOL SetWindowHandle(HWND hWnd);
-	BOOL SetWindowHandle(CWnd *pWnd);
 	BOOL SetOpacity(int nOpacity=220);
 
 	//// RUN IT ////
