@@ -2,7 +2,30 @@
 
 #include "ClipboardViewer.h"
 
-#include "wtl_thread.h"
+// The clipboard viewer only receives WM_DRAWCLIPBOARD while it runs on a thread
+// with a message queue of its own, so the copy thread owns a queue and pumps it.
+class CMessagePumpThread
+{
+public:
+	CMessagePumpThread() : m_hThread(NULL) {}
+	virtual ~CMessagePumpThread() { if (m_hThread != NULL) ::CloseHandle(m_hThread); }
+
+	BOOL Create(DWORD dwCreateFlags = 0);
+	BOOL Resume();
+	BOOL PostQuit();
+
+protected:
+	// Runs on the new thread before the pump starts; returning FALSE ends it.
+	virtual BOOL OnThreadStart() = 0;
+	// Runs on the new thread after the pump stops.
+	virtual void OnThreadStop() {}
+
+private:
+	static unsigned __stdcall ThreadEntry(void* pParam);
+	unsigned Run();
+
+	HANDLE m_hThread;
+};
 
 struct CCopyConfig
 {
@@ -39,7 +62,7 @@ public:
 	}
 };
 
-class CCopyThread : public WTL::CWinThread
+class CCopyThread : public CMessagePumpThread
 {
 public:
 	CCopyThread();
@@ -85,6 +108,6 @@ public:
 	void Init(CCopyConfig cfg);
 	bool Quit();
 
-	virtual BOOL InitInstance();
-	virtual int ExitInstance();
+	virtual BOOL OnThreadStart();
+	virtual void OnThreadStop();
 };

@@ -5,6 +5,8 @@
 #include "cp_main.h"
 #include "CopyThread.h"
 
+#include <process.h>	// _beginthreadex
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -21,7 +23,6 @@ CCopyThread::CCopyThread():
 	m_pClipboardViewer(NULL),
 	m_connectOnStartup(true)
 {
-	m_bAutoDelete = false;
 }
 
 CCopyThread::~CCopyThread()
@@ -31,7 +32,7 @@ CCopyThread::~CCopyThread()
 	delete m_pClipboardViewer;
 }
 
-BOOL CCopyThread::InitInstance()
+BOOL CCopyThread::OnThreadStart()
 {
 	m_pClipboardViewer = new CClipboardViewer(this);
 	m_pClipboardViewer->m_connectOnStartup = m_connectOnStartup;
@@ -42,11 +43,10 @@ BOOL CCopyThread::InitInstance()
 	return TRUE;
 }
 
-int CCopyThread::ExitInstance()
+void CCopyThread::OnThreadStop()
 {
-	m_pClipboardViewer->Disconnect(false);
-
-	return WTL::CWinThread::ExitInstance();
+	if (m_pClipboardViewer != NULL)
+		m_pClipboardViewer->Disconnect(false);
 }
 
 // Called within Copy Thread:
@@ -254,5 +254,55 @@ bool CCopyThread::Quit()
 {
 	m_bQuit = true;
 	m_pClipboardViewer->PostMessage( WM_QUIT );
-	return WTL::CWinThread::PostThreadMessage( WM_QUIT, NULL, NULL ) != FALSE;
+	return PostQuit() != FALSE;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// CMessagePumpThread
+
+BOOL CMessagePumpThread::Create(DWORD dwCreateFlags)
+{
+	unsigned nThreadID = 0;
+	m_hThread = (HANDLE)_beginthreadex(NULL, 0, ThreadEntry, this, dwCreateFlags, &nThreadID);
+	return m_hThread != NULL ? TRUE : FALSE;
+}
+
+BOOL CMessagePumpThread::Resume()
+{
+	return m_hThread != NULL && ::ResumeThread(m_hThread) != (DWORD)-1;
+}
+
+BOOL CMessagePumpThread::PostQuit()
+{
+	// The id comes from the handle, so it is already valid for a suspended thread.
+	return m_hThread != NULL && ::PostThreadMessage(::GetThreadId(m_hThread), WM_QUIT, 0, 0) != FALSE;
+}
+
+unsigned __stdcall CMessagePumpThread::ThreadEntry(void* pParam)
+{
+	return ((CMessagePumpThread*)pParam)->Run();
+}
+
+unsigned CMessagePumpThread::Run()
+{
+	try
+	{
+		if (OnThreadStart())
+		{
+			MSG msg;
+			while (::GetMessage(&msg, NULL, 0, 0) > 0)
+			{
+				::TranslateMessage(&msg);
+				::DispatchMessage(&msg);
+			}
+		}
+
+		OnThreadStop();
+	}
+	catch (...)
+	{
+		Log(_T("Exception in the copy thread message pump"));
+	}
+
+	return 0;
 }

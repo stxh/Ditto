@@ -398,7 +398,6 @@
     <ClCompile Include="ImageFormatAggregator.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="wtl_thread.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="sqlite\CppSQLite3.h">
@@ -831,7 +830,6 @@
     <ClInclude Include="ImageHelper.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="wtl_thread.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CP_Main.rc">

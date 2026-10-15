@@ -684,8 +684,8 @@ void CCP_MainApp::StartCopyThread()
 		Log(_T("Starting Ditto up connected from the clipboard, passed in true from command line to start connected"));
 	}
 
-	VERIFY(m_CopyThread.CreateThread(CREATE_SUSPENDED));
-	m_CopyThread.ResumeThread();
+	VERIFY(m_CopyThread.Create(CREATE_SUSPENDED));
+	m_CopyThread.Resume();
 }
 
 void CCP_MainApp::StopCopyThread()
