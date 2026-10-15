@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "CP_Main.h"
 #include "HotKeys.h"
 #include "Options.h"
 #include "Misc.h"
@@ -417,7 +418,7 @@ void CHotKeys::RegisterAll(bool bMsgOnError)
 			str += pHotKey->GetName();
 			Log(str);
 			if(bMsgOnError)
-				AfxMessageBox(str);
+				::MessageBox(theApp.m_MainhWnd, str, _T("Ditto"), MB_OK);
 		}
 	}
 }
@@ -432,12 +433,13 @@ void CHotKeys::UnregisterAll(bool bMsgOnError, bool bOnShowDitto)
 		pHotKey = ElementAt(i);
 		if(!pHotKey->Unregister(bOnShowDitto))
 		{
+			str = "Error Unregistering ";
 			str += pHotKey->GetName();
-		Log(str);
-		if(bMsgOnError)
-			MessageBox(NULL, str, _T("Error"), MB_OK | MB_ICONERROR);
+			Log(str);
+			if(bMsgOnError)
+				::MessageBox(theApp.m_MainhWnd, str, _T("Ditto"), MB_OK);
+		}
 	}
-}
 }
 
 void CHotKeys::GetKeys(ARRAY& keys)

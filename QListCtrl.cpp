@@ -187,7 +187,7 @@ BOOL CQListCtrl::SetFormattedText(int nRow, int nCol, LPCTSTR lpszFormat, ...)
 	CString csText;
 	va_list vlist;
 
-	ASSERT(AfxIsValidString(lpszFormat));
+	ASSERT(lpszFormat != NULL);
 	va_start(vlist, lpszFormat);
 	csText.FormatV(lpszFormat, vlist);
 	va_end(vlist);
@@ -1380,10 +1380,8 @@ LRESULT CQListCtrl::OnOdCacheHint(LPNMHDR pNMHDR)
 
 BOOL CQListCtrl::OnItemDeleted(long lID)
 {
-	m_RTFData.RemoveKey(lID);
-	BOOL bRet2 = TRUE;
-
-	return (bRet2);
+	m_RTFData.erase(lID);
+	return TRUE;
 }
 
 LRESULT CQListCtrl::OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)

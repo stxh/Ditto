@@ -75,7 +75,7 @@ HGLOBAL CClipIDs::Render(UINT cfType)
 void CClipIDs::GetTypes(CClipTypes& types)
 {
 	INT_PTR count = GetSize();
-	types.RemoveAll();
+	types.clear();
 
 	if(count == 1)
 	{
@@ -84,40 +84,32 @@ void CClipIDs::GetTypes(CClipTypes& types)
 	else if(count > 1)
 	{
 		//Add the types that are common across all paste ids
-		long lCount;
-		CMap<CLIPFORMAT, CLIPFORMAT, long, long> RenderTypes;
+		std::map<CLIPFORMAT, long> RenderTypes;
 
 		for(int nIDPos = 0; nIDPos < count; nIDPos++)
 		{
 			CClipTypes CurrTypes;
 			CClip::LoadTypes(ElementAt(nIDPos), CurrTypes);
 
-			INT_PTR typeCount = CurrTypes.GetSize();
-
-			for(int type = 0; type < typeCount; type++)
-			{	
-				lCount = 0;
-				if(nIDPos == 0 || RenderTypes.Lookup(CurrTypes[type], lCount) == TRUE)
+			for(CLIPFORMAT Format : CurrTypes)
+			{
+				if(nIDPos == 0 || RenderTypes.find(Format) != RenderTypes.end())
 				{
-					lCount++;
-					RenderTypes.SetAt(CurrTypes[type], lCount);
+					RenderTypes[Format]++;
 				}
 			}
 		}
 
-		CLIPFORMAT Format;
-		POSITION pos = RenderTypes.GetStartPosition();
-		while(pos)
+		for(const auto& type : RenderTypes)
 		{
-			RenderTypes.GetNextAssoc(pos, Format, lCount);
-			if(lCount == count)
+			if(type.second == count)
 			{
-				types.Add(Format);
-			}			
+				types.push_back(type.first);
+			}
 		}
 
 		//If there were no common types add the first clip
-		if(types.GetSize() <= 0)
+		if(types.empty())
 		{
 			CClip::LoadTypes(ElementAt(0), types);
 		}

@@ -7,6 +7,8 @@
 
 #include "tinyxml\Tinyxml.h"
 #include "tinyxml\tinystr.h"
+#include <vector>
+#include <map>
 
 #if _MSC_VER > 1000
 #pragma once
@@ -28,9 +30,9 @@ public:
 	CString m_csForeignLang;
 };
 
-typedef CArray<CLangItem*, CLangItem*> LANGUAGE_ARRAY;
+typedef std::vector<CLangItem*> LANGUAGE_ARRAY;
 
-typedef CMap<CString, LPCTSTR, CLangItem*, CLangItem*> LANGUAGE_MAP;
+typedef std::map<CString, CLangItem*> LANGUAGE_MAP;
 
 class CMultiLanguage  
 {

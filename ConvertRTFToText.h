@@ -1,7 +1,7 @@
 #pragma once
 #include "RichEditCtrlEx.h"
 
-class CConvertRTFToText : public CWnd
+class CConvertRTFToText : public ATL::CWindow
 {
 public:
 	BOOL Create();

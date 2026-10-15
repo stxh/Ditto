@@ -119,9 +119,8 @@ void CAddType::AddSelectedTypes()
 		if (nCount)
 		{
 			CString cs;
-			CArray<int, int> items;
-			items.SetSize(nCount);
-			m_lbCandidateTypes.GetSelItems(nCount, items.GetData());
+			std::vector<int> items(nCount);
+			m_lbCandidateTypes.GetSelItems(nCount, items.data());
 
 			for (int i = 0; i < nCount; i++)
 			{

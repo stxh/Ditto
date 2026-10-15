@@ -61,47 +61,32 @@ void CMultiLanguage::ClearArrays()
 
 void CMultiLanguage::ClearArray(LANGUAGE_ARRAY &Array)
 {
-	INT_PTR size = Array.GetSize();
-	for(int i = 0; i < size; i++)
+	for(CLangItem *plItem : Array)
 	{
-		CLangItem *plItem = Array[i];
-
 		delete plItem;
-		plItem = NULL;
 	}
-	Array.RemoveAll();
+	Array.clear();
 }
 
 void CMultiLanguage::ClearMap(LANGUAGE_MAP &Map)
 {
-	POSITION pos = Map.GetStartPosition();
-
-	CLangItem *plItem;
-	CString csKey;
-
-	while(pos)
+	for(const auto& item : Map)
 	{
-		Map.GetNextAssoc(pos, csKey, plItem);
-
-		if(plItem)
-		{
-			delete plItem;
-			plItem = NULL;
-		}
+		delete item.second;
 	}
 
-	Map.RemoveAll();
+	Map.clear();
 }
 
 CString CMultiLanguage::GetString(CString csID, CString csDefault)
 {
-	CLangItem *pItem;
-	
-	if(m_StringMap.Lookup(csID, pItem) == FALSE)
+	auto it = m_StringMap.find(csID);
+	if(it == m_StringMap.end())
 	{
 		return csDefault;
 	}
 
+	CLangItem *pItem = it->second;
 	if(pItem->m_csForeignLang.GetLength() <= 0)
 		return csDefault;
 
@@ -110,10 +95,8 @@ CString CMultiLanguage::GetString(CString csID, CString csDefault)
 
 CString CMultiLanguage::GetGlobalHotKeyString(CString csID, CString csDefault)
 {
-	INT_PTR size = m_GlobalHotKeys.GetSize();
-	for(int i = 0; i < size; i++)
+	for (CLangItem *plItem : m_GlobalHotKeys)
 	{
-		CLangItem *plItem = m_GlobalHotKeys[i];
 		if(plItem->m_csID == csID)
 		{
 			return plItem->m_csForeignLang;
@@ -125,10 +108,8 @@ CString CMultiLanguage::GetGlobalHotKeyString(CString csID, CString csDefault)
 
 CString CMultiLanguage::GetDeleteClipDataString(CString csID, CString csDefault)
 {
-	INT_PTR size = m_DeleteClipData.GetSize();
-	for(int i = 0; i < size; i++)
+	for (CLangItem *plItem : m_DeleteClipData)
 	{
-		CLangItem *plItem = m_DeleteClipData[i];
 		if(plItem->m_csID == csID)
 		{
 			return plItem->m_csForeignLang;
@@ -140,10 +121,8 @@ CString CMultiLanguage::GetDeleteClipDataString(CString csID, CString csDefault)
 
 CString CMultiLanguage::GetQuickPasteKeyboardString(int id, CString csDefault)
 {
-	INT_PTR size = m_OptionsQuickPasteKeyboard.GetSize();
-	for (int i = 0; i < size; i++)
+	for (CLangItem *plItem : m_OptionsQuickPasteKeyboard)
 	{
-		CLangItem *plItem = m_OptionsQuickPasteKeyboard[i];
 		if (plItem->m_nID == id)
 		{
 			return plItem->m_csForeignLang;
@@ -246,11 +225,8 @@ bool CMultiLanguage::UpdateDeleteClipData(HWND hWndParent)
 bool CMultiLanguage::UpdateMenuToLanguage(HMENU hMenu, LANGUAGE_ARRAY &Array)
 {
 	CMenuHandle menu(hMenu);
-	INT_PTR size = Array.GetSize();
-	for(int i = 0; i < size; i++)
+	for(CLangItem *plItem : Array)
 	{
-		CLangItem *plItem = Array[i];
-
 		if(plItem->m_csForeignLang.GetLength() > 0)
 		{
 			if(plItem->m_nID > 0)
@@ -276,11 +252,8 @@ bool CMultiLanguage::UpdateMenuToLanguage(HMENU hMenu, LANGUAGE_ARRAY &Array)
 
 bool CMultiLanguage::UpdateWindowToLanguage(HWND hWndParent, LANGUAGE_ARRAY &Array)
 {
-	INT_PTR size = Array.GetSize();
-	for(int i = 0; i < size; i++)
+	for(CLangItem *plItem : Array)
 	{
-		CLangItem *plItem = Array[i];
-
 		if(plItem->m_csForeignLang.GetLength() > 0)
 		{
 			if(plItem->m_nID > 0)
@@ -449,7 +422,7 @@ bool CMultiLanguage::LoadSection(TiXmlNode &doc, LANGUAGE_ARRAY &Array, CString 
 				//Replace the literal "\n" with line feeds
  				plItem->m_csForeignLang.Replace(_T("\\n"), csLineFeed);
 
-				Array.Add(plItem);
+				Array.push_back(plItem);
 			}
  		}		
 
@@ -497,7 +470,7 @@ bool CMultiLanguage::LoadStringTableSection(TiXmlNode &doc, LANGUAGE_MAP &Map, C
 			plItem->m_csForeignLang.Replace(_T("\\n"), csLineFeed);
 		}
 
-		Map.SetAt(plItem->m_csID, plItem);
+		Map[plItem->m_csID] = plItem;
 
 		ItemElement = ItemElement->NextSiblingElement();
 	}

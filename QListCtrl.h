@@ -2,6 +2,7 @@
 
 #include <atlbase.h>
 #include <atlcom.h>
+#include <map>
 #include "Shared/ArrayEx.h"
 #include "ToolTipEx.h"
 #include "FormattedTextDraw.h"
@@ -61,7 +62,7 @@ public:
 };
 
 
-typedef CMap<long, long, CClipFormat, CClipFormat&> CMapIDtoCF;
+typedef std::map<long, CClipFormat> CMapIDtoCF;
 
 class CQListCtrl : public ATL::CWindowImpl<CQListCtrl, WTL::CListViewCtrl>
 {

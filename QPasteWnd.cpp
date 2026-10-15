@@ -105,7 +105,7 @@ int CQPasteWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;
 	}
 
-	HICON b = (HICON)LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_MAINFRAME), IMAGE_ICON, 64, 64, LR_SHARED);
+	HICON b = (HICON)LoadImage(theApp.GetResourceInstance(), MAKEINTRESOURCE(IDR_MAINFRAME), IMAGE_ICON, 64, 64, LR_SHARED);
 	SetIcon(b, TRUE);
 
 	//BOOL b = this->Register(this);
@@ -4793,7 +4793,7 @@ void CQPasteWnd::RemoveStickyInternal(int id, bool &sort)
 
 bool CQPasteWnd::OnNewClip()
 {
-	CWindow wndMain = AfxGetMainWnd();
+	CWindow wndMain(theApp.m_MainhWnd);
 	if (wndMain.m_hWnd != NULL)
 	{
 		wndMain.SendMessage(WM_COMMAND, ID_FIRST_NEWCLIP, 0);
@@ -4804,7 +4804,7 @@ bool CQPasteWnd::OnNewClip()
 
 bool CQPasteWnd::OnImportClip()
 {
-	CWindow wndMain = AfxGetMainWnd();
+	CWindow wndMain(theApp.m_MainhWnd);
 	if (wndMain.m_hWnd != NULL)
 	{
 		wndMain.SendMessage(WM_COMMAND, ID_FIRST_IMPORT, 0);
@@ -4932,7 +4932,7 @@ bool CQPasteWnd::DoActionToggleClipboardConnection()
 
 bool CQPasteWnd::OnDeleteClipData()
 {
-	CWindow wndMain = AfxGetMainWnd();
+	CWindow wndMain(theApp.m_MainhWnd);
 	if (wndMain.m_hWnd != NULL)
 	{
 		wndMain.SendMessage(WM_COMMAND, ID_FIRST_DELETECLIPDATA, 0);
@@ -4943,7 +4943,7 @@ bool CQPasteWnd::OnDeleteClipData()
 
 bool CQPasteWnd::OnGlobalHotkyes()
 {
-	CWindow wndMain = AfxGetMainWnd();
+	CWindow wndMain(theApp.m_MainhWnd);
 	if (wndMain.m_hWnd != NULL)
 	{
 		wndMain.SendMessage(WM_COMMAND, ID_FIRST_GLOBALHOTKEYS, 0);

@@ -28,11 +28,8 @@ void CAutoSendToClientThread::FireSendToClient(CClipList *pClipList)
 	{
 		Log(_T("Adding clip to send to client in thread"));
 
-		POSITION pos = pClipList->GetHeadPosition();
-		while(pos)
+		for (CClip *pClip : pClipList->m_ClipList)
 		{
-			CClip *pClip = pClipList->GetNext(pos);
-		
 			m_saveClips.AddTail(pClip);
 		}
 
@@ -69,13 +66,8 @@ void CAutoSendToClientThread::OnSendToClient()
 	{
 		ATL::CCritSecLock csLock(m_cs);
 
-		POSITION pos;
-		CClip* pClip;
-
-		pos = m_saveClips.GetHeadPosition();
-		while(pos)
+		for (CClip* pClip : m_saveClips.m_ClipList)
 		{
-			pClip = m_saveClips.GetNext(pos);
 			pLocalClips->AddTail(pClip);
 		}
 
@@ -129,16 +121,12 @@ bool CAutoSendToClientThread::SendToClient(CClipList *pClipList)
 			//We were connected successfully show an error next time we can't connect
 			CGetSetOptions::m_SendClients[nClient].bShownFirstError = FALSE;
 
-			CClip* pClip;
-			POSITION pos;
-			pos = pClipList->GetHeadPosition();
-			while(pos)
+			for (CClip* pClip : pClipList->m_ClipList)
 			{
-				pClip = pClipList->GetNext(pos);
 				if(pClip == NULL)
 				{
 					ASSERT(FALSE);
-					LogSendRecieveInfo("Error in GetNext");
+					LogSendRecieveInfo("Null clip when sending to client");
 					break;
 				}
 

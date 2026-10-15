@@ -70,7 +70,7 @@ bool CDittoAddins::AddPrePasteAddinsToMenu(CMenuHandle *pMenu)
 {
 	bool bRet = false;
 
-	m_FunctionMap.RemoveAll();
+	m_FunctionMap.clear();
 	int nMenuId = 3000;
 
 	HMENU AllAddinsMenu = ::CreateMenu();
@@ -92,7 +92,7 @@ bool CDittoAddins::AddPrePasteAddinsToMenu(CMenuHandle *pMenu)
 					CFunctionLookup lookup;
 					lookup.m_csFunctionName = pAddin->m_PrePasteFunctions[x].m_csFunction;
 					lookup.m_pAddin = pAddin;
-					m_FunctionMap.SetAt(nMenuId, lookup);
+					m_FunctionMap[nMenuId] = lookup;
 					nMenuId++;
 				}
 
@@ -105,7 +105,7 @@ bool CDittoAddins::AddPrePasteAddinsToMenu(CMenuHandle *pMenu)
 				CFunctionLookup lookup;
 				lookup.m_csFunctionName = pAddin->m_PrePasteFunctions[0].m_csFunction;
 				lookup.m_pAddin = pAddin;
-				m_FunctionMap.SetAt(nMenuId, lookup);
+				m_FunctionMap[nMenuId] = lookup;
 
 				CString menuName;
 				menuName.Format(_T("%s - %s"), pAddin->DisplayName(), pAddin->m_PrePasteFunctions[0].m_csDisplayName);
@@ -130,8 +130,9 @@ bool CDittoAddins::CallPrePasteFunction(int Id, IClip *pClip)
 {
 	bool bRet = false;
 	CFunctionLookup func;
-	if(m_FunctionMap.Lookup(Id, func))
+	if (m_FunctionMap.find(Id) != m_FunctionMap.end())
 	{
+		func = m_FunctionMap[Id];
 		CDittoInfo DittoInfo;
 		LoadDittoInfo(DittoInfo);
 

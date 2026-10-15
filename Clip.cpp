@@ -118,7 +118,7 @@ std::shared_ptr<CClipTypes> COleDataObjectEx::GetAvailableTypes()
 		// See https://learn.microsoft.com/en-us/windows/win32/dataxchg/standard-clipboard-formats
 		if (format == 0 || format == CF_MAX)
 			continue;
-		types->Add(format);
+		types->push_back(format);
 	} while (format != 0);
 
 	CloseClipboard();
@@ -348,7 +348,7 @@ bool CClip::AddFormat(CLIPFORMAT cfType, void* pData, UINT nLen, bool setDesc)
 // Fills this CClip with the contents of the clipboard.
 int CClip::LoadFromClipboard(CClipTypes* pClipTypes, bool checkClipboardIgnore, CString activeApp, CString activeAppTitle)
 {
-	if(pClipTypes == NULL || pClipTypes->GetSize() == 0)
+	if(pClipTypes == NULL || pClipTypes->empty())
 	{
 		ASSERT(0); // this feature is not currently used... it is an error if it is.
 		Log(_T("no types were given to accept, skipping this clipboard change"));
@@ -444,13 +444,13 @@ int CClip::LoadFromClipboard(CClipTypes* pClipTypes, bool checkClipboardIgnore, 
 
 	INT_PTR nSize;
 	CClipFormat cf;
-	INT_PTR numTypes = pTypes->GetSize();
+	INT_PTR numTypes = (INT_PTR)pTypes->size();
 
 	Log(StrF(_T("Begin enumerating over supported types, Count: %d"), numTypes));
 
 	for(int i = 0; i < numTypes; i++)
 	{
-		cf.m_cfType = pTypes->ElementAt(i);
+		cf.m_cfType = (*pTypes)[i];
 
 		if (cf.m_cfType == CF_DIB &&
 			oleData.IsDataAvailable(CF_TEXT) &&
@@ -1672,7 +1672,7 @@ bool CClip::LoadFormats(int id, bool bOnlyLoad_CF_TEXT, bool includeRichTextForT
 
 void CClip::LoadTypes(int id, CClipTypes& types)
 {
-	types.RemoveAll();
+	types.clear();
 	try
 	{
 		CString csSQL;
@@ -1689,7 +1689,7 @@ void CClip::LoadTypes(int id, CClipTypes& types)
 
 		while(q.eof() == false)
 		{		
-			types.Add(GetFormatID(q.getStringField(0)));
+			types.push_back(GetFormatID(q.getStringField(0)));
 			q.nextRow();
 		}
 	}
@@ -2065,18 +2065,13 @@ int CClipList::AddToDB(bool bLatestOrder)
 	Log(_T("AddToDB - Start"));
 
 	int savedCount = 0;
-	CClip* pClip;
-	POSITION pos;
 	bool bResult;
 	
 	INT_PTR remaining = GetCount();
-	pos = GetHeadPosition();
-	while(pos)
+	for(CClip* pClip : m_ClipList)
 	{
 		Log(StrF(_T("AddToDB - while(pos), Start Remaining %d"), remaining));
 		remaining--;
-		
-		pClip = GetNext(pos);
 		ASSERT(pClip);
 		
 		if(bLatestOrder)
@@ -2101,13 +2096,8 @@ int CClipList::AddToDB(bool bLatestOrder)
 
 const CClipList& CClipList::operator=(const CClipList &cliplist)
 {
-	POSITION pos;
-	CClip* pClip;
-	
-	pos = cliplist.GetHeadPosition();
-	while(pos)
+	for (CClip* pClip : cliplist.m_ClipList)
 	{
-		pClip = cliplist.GetNext(pos);
 		ASSERT(pClip);
 
 		CClip *pNewClip = new CClip;

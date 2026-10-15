@@ -17,7 +17,7 @@
 class CClip;
 class CCopyThread;
 
-typedef CArray<CLIPFORMAT, CLIPFORMAT> CClipTypes;
+typedef std::vector<CLIPFORMAT> CClipTypes;
 
 /*----------------------------------------------------------------------------*\
 	COleDataObjectEx
@@ -271,32 +271,6 @@ public:
 	void RemoveAll() { m_ClipList.clear(); }
 	CClip* GetHead() { return m_ClipList.empty() ? nullptr : m_ClipList.front(); }
 	CClip* GetTail() { return m_ClipList.empty() ? nullptr : m_ClipList.back(); }
-
-	// MFC style iteration, POSITION is a one based index, 0 means end
-	POSITION GetHeadPosition() const { return m_ClipList.empty() ? 0 : 1; }
-	POSITION GetTailPosition() const { return (POSITION)m_ClipList.size(); }
-	CClip* GetNext(POSITION& rPosition) const
-	{
-		if (rPosition < 1 || rPosition > (INT_PTR)m_ClipList.size())
-		{
-			rPosition = 0;
-			return nullptr;
-		}
-		CClip* pClip = m_ClipList[(size_t)rPosition - 1];
-		rPosition = (rPosition < (INT_PTR)m_ClipList.size()) ? rPosition + 1 : 0;
-		return pClip;
-	}
-	CClip* GetPrev(POSITION& rPosition) const
-	{
-		if (rPosition < 1 || rPosition > (INT_PTR)m_ClipList.size())
-		{
-			rPosition = 0;
-			return nullptr;
-		}
-		CClip* pClip = m_ClipList[(size_t)rPosition - 1];
-		rPosition = (rPosition > 1) ? rPosition - 1 : 0;
-		return pClip;
-	}
 };
 
 #endif // !defined(AFX_PROCESSCOPY_H__185CBB6F_4B63_4397_8FF9_E18D777DA506__INCLUDED_)

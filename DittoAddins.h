@@ -2,6 +2,7 @@
 
 #include "DittoAddin.h"
 #include <vector>
+#include <map>
 
 
 class CDittoAddins
@@ -29,7 +30,7 @@ protected:
 		CStringA m_csFunctionName;
 	};
 
-	CMap<int, int, CFunctionLookup, CFunctionLookup> m_FunctionMap;
+	std::map<int, CFunctionLookup> m_FunctionMap;
 
 protected:
 	void LoadDittoInfo(CDittoInfo &DittoInfo);

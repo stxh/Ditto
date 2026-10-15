@@ -46,12 +46,8 @@ BOOL SendToFriend(CSendToFriendInfo &Info)
 	INT_PTR count = Info.m_pClipList->GetCount();
 	int i = -1;
 
-	CClip* pClip;
-	POSITION pos;
-	pos = Info.m_pClipList->GetHeadPosition();
-	while(pos)
+	for (CClip* pClip : Info.m_pClipList->m_ClipList)
 	{
-		pClip = Info.m_pClipList->GetNext(pos);
 		if(pClip == NULL)
 		{
 			ASSERT(FALSE);

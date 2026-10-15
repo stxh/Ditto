@@ -74,7 +74,7 @@ void AppendToFile(const TCHAR* fn, const TCHAR* msg)
 
 void log(const TCHAR* msg, bool bFromSendRecieve, CString csFile, long lLine)
 {
-	ASSERT(AfxIsValidString(msg));
+	ASSERT(msg != NULL);
 
 	SYSTEMTIME st;
 	GetLocalTime(&st);
@@ -177,7 +177,7 @@ double IdleSeconds()
 
 CString StrF(const TCHAR * pszFormat, ...)
 {
-	ASSERT( AfxIsValidString( pszFormat ) );
+	ASSERT(pszFormat != NULL);
 	CString str;
 	va_list argList;
 	va_start( argList, pszFormat );

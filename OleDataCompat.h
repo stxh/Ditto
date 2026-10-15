@@ -636,7 +636,7 @@ public:
 		return stg.hGlobal;
 	}
 
-	POSITION BeginEnumFormats()
+	int BeginEnumFormats()
 	{
 		if (m_pEnum != NULL)
 		{

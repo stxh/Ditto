@@ -343,7 +343,7 @@ void CSymbolEdit::SetSymbolIcon(UINT id, BOOL redraw)
 	DestroyIcon();
 
 	m_hSymbolIcon = (HICON)::LoadImage(
-		AfxGetResourceHandle(),
+		theApp.GetResourceInstance(),
 		MAKEINTRESOURCE(id),
 		IMAGE_ICON,
 		16,

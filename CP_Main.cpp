@@ -732,22 +732,22 @@ CClipTypes* CCP_MainApp::LoadTypesFromDB()
 		CppSQLite3Query q = theApp.m_db.execQuery(_T("SELECT TypeText FROM Types"));			
 		while(q.eof() == false)
 		{
-			pTypes->Add(GetFormatID(q.getStringField(_T("TypeText"))));
+			pTypes->push_back(GetFormatID(q.getStringField(_T("TypeText"))));
 
 			q.nextRow();
 		}
 	}
 	CATCH_SQLITE_EXCEPTION
 
-	if(pTypes->GetSize() <= 0)
+	if(pTypes->empty())
 	{
-		pTypes->Add(CF_TEXT);
-		pTypes->Add(RegisterClipboardFormat(CF_RTF));
-		pTypes->Add(CF_UNICODETEXT);
-		pTypes->Add(CF_HDROP);
-		pTypes->Add(CF_DIB);
-		pTypes->Add(GetFormatID(_T("HTML Format")));
-		pTypes->Add(GetFormatID(_T("PNG")));
+		pTypes->push_back(CF_TEXT);
+		pTypes->push_back(RegisterClipboardFormat(CF_RTF));
+		pTypes->push_back(CF_UNICODETEXT);
+		pTypes->push_back(CF_HDROP);
+		pTypes->push_back(CF_DIB);
+		pTypes->push_back(GetFormatID(_T("HTML Format")));
+		pTypes->push_back(GetFormatID(_T("PNG")));
 	}
 
 	return pTypes;

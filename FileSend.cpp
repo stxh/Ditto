@@ -87,17 +87,11 @@ BOOL CFileSend::SendClientFiles(SOCKET sock, CClipList *pClipList)
 
 CClipFormat* CFileSend::GetCF_HDROP_Data(CClipList *pClipList)
 {
-	CClip* pClip;
-	CClipFormat* pCF;
-	POSITION pos;
-	
-	pos = pClipList->GetHeadPosition();
-	while(pos)
+	for (CClip* pClip : pClipList->m_ClipList)
 	{
-		pClip = pClipList->GetNext(pos);
 		if(pClip)
 		{
-			pCF = pClip->m_Formats.FindFormat(CF_HDROP);
+			CClipFormat* pCF = pClip->m_Formats.FindFormat(CF_HDROP);
 			if(pCF)
 				return pCF;
 		}

@@ -39,7 +39,7 @@ BOOL COleClipSource::DoDelayRender()
 
 	bool foundHDrop = false;
 	
-	INT_PTR count = types.GetSize();
+	INT_PTR count = (INT_PTR)types.size();
 	for(int i=0; i < count; i++)
 	{
 		if (m_pasteOptions.m_dragDropFilesOnly)
