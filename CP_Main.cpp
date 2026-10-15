@@ -44,7 +44,8 @@ public:
   		if(bFlag)
   		{
   			if(STRICMP(pszParam, _T("Connect")) == 0)
-  			{  				m_bConnect = TRUE;
+  			{
+  				m_bConnect = TRUE;
   			}
   			else if(STRICMP(pszParam, _T("Disconnect")) == 0)
   			{
@@ -182,7 +183,7 @@ CCP_MainApp::CCP_MainApp()
 	m_bAsynchronousRefreshView = true;
 	m_lClipsSent = 0;
 	m_lClipsRecieved = 0;
-	GetSystemTime(&m_oldtStartUp); // Initialize with current system time
+	GetLocalTime(&m_oldtStartUp); // Local time, the Stats page shows this as "Last Started"
 
 	m_bExitServerThread = false;
 
@@ -1387,7 +1388,7 @@ int CCP_MainApp::GetActiveGroupId()
 	m_activeGroupId = -1;
 	m_activeGroupStartTime = 0;
 
-return ret;
+	return ret;
 }
 
 // WTL entry point, replacing the WinMain provided by the MFC framework.

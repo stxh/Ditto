@@ -694,7 +694,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
         {
             KillTimer(SET_WINDOWS_THEME_TIMER);
             CString theme = CGetSetOptions::GetTheme();
-            if(theme != _T(""))
+            if(theme == _T(""))
             {
                 CGetSetOptions::m_Theme.Load(theme);
 
@@ -745,6 +745,22 @@ LRESULT CMainFrame::OnFirstShowquickpaste(WORD wNotifyCode, WORD wID, HWND hWndC
 LRESULT CMainFrame::OnFirstToggleConnectCV(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
     theApp.ToggleConnectCV();
+    return 0;
+}
+LRESULT CMainFrame::OnInitMenuPopup(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+{
+    // MFC refreshed these two tray menu items through ON_UPDATE_COMMAND_UI; WTL leaves
+    // menu updating to the frame, so do it when the popup is about to open.
+    CMenuHandle menu = (HMENU)wParam;
+    if (menu.IsMenu())
+    {
+        theApp.UpdateMenuConnectCV(&menu, ID_FIRST_TOGGLECONNECTCV);
+
+        menu.CheckMenuItem(ID_FIRST_SHOWSTARTUPMESSAGE,
+            CGetSetOptions::GetShowStartupMessage() ? MF_CHECKED : MF_UNCHECKED);
+    }
+
+    bHandled = FALSE;
     return 0;
 }
 LRESULT CMainFrame::OnClipboardCopied(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
@@ -978,7 +994,8 @@ LRESULT CMainFrame::OnSetConnected(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL
         theApp.SetConnectCV(false);
     }
 
-    return 0;
+    // the /connect and /disconnect command line checks this to decide whether to exit.
+    return 1;
 }
 
 LRESULT CMainFrame::OnOpenCloseWindow(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
@@ -1015,7 +1032,7 @@ LRESULT CMainFrame::OnFirstOption(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL
 {
     if(m_pOptions != NULL)
     {
-        ::SetForegroundWindow(m_pOptions);
+        ::SetForegroundWindow(m_pOptions->m_hWnd);
     }
     else
     {
@@ -1025,7 +1042,7 @@ LRESULT CMainFrame::OnFirstOption(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL
             pOptions->SetNotifyWnd(m_hWnd);
             pOptions->Create();
             pOptions->ShowWindow(SW_SHOW);
-            m_pOptions = pOptions->m_hWnd;
+            m_pOptions = pOptions;
         }
     }
     return 0;
@@ -1034,7 +1051,7 @@ LRESULT CMainFrame::OnFirstGlobalhotkeys(WORD wNotifyCode, WORD wID, HWND hWndCt
 {
     if(m_pGlobalClips != NULL)
     {
-        ::SetForegroundWindow(m_pGlobalClips);
+        ::SetForegroundWindow(m_pGlobalClips->m_hWnd);
     }
     else
     {
@@ -1046,7 +1063,7 @@ LRESULT CMainFrame::OnFirstGlobalhotkeys(WORD wNotifyCode, WORD wID, HWND hWndCt
             pGlobalClips->SetNotifyWnd(m_hWnd);
             pGlobalClips->Create(NULL);
             pGlobalClips->ShowWindow(SW_SHOW);
-            m_pGlobalClips = pGlobalClips->m_hWnd;
+            m_pGlobalClips = pGlobalClips;
         }
     }
     return 0;
@@ -1055,7 +1072,7 @@ LRESULT CMainFrame::OnShowOptions(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL&
 {
     if(m_pOptions != NULL)
     {
-        ::SetForegroundWindow(m_pOptions);
+        ::SetForegroundWindow(m_pOptions->m_hWnd);
     }
     else
     {
@@ -1065,7 +1082,7 @@ LRESULT CMainFrame::OnShowOptions(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL&
             pOptions->SetNotifyWnd(m_hWnd);
             pOptions->Create();
             pOptions->ShowWindow(SW_SHOW);
-            m_pOptions = pOptions->m_hWnd;
+            m_pOptions = pOptions;
         }
     }
     return 0;
@@ -1077,10 +1094,8 @@ LRESULT CMainFrame::OnOptionsClosed(UINT uMsg, WPARAM wParam, LPARAM lParam, BOO
     CAlphaBlend tran;
     tran.SetTransparent(m_hWnd, 255, 0);
 
-    if(m_pOptions != NULL)
-    {
-        ::DestroyWindow(m_pOptions);
-    }
+    // The sheet posts this from its WM_NCDESTROY, so only the C++ object is left.
+    delete m_pOptions;
     m_pOptions = NULL;
 
     if(themeChanged)
@@ -1116,10 +1131,8 @@ LRESULT CMainFrame::OnGlobalClipsClosed(UINT uMsg, WPARAM wParam, LPARAM lParam,
     CAlphaBlend tran;
     tran.SetTransparent(m_hWnd, 255, 0);
 
-    if(m_pGlobalClips != NULL)
-    {
-        ::DestroyWindow(m_pGlobalClips);
-    }
+    // The dialog posts this from its WM_NCDESTROY, so only the C++ object is left.
+    delete m_pGlobalClips;
     m_pGlobalClips = NULL;
 
     return 0;
@@ -1142,10 +1155,8 @@ LRESULT CMainFrame::OnDeleteClipDataClosed(UINT uMsg, WPARAM wParam, LPARAM lPar
     CAlphaBlend tran;
     tran.SetTransparent(m_hWnd, 255, 0);
 
-    if(m_pDeleteClips != NULL)
-    {
-        ::DestroyWindow(m_pDeleteClips);
-    }
+    // The dialog posts this from its WM_NCDESTROY, so only the C++ object is left.
+    delete m_pDeleteClips;
     m_pDeleteClips = NULL;
 
     return 0;
@@ -1154,7 +1165,7 @@ LRESULT CMainFrame::OnFirstDeleteclipdata(WORD wNotifyCode, WORD wID, HWND hWndC
 {
     if(m_pDeleteClips != NULL)
     {
-        ::SetForegroundWindow(m_pDeleteClips);
+        ::SetForegroundWindow(m_pDeleteClips->m_hWnd);
     }
     else
     {
@@ -1166,7 +1177,7 @@ LRESULT CMainFrame::OnFirstDeleteclipdata(WORD wNotifyCode, WORD wID, HWND hWndC
             pDeleteClips->SetNotifyWnd(m_hWnd);
             pDeleteClips->Create(NULL);
             pDeleteClips->ShowWindow(SW_SHOW);
-            m_pDeleteClips = pDeleteClips->m_hWnd;
+            m_pDeleteClips = pDeleteClips;
         }
     }
     return 0;

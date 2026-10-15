@@ -5574,6 +5574,8 @@ void CQPasteWnd::OnNcLButtonDblClk(UINT nHitTest, CPoint point)
 		}
 	}
 
+	// Upstream chained to CWnd::OnNcLButtonDblClk, i.e. DefWindowProc still saw it.
+	SetMsgHandled(FALSE);
 }
 
 LRESULT CQPasteWnd::OnShowGroupsTop(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)

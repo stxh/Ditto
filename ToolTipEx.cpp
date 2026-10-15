@@ -323,6 +323,8 @@ void CToolTipEx::OnNcLButtonDblClk(UINT nHitTest, CPoint point)
 	{
 		OnFirstAlwaysontop();
 	}
+
+	SetMsgHandled(FALSE);
 }
 
 void CToolTipEx::SaveWindowSize()
@@ -1073,6 +1075,9 @@ void CToolTipEx::OnNcLButtonDown(UINT nHitTest, CPoint point)
 {
 	int buttonPressed = m_DittoWindow.DoNcLButtonDown(this, nHitTest, point);
 	SetTimer(TIMER_BUTTON_UP, 100, NULL);
+
+	// DefWindowProc has to see it, it drives the caption move/size loops.
+	SetMsgHandled(FALSE);
 }
 
 void CToolTipEx::OnNcLButtonUp(UINT nHitTest, CPoint point)
@@ -1103,6 +1108,8 @@ void CToolTipEx::OnNcLButtonUp(UINT nHitTest, CPoint point)
 			p.SetFocus();
 		}
 	}
+
+	SetMsgHandled(FALSE);
 }
 
 void CToolTipEx::OnNcMouseMove(UINT nHitTest, CPoint point) 
@@ -1117,6 +1124,8 @@ void CToolTipEx::OnNcMouseMove(UINT nHitTest, CPoint point)
 			m_bMaxSetTimer = true;
 		}
 	}
+
+	SetMsgHandled(FALSE);
 }
 
 void CToolTipEx::OnOptions()

@@ -40,10 +40,14 @@ bool CDittoCopyBuffer::StartCopy(long lCopyBuffer, bool bCut)
 
 		//Create a thread to track if they have copied anything, if thread has exited before they have
 		//copied something then the copy buffer copy is canceled
-		// Use Windows API instead of MFC AfxBeginThread
-	HANDLE hThread1 = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)CDittoCopyBuffer::StartCopyTimer, (LPVOID)this, 0, NULL);
-	if (hThread1)
-		CloseHandle(hThread1);
+		//Lowest priority, it only watches for a copy the user may never make.
+		HANDLE hThread1 = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)CDittoCopyBuffer::StartCopyTimer, (LPVOID)this, CREATE_SUSPENDED, NULL);
+		if (hThread1)
+		{
+			::SetThreadPriority(hThread1, THREAD_PRIORITY_LOWEST);
+			::ResumeThread(hThread1);
+			CloseHandle(hThread1);
+		}
 
 		m_bActive = true;
 		m_lCurrentDittoBuffer = lCopyBuffer;
@@ -179,10 +183,14 @@ bool CDittoCopyBuffer::PastCopyBuffer(long lCopyBuffer)
 
 					Log(StrF(_T("PastCopyBuffer sent paste, starting thread to restore clipboard, Delay = %d"), m_pClipboard->m_lRestoreDelay));
 
-					// Use Windows API instead of MFC AfxBeginThread
-	HANDLE hThread2 = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)CDittoCopyBuffer::DelayRestoreClipboard, (LPVOID)this, 0, NULL);
-	if (hThread2)
-		CloseHandle(hThread2);
+					//Lowest priority, the clipboard restore must not compete with the paste in progress.
+					HANDLE hThread2 = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)CDittoCopyBuffer::DelayRestoreClipboard, (LPVOID)this, CREATE_SUSPENDED, NULL);
+					if (hThread2)
+					{
+						::SetThreadPriority(hThread2, THREAD_PRIORITY_LOWEST);
+						::ResumeThread(hThread2);
+						CloseHandle(hThread2);
+					}
 
 					bRet = true;
 				}

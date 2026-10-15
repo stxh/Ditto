@@ -88,7 +88,7 @@ LRESULT COptionsStats::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 
 	// Calculate time span since startup
 	SYSTEMTIME stNow;
-	GetSystemTime(&stNow);
+	GetLocalTime(&stNow);
 
 	// Convert both SYSTEMTIMEs to FILETIME for calculation
 	FILETIME ftStartup, ftNow, ftDiff;

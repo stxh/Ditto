@@ -82,37 +82,46 @@ int CWndEx::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	r.InflateRect(m_DittoWindow.m_dpi.Scale(25), m_DittoWindow.m_dpi.Scale(25));
 	m_toolTip.AddTool(m_hWnd, _T("Ditto"), &r, 1);
 
-	theApp.GetMessageLoop()->AddMessageFilter(this);
+	WTL::CMessageLoop* pLoop = theApp.GetMessageLoop();
+	if (pLoop != NULL)
+	{
+		pLoop->AddMessageFilter(this);
+	}
 
 	return 0;
 }
 
 void CWndEx::OnDestroy()
 {
-	theApp.GetMessageLoop()->RemoveMessageFilter(this);
+	WTL::CMessageLoop* pLoop = theApp.GetMessageLoop();
+	if (pLoop != NULL)
+	{
+		pLoop->RemoveMessageFilter(this);
+	}
 }
 
 // The message loop calls every filter for every message, while MFC only reached a
-// window through the focused control's parent chain.  Rebuild that restriction here.
+// window through the message window's parent chain.  Rebuild that restriction here.
 bool CWndEx::IsMsgForThisWindowTree(MSG* pMsg)
 {
-	if (!::IsWindow(m_hWnd))
+	if (!::IsWindow(m_hWnd) || pMsg == NULL || !::IsWindow(pMsg->hwnd))
 	{
 		return false;
 	}
 
-	HWND hWnd = ::GetFocus();
-	if (hWnd == NULL)
+	// Walk up from the window the message is addressed to, as CWinThread did.
+	HWND hWnd = pMsg->hwnd;
+	while (::IsWindow(hWnd))
 	{
-		hWnd = pMsg->hwnd;
-	}
+		if (hWnd == m_hWnd)
+		{
+			return true;
+		}
 
-	while (hWnd != NULL && hWnd != m_hWnd)
-	{
 		hWnd = ::GetParent(hWnd);
 	}
 
-	return hWnd == m_hWnd;
+	return false;
 }
 
 bool CWndEx::SetCaptionColorActive(BOOL bPersistant, BOOL ConnectedToClipboard)
@@ -177,6 +186,9 @@ void CWndEx::OnNcLButtonDown(UINT nHitTest, CPoint point)
 	{
 		SetTimer(TIMER_BUTTON_UP, 100, NULL);
 	}
+
+	// DefWindowProc has to see it, it drives the caption move/size loops.
+	SetMsgHandled(FALSE);
 }
 
 void CWndEx::OnNcLButtonUp(UINT nHitTest, CPoint point) 
@@ -193,6 +205,8 @@ void CWndEx::OnNcLButtonUp(UINT nHitTest, CPoint point)
 	}
 
 	KillTimer(TIMER_BUTTON_UP);
+
+	SetMsgHandled(FALSE);
 }
 
 
@@ -209,6 +223,8 @@ void CWndEx::OnNcMouseMove(UINT nHitTest, CPoint point)
 			m_bMaxSetTimer = true;
 		}
 	}
+
+	SetMsgHandled(FALSE);
 }
 
 BOOL CWndEx::PreTranslateMessage(MSG* pMsg) 

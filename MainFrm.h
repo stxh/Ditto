@@ -33,9 +33,10 @@
 #define CLOSE_NO_DB_WINDOW_TIMER        18
 
 class COptionsSheet;
+class GlobalClips;
+class CDeleteClipData;
 
     class CMainFrame : public CFrameWindowImpl<CMainFrame>,
-                       public CUpdateUI<CMainFrame>,
                        public CMessageFilter,
                        public CIdleHandler
 {
@@ -95,14 +96,9 @@ public:
         MESSAGE_HANDLER(WM_RESTORE_DB, OnRestoreDb)
         MESSAGE_HANDLER(WM_PASTE_CLIP, OnPasteClip)
         MESSAGE_HANDLER(WM_EDIT_CLIP, OnEditClip)
+        MESSAGE_HANDLER(WM_INITMENUPOPUP, OnInitMenuPopup)
         CHAIN_MSG_MAP(CFrameWindowImpl<CMainFrame>)
-        CHAIN_MSG_MAP(CUpdateUI<CMainFrame>)
     END_MSG_MAP()
-
-    BEGIN_UPDATE_UI_MAP(CMainFrame)
-        UPDATE_ELEMENT(ID_FIRST_TOGGLECONNECTCV)
-        UPDATE_ELEMENT(ID_FIRST_SHOWSTARTUPMESSAGE)
-    END_UPDATE_UI_MAP()
 
 public:
     CQuickPaste m_quickPaste;
@@ -116,9 +112,9 @@ public:
     short m_keyModifiersTimerCount;
     HWND m_tempFocusWnd;
     CMainFrmThread m_thread;
-    HWND m_pGlobalClips;
-    HWND m_pDeleteClips;
-    HWND m_pOptions;
+    GlobalClips* m_pGlobalClips;
+    CDeleteClipData* m_pDeleteClips;
+    COptionsSheet* m_pOptions;
     int m_doubleClickGroupId;
     DWORD m_doubleClickGroupStartTime;
     CPowerManager m_PowerManager;
@@ -167,6 +163,7 @@ public:
     LRESULT OnBackupDb(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
     LRESULT OnPasteClip(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
     LRESULT OnEditClip(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT OnInitMenuPopup(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 
     int OnCreate(LPCREATESTRUCT lpCreateStruct);
     void OnClose();

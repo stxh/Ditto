@@ -214,7 +214,6 @@ public:
 	
 	// WTL message handling
 	BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID = 0);
-	BOOL OnIdle(LONG lCount);
 protected:
 	void ShowCommandLineError(CString csTitle, CString csMessage);
 	CUAC_Thread* m_pUacPasteThread;

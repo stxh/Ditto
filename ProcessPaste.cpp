@@ -163,10 +163,14 @@ void CProcessPaste::MarkAsPasted(bool updateClipOrder)
 	pData->updateClipOrder = updateClipOrder;
 
 	//Moved to a thread because when running from from U3 devices the write is time consuming
-	// Use Windows API instead of MFC AfxBeginThread
-	HANDLE hThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)CProcessPaste::MarkAsPastedThread, (LPVOID)pData, 0, NULL);
+	//Lowest priority so the paste target application is not slowed by our database write.
+	HANDLE hThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)CProcessPaste::MarkAsPastedThread, (LPVOID)pData, CREATE_SUSPENDED, NULL);
 	if (hThread)
+	{
+		::SetThreadPriority(hThread, THREAD_PRIORITY_LOWEST);
+		::ResumeThread(hThread);
 		CloseHandle(hThread);
+	}
 
 	Log(_T("End of MarkAsPasted"));
 }

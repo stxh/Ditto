@@ -633,7 +633,7 @@ BEGIN
     CONTROL         "Use currently selected group in Ditto's UI for last ten copies",IDC_CHECK_USE_UI_GROUP_LAST_10,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,147,324,12
     CONTROL         "Send custom strokes Per Application",IDC_STATIC_CUSTOM_KEYS,
-                    "MfcLink",WS_TABSTOP,245,8,127,13
+                    "Static",WS_TABSTOP,245,8,127,13
     CONTROL         "",IDC_HOTKEY_COPYSAVECLIPBOARD,"msctls_hotkey32",WS_BORDER | WS_TABSTOP,128,91,80,14
     CONTROL         "Win",IDC_CHECK_WIN_COPY_SAVE_CLIPBOARD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,210,91,33,14
     LTEXT           "Copy And Save Current Clipboard",IDC_STATIC_COLLECT_CLIPBOARD2,12,91,111,14,SS_CENTERIMAGE
@@ -671,9 +671,9 @@ BEGIN
     COMBOBOX        IDC_COMBO_POPUP_POSITION,67,104,130,95,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Popup Position",IDC_STATIC_POPUP_POS,9,104,51,12,SS_CENTERIMAGE
     LTEXT           "Display Font",IDC_STATIC_FONT,9,125,51,14,SS_CENTERIMAGE
-    CONTROL         "Environment Variables",IDC_MFCLINK_ENV_VAR,"MfcLink",WS_TABSTOP,67,162,283,14
+    CONTROL         "Environment Variables",IDC_MFCLINK_ENV_VAR,"Static",WS_TABSTOP,67,162,283,14
     CONTROL         "Privacy Policy: https://ditto-cp.sourceforge.io/PrivacyPolicy.php",IDC_MFCLINK2,
-                    "MfcLink",WS_TABSTOP,14,257,232,14
+                    "Static",WS_TABSTOP,14,257,232,14
 END
 
 IDD_SELECT_DB DIALOGEX 0, 0, 276, 46
@@ -1047,8 +1047,8 @@ BEGIN
     LTEXT           "Script",IDC_STATIC_SCRIPT,100,56,30,10
     LTEXT           "Active",IDC_STATIC_ACTIVE,100,42,21,14
     CONTROL         "ChaiScript (http://chaiscript.com/)",IDC_MFCLINK_CHAISCRIPT,
-                    "MfcLink",WS_TABSTOP,142,54,119,10
-    CONTROL         "Examples",IDC_MFCLINK2_EXAMPLES,"MfcLink",WS_TABSTOP,294,54,60,10
+                    "Static",WS_TABSTOP,142,54,119,10
+    CONTROL         "Examples",IDC_MFCLINK2_EXAMPLES,"Static",WS_TABSTOP,294,54,60,10
     CONTROL         "",IDC_RICHEDIT21,"RichEdit20W",WS_BORDER | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP | 0x10c4,100,66,326,105
     EDITTEXT        IDC_EDIT_ACTIVE_APP,371,196,55,14,ES_AUTOHSCROLL
     EDITTEXT        IDC_EDIT_ACTIVE_APP_TITLE,371,213,55,14,ES_AUTOHSCROLL

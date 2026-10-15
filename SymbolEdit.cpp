@@ -693,6 +693,9 @@ LRESULT CSymbolEdit::OnLButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL
 		m_mouseDownOnSearches = false;
 	}
 
+	// Upstream repainted the whole control after CWnd's default handling.
+	Invalidate();
+
 	bHandled = FALSE;
 	return 0;
 }

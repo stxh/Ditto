@@ -1291,8 +1291,8 @@ int FindNoCaseAndInsert(CString& mainStr, CString& findStr, CString preInsert, C
 
 void OnInitMenuPopupEx(HMENU hPopupMenu)
 {
-	// WTL has no CCmdUI::DoUpdate; the main frame chains CUpdateUI, whose
-	// WM_INITMENUPOPUP handler walks its update map and refreshes the popup items.
+	// WTL has no CCmdUI::DoUpdate; the frame's own WM_INITMENUPOPUP handler refreshes
+	// the items it cares about.  Route the popup there, as MFC did for its owner frame.
 	if (theApp.m_pMainFrame != NULL)
 		theApp.m_pMainFrame->SendMessage(WM_INITMENUPOPUP, (WPARAM)hPopupMenu, 0);
 }

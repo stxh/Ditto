@@ -45,6 +45,14 @@ LRESULT CCopyProperties::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, B
 	SetWindowLong(GWL_EXSTYLE, extendedStyle | WS_EX_DLGMODALFRAME);
 	SetWindowPos(NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 
+	// WTL does not bind template controls, they have to be attached before use.
+	m_QuickPasteText.Attach(GetDlgItem(IDC_EDIT_QUICK_PASTE));
+	m_description.Attach(GetDlgItem(IDC_EDIT_PROPERTIES));
+	m_GroupCombo.Attach(GetDlgItem(IDC_COMBO1));
+	m_HotKey.Attach(GetDlgItem(IDC_HOTKEY));
+	m_lCopyData.Attach(GetDlgItem(IDC_COPY_DATA));
+	m_MoveToGrouHotKey.Attach(GetDlgItem(IDC_HOTKEY_MOVE_TO_GROUP));
+
 	m_GroupCombo.FillCombo();
 
 	try
@@ -512,8 +520,9 @@ LRESULT CCopyProperties::OnCtlColor(UINT uMsg, WPARAM wParam, LPARAM lParam, BOO
 		return (LRESULT)GetSysColorBrush(COLOR_WINDOW);
 	}
 
-	// For other controls, return default
-	return (LRESULT)::GetSysColorBrush(COLOR_BTNFACE);
+	// For other controls, fall through so DefWindowProc picks the dialog default.
+	bHandled = FALSE;
+	return 0;
 }
 
 
@@ -601,6 +610,9 @@ LRESULT CCopyProperties::OnNcLButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam
 	{
 		m_mouseDownOnCaption = true;
 	}
+
+	// DefWindowProc has to run: it starts the caption-move and border-size loops.
+	bHandled = FALSE;
 
 	return 0;
 }
