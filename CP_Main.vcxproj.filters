@@ -130,9 +130,6 @@
     <ClCompile Include="MainTableFunctions.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="MessagePumpThread.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
     <ClCompile Include="MoveToGroupDlg.cpp">
       <Filter>source</Filter>
     </ClCompile>
@@ -560,9 +557,6 @@
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="memdc.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="MessagePumpThread.h">
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="Misc.h">

@@ -80,6 +80,12 @@ using namespace Gdiplus;
 #define TRACE ATLTRACE
 #endif
 
+// MFC's DEBUG_NEW routed allocations through the leak tracker; nothing here does,
+// so keep the debug-only allocations in the sources compiling as plain new.
+#ifdef _DEBUG
+#define DEBUG_NEW new
+#endif
+
 using ATL::CTime;
 
 //{{AFX_INSERT_LOCATION}}

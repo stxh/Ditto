@@ -71,7 +71,7 @@ BOOL CBitmapHelper::GetCBitmap(void	*pClip2, HDC hdc, CBitmap *pBitMap, int nMax
 
 	//do the resize
 	pBitMap->CreateCompatibleBitmap(hdc, nWidth, nHeight);
-	ASSERT(pBitMap->m_hObject != NULL);
+	ASSERT(pBitMap->m_hBitmap != NULL);
 
 	CDC MemDc2;
 	MemDc2.CreateCompatibleDC(hdc);
@@ -129,7 +129,7 @@ BOOL CBitmapHelper::GetCBitmap(CClipFormats &clips, HDC hdc, CBitmap* pBitMap, B
 	}
 
 	pBitMap->CreateCompatibleBitmap(hdc, width, height);
-	ASSERT(pBitMap->m_hObject != NULL);
+	ASSERT(pBitMap->m_hBitmap != NULL);
 
 	CDC MemDc2;
 	MemDc2.CreateCompatibleDC(hdc);

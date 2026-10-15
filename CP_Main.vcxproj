@@ -419,7 +419,7 @@
       <AdditionalIncludeDirectories>E:\PubCode\Ditto\wtl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;_MBCS;UNICODE;HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>.\Debug64/CP_Main.pch</PrecompiledHeaderOutputFile>
@@ -434,7 +434,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>ws2_32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;Winmm.lib;Pdh.lib;Version.lib;$(Configuration)64\\EncryptDecrypt.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;Winmm.lib;Pdh.lib;Version.lib;$(Configuration)64\\EncryptDecrypt.lib;Shlwapi.lib;wininet.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>debug64\Ditto.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -848,7 +848,6 @@
     <ClCompile Include="ImageViewer.cpp" />
     <ClCompile Include="MainFrmThread.cpp" />
     <ClCompile Include="Md5.cpp" />
-    <ClCompile Include="MessagePumpThread.cpp" />
     <ClCompile Include="NTray.cpp" />
     <ClCompile Include="Popup.cpp" />
     <ClCompile Include="PowerManager.cpp" />
@@ -2693,7 +2692,6 @@
     <ClInclude Include="MainFrmThread.h" />
     <ClInclude Include="Md5.h" />
     <ClInclude Include="memdc.h" />
-    <ClInclude Include="MessagePumpThread.h" />
     <ClInclude Include="NTray.h" />
     <ClInclude Include="NumberEdit.h" />
     <ClInclude Include="Popup.h" />

@@ -201,7 +201,10 @@ int CClipboardViewer::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 void CClipboardViewer::OnDestroy()
 {
-	Disconnect();
+	// The copy thread already disconnected on its way out; only repair the chain here
+	// when the window goes away while still listening.
+	if(m_bIsConnected)
+		Disconnect();
 }
 
 void CClipboardViewer::OnChangeCbChain(HWND hWndRemove, HWND hWndAfter) 

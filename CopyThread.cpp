@@ -46,7 +46,13 @@ BOOL CCopyThread::OnThreadStart()
 void CCopyThread::OnThreadStop()
 {
 	if (m_pClipboardViewer != NULL)
+	{
 		m_pClipboardViewer->Disconnect(false);
+		// A thread that terminates does not send WM_DESTROY to its windows, so the
+		// object would be deleted with a live handle (and a dead window thunk) later on.
+		if (::IsWindow(m_pClipboardViewer->m_hWnd))
+			m_pClipboardViewer->DestroyWindow();
+	}
 }
 
 // Called within Copy Thread:

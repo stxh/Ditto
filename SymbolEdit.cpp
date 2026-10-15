@@ -530,6 +530,7 @@ LRESULT CSymbolEdit::OnPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHan
 
 	//OutputDebugString(_T("OnPaint \r\n"));
 
+	return 0;
 }
 
 LRESULT CSymbolEdit::OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
