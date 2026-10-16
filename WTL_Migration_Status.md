@@ -40,9 +40,9 @@ MSBuild.exe CP_Main.vcxproj -p:Configuration=Release -p:Platform=x64 -m -nologo 
 
 Win32 之前链接失败（`LNK1181` 找不到 `Release\EncryptDecrypt.lib`，补齐后 `LNK1120` 七个未解析符号）。两个原因：一是 EncryptDecrypt 的输出目录用了 `$(SolutionDir)`，单独构建 `CP_Main.vcxproj` 时该宏不成立，依赖必须先由解决方案或显式构建 `EncryptDecrypt.vcxproj` 产出；二是 `Release|Win32` 是唯一还用 `/MT` 的配置，而 `zlibstatic.lib`/wininet 按导入 CRT 引用 `__imp__*`，且 `AdditionalDependencies` 里漏了 `wininet.lib`。现已改为 `MultiThreadedDLL` 并补上 `wininet.lib`，与 `Release|x64`、`Debug|Win32` 一致。
 
-用整解决方案构建 Win32 仍会在 `Addins\DittoUtil` 上失败：`MSB8041 此项目需要 MFC 库`（见剩余工作第 1 项），这与主程序无关。
+`Addins\DittoUtil` 之前是 Win32 整解决方案构建的阻塞点（`MSB8041`），现已修复（`5a89dc2`）：`Release|Win32` 的 `UseOfMfc` 由 `Dynamic` 改为 `false`（与其他配置一致），并为全部 6 个配置补上内嵌 WTL 的包含目录 `$(SolutionDir)wtl\include`——因为它的 `stdafx.h` 经根目录 `StdAfx.h` 间接引用 WTL 头。至此整解决方案四个配置均可构建。
 
-已知非阻断告警：链接期 `LNK4098`（LIBCMT/LIBCMTD 冲突，历史遗留）、若干 `C4244`/`C4018`/`C4101`/`C4996`/`C4715`。
+已知非阻断告警：链接期 `LNK4098`（LIBCMT/LIBCMTD 冲突，历史遗留）、若干 `C4244`/`C4018`/`C4101`/`C4996`/`C4715`；Win32 `focus.vcxproj` 的 `LNK4075`（`/EDITANDCONTINUE` 因 `/SAFESEH` 被忽略）。
 
 ## 4. 已完成
 
@@ -62,14 +62,15 @@ Win32 之前链接失败（`LNK1181` 找不到 `Release\EncryptDecrypt.lib`，�
   - 删除旁路项目目录 `Help\`、`WebSite\`、`U3Stop\`、`AccessToSqlite\`（94 个文件，均不在 `CP_Main_10.sln` 内）。
   - 语言包与主题从输出目录 `Debug\` 移到仓库根 `Language\`、`Themes\`，安装脚本与便携打包脚本同步更新（`b191d2c`）。
   - 约 85 个构建产物（`*.obj/*.lib/*.exe/*.dll/*.map/*.log/*.res/*.recipe/*.ilk/*.idb/*.tlh/*.tli/*.user/CP_Main_i.c/h` 等）从版本控制移除，`.gitignore` 扩展覆盖；`DittoSetup` 的 rcedit/ProjectZip 工具和 `zlib\zlibstat.lib` 属构建输入，保留跟踪。磁盘上的 `Debug/Debug64/Release/Release64/x64/Win32/` 及各项目中间目录已清空（约 2 GB），全部可由构建再生。
+  - 清理后从零重建 `CP_Main_10.sln` 全部四个配置（Release/Debug × x64/Win32）均 `0 error`，`Ditto.exe` 与 `DittoUtil.dll` 八个产物齐备（`5a89dc2`）。
 
 ## 5. 剩余工作
 
 按风险从低到高：
 
-1. **旁路插件仍是 MFC**：`Addins\DittoUtil` 仅 `Release|Win32` 一个配置还是 `UseOfMfc=Dynamic`，导致整解决方案的 Win32 构建在未装 MFC 组件的机器上报 `MSB8041`。
-2. **未注册的 OLE 拖放**：`CQPasteWnd::OnDragEnter/OnDragOver/OnDrop/OnDragLeave` 是空实现，上游 MFC 版本同样如此且 `CMyDropTarget`/`CDittoDropTarget` 从未注册，因此不是迁移丢失，但可顺手清理或真正实现拖放。
-3. **告警治理**：`LNK4098` 与 C4xxx 系列。
+1. **未注册的 OLE 拖放**：`CQPasteWnd::OnDragEnter/OnDragOver/OnDrop/OnDragLeave` 是空实现，上游 MFC 版本同样如此且 `CMyDropTarget`/`CDittoDropTarget` 从未注册，因此不是迁移丢失，但可顺手清理或真正实现拖放。
+2. **告警治理**：`LNK4098` 与 C4xxx 系列。
+3. **运行验证**：第 6 节清单需人工逐项执行，尤其是本轮清理（死文件、旁路项目、产物出仓）之后重跑四个配置的冒烟测试。
 
 ## 6. 手动验证清单
 
