@@ -40,7 +40,7 @@ MSBuild.exe CP_Main.vcxproj -p:Configuration=Release -p:Platform=x64 -m -nologo 
 
 Win32 之前链接失败（`LNK1181` 找不到 `Release\EncryptDecrypt.lib`，补齐后 `LNK1120` 七个未解析符号）。两个原因：一是 EncryptDecrypt 的输出目录用了 `$(SolutionDir)`，单独构建 `CP_Main.vcxproj` 时该宏不成立，依赖必须先由解决方案或显式构建 `EncryptDecrypt.vcxproj` 产出；二是 `Release|Win32` 是唯一还用 `/MT` 的配置，而 `zlibstatic.lib`/wininet 按导入 CRT 引用 `__imp__*`，且 `AdditionalDependencies` 里漏了 `wininet.lib`。现已改为 `MultiThreadedDLL` 并补上 `wininet.lib`，与 `Release|x64`、`Debug|Win32` 一致。
 
-用整解决方案构建 Win32 仍会在 `Addins\DittoUtil` 上失败：`MSB8041 此项目需要 MFC 库`（见剩余工作第 3 项），这与主程序无关。
+用整解决方案构建 Win32 仍会在 `Addins\DittoUtil` 上失败：`MSB8041 此项目需要 MFC 库`（见剩余工作第 1 项），这与主程序无关。
 
 已知非阻断告警：链接期 `LNK4098`（LIBCMT/LIBCMTD 冲突，历史遗留）、若干 `C4244`/`C4018`/`C4101`/`C4996`/`C4715`。
 
@@ -54,20 +54,22 @@ Win32 之前链接失败（`LNK1181` 找不到 `Release\EncryptDecrypt.lib`，�
   - 21 处 `CFont::DeleteObject()` 加 `IsNull()` 守卫——ATL 断言句柄非空，MFC 返回 FALSE。
   - `CHyperLink` 从 `Attach()` 改为 `SubclassWindow()`——它是 `CWindowImpl` 派生类，`Attach()` 留下无 thunk 的活句柄，`~CWindowImplRoot()` 会断言；这同时恢复了 About 页链接的实际可点。
   - `CTrayNotifyIcon::m_wndInvisible`（静态 `CTrayWnd`）新增 `ReleaseInvisibleWindow()`，在 `ExitInstance()` 调用；`MinimiseToTray()` 会把主框架重新挂到该窗口上，不销毁则进程退出时断言。
-  - `OptionsSheet.cpp` 补 `#include "OptionsUtilities.h"`，修掉 `delete m_pUtilites` 跳过析构的 C4150。
+  - 死代码 `COptionsUtilities` 整体删除，`OptionsSheet` 中的 `m_pUtilites` 成员与配套 include、new/delete 一并移除。
 - 网络接收改为默认关闭、逐项 opt-in（`9fe3277`）。
 - 迁移过程中被静默丢掉的行为已按 `git show 2ee24aa` 逐一比对恢复。
+- 项目清理（本轮）：
+  - 删除 56 个死代码文件（`e6d0476`），含上游从未编译的 MFC 遗留 `SystemTray`、`MyDropTarget`、`ProcessCopy`、`DittoDropTarget`、`EditWnd`，以及从未被使用的 `OptionsUtilities`。
+  - 删除旁路项目目录 `Help\`、`WebSite\`、`U3Stop\`、`AccessToSqlite\`（94 个文件，均不在 `CP_Main_10.sln` 内）。
+  - 语言包与主题从输出目录 `Debug\` 移到仓库根 `Language\`、`Themes\`，安装脚本与便携打包脚本同步更新（`b191d2c`）。
+  - 约 85 个构建产物（`*.obj/*.lib/*.exe/*.dll/*.map/*.log/*.res/*.recipe/*.ilk/*.idb/*.tlh/*.tli/*.user/CP_Main_i.c/h` 等）从版本控制移除，`.gitignore` 扩展覆盖；`DittoSetup` 的 rcedit/ProjectZip 工具和 `zlib\zlibstat.lib` 属构建输入，保留跟踪。磁盘上的 `Debug/Debug64/Release/Release64/x64/Win32/` 及各项目中间目录已清空（约 2 GB），全部可由构建再生。
 
 ## 5. 剩余工作
 
 按风险从低到高：
 
-1. **死代码清除**（已转为 WTL/STL 写法但无调用者）：`CRichEditCtrlEx::GetSystemFonts()` + `m_saFontList`、`SimpleBrowser::ParsePostData()`。
-2. **未参与编译的遗留 MFC 文件**：`SystemTray.h/.cpp`、`MyDropTarget.h/.cpp`、`ProcessCopy.h/.cpp`、`DittoDropTarget.h/.cpp`、`EditWnd.h`（都不在 vcxproj 中，编译期分别被 `TrayWnd`、WTL 拖放实现、`DittoWindow` 取代）。
-3. **旁路项目仍是 MFC**：`AccessToSqlite`、`U3Stop`（都不在 `CP_Main_10.sln` 里，不影响主程序）；`Addins\DittoUtil` 仅 `Release|Win32` 一个配置还是 `UseOfMfc=Dynamic`，导致整解决方案的 Win32 构建在未装 MFC 组件的机器上报 `MSB8041`。
-4. **未注册的 OLE 拖放**：`CQPasteWnd::OnDragEnter/OnDragOver/OnDrop/OnDragLeave` 是空实现，上游 MFC 版本同样如此且 `CMyDropTarget`/`CDittoDropTarget` 从未注册，因此不是迁移丢失，但可顺手清理或真正实现拖放。
-5. **工作区垃圾**：`*.backup`、`test_*.cpp`、`atledit.h`、`DittoWindow_mfc.h`、`DittoPopupWindow.h.bak`、`ComboBoxSearch.h/.cpp`、`wtl\include_fake_removed`、`wtl\include.backup`、根目录日志/obj，建议清理或加入 `.gitignore`；构建产物（`Release64/`、`Debug64/`、`x64/`、`*.map`、`*.log`、`*.tlh`、`CP_Main_i.c/h`）也被纳入版本控制，源码提交需要显式挑选文件。
-6. **告警治理**：`LNK4098` 与 C4xxx 系列。
+1. **旁路插件仍是 MFC**：`Addins\DittoUtil` 仅 `Release|Win32` 一个配置还是 `UseOfMfc=Dynamic`，导致整解决方案的 Win32 构建在未装 MFC 组件的机器上报 `MSB8041`。
+2. **未注册的 OLE 拖放**：`CQPasteWnd::OnDragEnter/OnDragOver/OnDrop/OnDragLeave` 是空实现，上游 MFC 版本同样如此且 `CMyDropTarget`/`CDittoDropTarget` 从未注册，因此不是迁移丢失，但可顺手清理或真正实现拖放。
+3. **告警治理**：`LNK4098` 与 C4xxx 系列。
 
 ## 6. 手动验证清单
 
