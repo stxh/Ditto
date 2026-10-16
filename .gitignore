@@ -61,3 +61,5 @@ x64/
 Win32/
 *.iobj
 *.ipdb
+FileListAbsolute.txt
+RC*
