@@ -51,7 +51,7 @@ LRESULT CSelectDB::OnSelect(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHan
 
 	if (!ValidDB(csPath))
 	{
-		MessageBox(_T("Invalid Database"), _T("Ditto"), MB_OK);
+		MessageBox(_T("Invalid Database"), _T("DittoWTL"), MB_OK);
 		m_ePath.SetFocus();
 	}
 	else

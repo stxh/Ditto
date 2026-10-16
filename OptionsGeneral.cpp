@@ -195,7 +195,7 @@ int COptionsGeneral::OnApply()
 			CString cs;
 			cs.Format(_T("Error loading language file - %s - \n\n%s"), csLanguage, theApp.m_Language.m_csLastError);
 
-			MessageBox(cs, _T("Ditto"), MB_OK);
+			MessageBox(cs, _T("DittoWTL"), MB_OK);
 		}
 	}
 
@@ -212,7 +212,7 @@ int COptionsGeneral::OnApply()
 			CString cs;
 			cs.Format(_T("The database %s does not exist.\n\nCreate a new database?"), resolvedPath);
 
-			if (MessageBox(cs, _T("Ditto"), MB_YESNO) == IDYES)
+			if (MessageBox(cs, _T("DittoWTL"), MB_YESNO) == IDYES)
 			{
 				if (CreateDB(resolvedPath))
 				{
@@ -228,7 +228,7 @@ int COptionsGeneral::OnApply()
 		{
 			if (ValidDB(resolvedPath) == FALSE)
 			{
-				MessageBox(_T("Invalid Database"), _T("Ditto"), MB_OK);
+				MessageBox(_T("Invalid Database"), _T("DittoWTL"), MB_OK);
 				m_ePath.SetFocus();
 				return PSNRET_INVALID;
 			}
@@ -244,7 +244,7 @@ int COptionsGeneral::OnApply()
 
 			if (OpenDatabase(resolvedPath) == FALSE)
 			{
-				MessageBox(_T("Error Opening new database"), _T("Ditto"), MB_OK);
+				MessageBox(_T("Error Opening new database"), _T("DittoWTL"), MB_OK);
 				m_ePath.SetFocus();
 				return PSNRET_INVALID;
 			}
@@ -322,7 +322,7 @@ LRESULT COptionsGeneral::OnGetPath(WORD, WORD, HWND, BOOL&)
 	{
 		if (ValidDB(csPath) == FALSE)
 		{
-			MessageBox(_T("Invalid Database"), _T("Ditto"), MB_OK);
+			MessageBox(_T("Invalid Database"), _T("DittoWTL"), MB_OK);
 			m_ePath.SetFocus();
 		}
 		else
@@ -361,14 +361,14 @@ LRESULT COptionsGeneral::OnButtonAbout(WORD, WORD, HWND, BOOL&)
 			Lang.GetAuthor(),
 			Lang.GetNotes());
 
-		MessageBox(csMessage, _T("Ditto"), MB_OK);
+		MessageBox(csMessage, _T("DittoWTL"), MB_OK);
 	}
 	else
 	{
 		CString csError;
 		csError.Format(_T("Error loading language file - %s - reason = "), csLanguage, Lang.m_csLastError);
 
-		MessageBox(csError, _T("Ditto"), MB_OK);
+		MessageBox(csError, _T("DittoWTL"), MB_OK);
 	}
 
 	return 0;
@@ -417,14 +417,14 @@ LRESULT COptionsGeneral::OnBnClickedButtonTheme(WORD, WORD, HWND, BOOL&)
 			theme.Author(),
 			theme.Notes());
 
-		MessageBox(csMessage, _T("Ditto"), MB_OK);
+		MessageBox(csMessage, _T("DittoWTL"), MB_OK);
 	}
 	else
 	{
 		CString csError;
 		csError.Format(_T("Error loading theme file - %s - reason = "), csTheme, theme.LastError());
 
-		MessageBox(csError, _T("Ditto"), MB_OK);
+		MessageBox(csError, _T("DittoWTL"), MB_OK);
 	}
 
 	return 0;

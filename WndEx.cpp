@@ -80,7 +80,7 @@ int CWndEx::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	::ScreenToClient(m_hWnd, &ptRB);
 	r.SetRect(ptLT, ptRB);
 	r.InflateRect(m_DittoWindow.m_dpi.Scale(25), m_DittoWindow.m_dpi.Scale(25));
-	m_toolTip.AddTool(m_hWnd, _T("Ditto"), &r, 1);
+	m_toolTip.AddTool(m_hWnd, _T("DittoWTL"), &r, 1);
 
 	WTL::CMessageLoop* pLoop = theApp.GetMessageLoop();
 	if (pLoop != NULL)

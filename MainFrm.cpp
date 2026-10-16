@@ -60,15 +60,15 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
     Log(_T("Setting polling timer to track focus"));
     SetTimer(ACTIVE_WINDOW_TIMER, CGetSetOptions::FocusWndTimerTimeout(), 0);
     SetTimer(READ_RANDOM_DB_FILE, CGetSetOptions::ReadRandomFileInterval() * 1000, 0);
-    SetWindowText(_T("Ditto"));
+    SetWindowText(_T("DittoWTL"));
     
-    m_trayIcon.Create(this, IDR_MENU, _T("Ditto"), CTrayNotifyIcon::LoadIcon(IDR_MAINFRAME), WM_TRAYNOTIFY, 0, 1);
+    m_trayIcon.Create(this, IDR_MENU, _T("DittoWTL"), CTrayNotifyIcon::LoadIcon(IDR_MAINFRAME), WM_TRAYNOTIFY, 0, 1);
     m_trayIcon.SetDefaultMenuItem(ID_FIRST_SHOWQUICKPASTE, FALSE);
 
     if(CGetSetOptions::GetShowStartupMessage())
     {
         CString msg = theApp.m_Language.GetString(_T("StartupMsg"), _T("Ditto is running minimized, Ditto can be opened by hot keys or by clicking the task tray icon"));
-        m_trayIcon.SetBalloonDetails(msg, _T("Ditto"), CTrayNotifyIcon::BalloonStyle::Info, CGetSetOptions::GetBalloonTimeout());
+        m_trayIcon.SetBalloonDetails(msg, _T("DittoWTL"), CTrayNotifyIcon::BalloonStyle::Info, CGetSetOptions::GetBalloonTimeout());
     }
 
     theApp.m_Language.UpdateTrayIconRightClickMenu(m_trayIcon.GetMenu());
@@ -935,7 +935,7 @@ LRESULT CMainFrame::OnErrorOnSendRecieve(UINT uMsg, WPARAM wParam, LPARAM lParam
 LRESULT CMainFrame::OnErrorMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
     CString csNewText = (TCHAR*)wParam;
-    ShowErrorMessage(_T("Ditto"), csNewText);
+    ShowErrorMessage(_T("DittoWTL"), csNewText);
     return 0;
 }
 CString WndName(HWND hParent)
@@ -1252,7 +1252,7 @@ LRESULT CMainFrame::OnShowMsgWindow(UINT uMsg, WPARAM wParam, LPARAM lParam, BOO
     CString* pMsg = (CString*)wParam;
     int clipId = (int)lParam;
 
-    m_trayIcon.SetBalloonDetails(pMsg->GetBuffer(), _T("Ditto"), CTrayNotifyIcon::BalloonStyle::Info, CGetSetOptions::GetBalloonTimeout());
+    m_trayIcon.SetBalloonDetails(pMsg->GetBuffer(), _T("DittoWTL"), CTrayNotifyIcon::BalloonStyle::Info, CGetSetOptions::GetBalloonTimeout());
 
     delete pMsg;
     return 0;
@@ -1335,7 +1335,7 @@ LRESULT CMainFrame::OnRestoreDb(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& b
 
 LRESULT CMainFrame::OnFirstDeleteallnonusedclips(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
-    int nRet = MessageBox(theApp.m_Language.GetString(_T("Delete_All_Non_Used_Clips"), _T("Delete all clips that are not groups, in groups, marked as never auto delete, has a shortcut key or marked as sticky.\r\n\r\nThis cannot be undone.")), _T("Ditto"), MB_YESNO | MB_TOPMOST);
+    int nRet = MessageBox(theApp.m_Language.GetString(_T("Delete_All_Non_Used_Clips"), _T("Delete all clips that are not groups, in groups, marked as never auto delete, has a shortcut key or marked as sticky.\r\n\r\nThis cannot be undone.")), _T("DittoWTL"), MB_YESNO | MB_TOPMOST);
     if(nRet == IDNO)
     {
         return 0;

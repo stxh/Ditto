@@ -280,11 +280,11 @@ BOOL CCP_MainApp::InitInstance(HINSTANCE hInstance, int nCmdShow)
 			CClip_ImportExport clip;
 			if(clip.ImportFromSqliteDB(db, false, true))
 			{
-				ShowCommandLineError("Ditto", theApp.m_Language.GetString("Importing_Good", "Clip placed on clipboard"));
+				ShowCommandLineError("DittoWTL", theApp.m_Language.GetString("Importing_Good", "Clip placed on clipboard"));
 			}
 			else
 			{
-				ShowCommandLineError("Ditto", theApp.m_Language.GetString("Error_Importing", "Error importing exported clip"));
+				ShowCommandLineError("DittoWTL", theApp.m_Language.GetString("Error_Importing", "Error importing exported clip"));
 			}
 		}
 		catch (CppSQLite3Exception& e)
@@ -293,7 +293,7 @@ BOOL CCP_MainApp::InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 			CString csError;
 			csError.Format(_T("%s - Exception - %d - %s"), theApp.m_Language.GetString("Error_Parsing", "Error parsing exported clip"), e.errorCode(), e.errorMessage());
-			ShowCommandLineError("Ditto", csError);
+			ShowCommandLineError("DittoWTL", csError);
 		}	
 
 		return FALSE;
@@ -1018,13 +1018,13 @@ void CCP_MainApp::SetConnectCV(bool bConnect)
 	if(bConnect)
 	{
 		m_pMainFrame->m_trayIcon.SetIcon(IDR_MAINFRAME);
-		m_pMainFrame->m_trayIcon.SetTooltipText(_T("Ditto"));
+		m_pMainFrame->m_trayIcon.SetTooltipText(_T("DittoWTL"));
 	}
 	else
 	{
 		m_pMainFrame->m_trayIcon.SetIcon(IDI_DITTO_NOCOPYCB);
 		CString cs;
-		cs = _T("Ditto ");
+		cs = _T("DittoWTL ");
 		cs += theApp.m_Language.GetString("disconnected", "[Disconnected]");
 		m_pMainFrame->m_trayIcon.SetTooltipText(cs);
 	}
@@ -1094,12 +1094,12 @@ bool CCP_MainApp::ImportClips(HWND hWnd)
 			else
 				cs += theApp.m_Language.GetString("Clips", "clips");
 
-			MessageBox(hWnd, cs, _T("Ditto"), MB_OK);
+			MessageBox(hWnd, cs, _T("DittoWTL"), MB_OK);
 		}
 		else
 		{
 			CShowTaskBarIcon show;
-			MessageBox(hWnd, theApp.m_Language.GetString("Error_Importing", "Error importing exported clip"), _T("Ditto"), MB_OK);
+			MessageBox(hWnd, theApp.m_Language.GetString("Error_Importing", "Error importing exported clip"), _T("DittoWTL"), MB_OK);
 		}
 	}
 	catch (CppSQLite3Exception& e)
@@ -1108,7 +1108,7 @@ bool CCP_MainApp::ImportClips(HWND hWnd)
 
 		CString csError;
 		csError.Format(_T("%s - Exception - %d - %s"), theApp.m_Language.GetString("Error_Parsing", "Error parsing exported clip"), e.errorCode(), e.errorMessage());
-		MessageBox(hWnd, csError, _T("Ditto"), MB_OK);
+		MessageBox(hWnd, csError, _T("DittoWTL"), MB_OK);
 	}	
 
 	return true;

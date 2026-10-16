@@ -34,7 +34,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif 
 
-#define QPASTE_TITLE			"Ditto"
+#define QPASTE_TITLE			"DittoWTL"
 
 
 
@@ -2463,7 +2463,7 @@ BOOL CQPasteWnd::SendToFriendbyPos(int nPos, CString override_IP_Host)
 
 			if (SendToFriend(Info) == FALSE)
 			{
-				MessageBox(StrF(_T("Error Sending data to %s\n\n%s"), Info.m_csIP, Info.m_csErrorText), _T("Ditto"), MB_OK | MB_TOPMOST);
+				MessageBox(StrF(_T("Error Sending data to %s\n\n%s"), Info.m_csIP, Info.m_csErrorText), _T("DittoWTL"), MB_OK | MB_TOPMOST);
 			}
 			else
 			{
@@ -2491,7 +2491,7 @@ void CQPasteWnd::DeleteSelectedRows()
 		bool bStartValue = m_bHideWnd;
 		m_bHideWnd = false;
 
-		int nRet = MessageBox(theApp.m_Language.GetString("Delete_Clip", "Delete Selected Clips?"), _T("Ditto"), MB_OKCANCEL | MB_TOPMOST);
+		int nRet = MessageBox(theApp.m_Language.GetString("Delete_Clip", "Delete Selected Clips?"), _T("DittoWTL"), MB_OKCANCEL | MB_TOPMOST);
 
 		m_bHideWnd = bStartValue;
 
@@ -6288,7 +6288,7 @@ LRESULT CQPasteWnd::OnDeleteId(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bH
 		bool bStartValue = m_bHideWnd;
 		m_bHideWnd = false;
 
-		int nRet = MessageBox(theApp.m_Language.GetString("Delete_Clip_Groups", "Delete Group?"), _T("Ditto"), MB_OKCANCEL | MB_TOPMOST);
+		int nRet = MessageBox(theApp.m_Language.GetString("Delete_Clip_Groups", "Delete Group?"), _T("DittoWTL"), MB_OKCANCEL | MB_TOPMOST);
 
 		m_bHideWnd = bStartValue;
 
@@ -7594,7 +7594,7 @@ bool CQPasteWnd::DoDeleteAllNonUsedClips()
 	bool bStartValue = m_bHideWnd;
 	m_bHideWnd = false;
 
-	int nRet = MessageBox(theApp.m_Language.GetString("Delete_All_Non_Used_Clips", "Delete all clips that are not groups, in groups, marked as never auto delete, has a shortcut key or marked as sticky.\r\n\r\nThis cannot be undone."), _T("Ditto"), MB_YESNO | MB_TOPMOST);
+	int nRet = MessageBox(theApp.m_Language.GetString("Delete_All_Non_Used_Clips", "Delete all clips that are not groups, in groups, marked as never auto delete, has a shortcut key or marked as sticky.\r\n\r\nThis cannot be undone."), _T("DittoWTL"), MB_YESNO | MB_TOPMOST);
 
 	m_bHideWnd = bStartValue;
 	if (nRet == IDNO)

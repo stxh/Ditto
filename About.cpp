@@ -31,7 +31,7 @@ LRESULT CAbout::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHan
 	m_HyperLink.SubclassWindow(GetDlgItem(IDC_HYPER_LINK));
 	m_Link.SubclassWindow(GetDlgItem(IDC_STATIC_LINK));
 
-	m_List.AddString(_T("Ditto"));
+	m_List.AddString(_T("DittoWTL"));
 
 	CInternetUpdate update;
 

@@ -271,14 +271,14 @@ LRESULT COptionsQuickPaste::OnBnClickedButtonTheme(WORD, WORD, HWND, BOOL&)
 			theme.Author(), 
 			theme.Notes());
 
-		MessageBox(csMessage, _T("Ditto"), MB_OK);
+		MessageBox(csMessage, _T("DittoWTL"), MB_OK);
 	}
 	else
 	{
 		CString csError;
 		csError.Format(_T("Error loading theme file - %s - reason = "), csTheme, theme.LastError());
 
-		MessageBox(csError, _T("Ditto"), MB_OK);
+		MessageBox(csError, _T("DittoWTL"), MB_OK);
 	}
 	return 0;
 }

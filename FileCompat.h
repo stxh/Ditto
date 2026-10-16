@@ -34,7 +34,7 @@ public:
 	{
 		TCHAR szError[1024];
 		if (GetErrorMessage(szError, _countof(szError)))
-			::MessageBox(hWndParent, szError, _T("Ditto"), MB_OK | MB_ICONERROR);
+			::MessageBox(hWndParent, szError, _T("DittoWTL"), MB_OK | MB_ICONERROR);
 	}
 
 	void Delete() { delete this; }

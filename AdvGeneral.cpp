@@ -127,7 +127,7 @@ void CAdvGeneral::BuildGrid()
 	static const TCHAR szSoundFilter[] = _T("Sounds(*.wav)|*.wav||");
 	static const TCHAR szAppFilter[] = _T("Applications(*.exe)|*.exe||");
 
-	m_grid.AddCategory(_T("Ditto"));
+	m_grid.AddCategory(_T("DittoWTL"));
 
 	m_grid.AddInt(0, _T("Activate window delay (100ms default)"), (long)CGetSetOptions::SendKeysDelay(), _T(""), SETTING_ACTIVATE_WINDOW_DELAY);
 	AddTrueFalse(_T("Add file drop when dragging clips"), CGetSetOptions::GetAddCFHDROP_OnDrag(), SETTING_ADD_CF_HDROP_ON_DRAG);
@@ -571,7 +571,7 @@ LRESULT CAdvGeneral::OnSize(UINT, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 LRESULT CAdvGeneral::OnBnClickedBtCompactAndRepair(WORD, WORD, HWND, BOOL&)
 {
 	auto msg = theApp.m_Language.GetString("CompactRepairWarning", "Warning this can take quite a long time and require up to double the hard drive space as your current database size, Continue?");
-	int ret = MessageBox(msg, _T("Ditto"), MB_YESNO);
+	int ret = MessageBox(msg, _T("DittoWTL"), MB_YESNO);
 
 	if (ret == IDYES)
 	{

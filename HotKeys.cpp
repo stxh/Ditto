@@ -418,7 +418,7 @@ void CHotKeys::RegisterAll(bool bMsgOnError)
 			str += pHotKey->GetName();
 			Log(str);
 			if(bMsgOnError)
-				::MessageBox(theApp.m_MainhWnd, str, _T("Ditto"), MB_OK);
+				::MessageBox(theApp.m_MainhWnd, str, _T("DittoWTL"), MB_OK);
 		}
 	}
 }
@@ -437,7 +437,7 @@ void CHotKeys::UnregisterAll(bool bMsgOnError, bool bOnShowDitto)
 			str += pHotKey->GetName();
 			Log(str);
 			if(bMsgOnError)
-				::MessageBox(theApp.m_MainhWnd, str, _T("Ditto"), MB_OK);
+				::MessageBox(theApp.m_MainhWnd, str, _T("DittoWTL"), MB_OK);
 		}
 	}
 }

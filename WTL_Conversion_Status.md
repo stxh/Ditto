@@ -1,3 +1,5 @@
+> **历史文档 / HISTORICAL**：本文记录的是已放弃的 MFC 仿真 shim 方案（路线 A），其结论、类名与步骤均与当前代码不符。当前迁移状态见 [WTL_Migration_Status.md](WTL_Migration_Status.md)。
+
 # WTL Conversion Status Report
 
 ## Completed Conversions ✓

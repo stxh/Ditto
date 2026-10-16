@@ -773,7 +773,7 @@ END
 
 IDD_ABOUT DIALOGEX 0, 0, 337, 206
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "About Ditto"
+CAPTION "About DittoWTL"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     LISTBOX         IDC_LIST,7,16,323,132,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP
@@ -783,7 +783,7 @@ END
 
 IDD_GROUP_NAME DIALOGEX 0, 0, 186, 49
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Ditto"
+CAPTION "DittoWTL"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     EDITTEXT        IDC_NAME,7,11,172,12,ES_AUTOHSCROLL
@@ -844,7 +844,7 @@ END
 
 IDD_DIALOG_REMOTE_FILE DIALOGEX 0, 0, 284, 110
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Ditto"
+CAPTION "DittoWTL"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,227,89,50,14
@@ -1061,8 +1061,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 3,24,238,2
- PRODUCTVERSION 3,24,238,2
+ FILEVERSION 4,0,0,1
+ PRODUCTVERSION 4,0,0,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -1077,13 +1077,13 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "FileDescription", "Ditto"
-            VALUE "FileVersion", "3.24.238.2"
+            VALUE "FileDescription", "DittoWTL"
+            VALUE "FileVersion", "4.0.0.1"
             VALUE "InternalName", "CP_Main"
             VALUE "LegalCopyright", "Copyright (C) 2003"
             VALUE "OriginalFilename", "Ditto"
-            VALUE "ProductName", "Ditto"
-            VALUE "ProductVersion", "3.24.238.2"
+            VALUE "ProductName", "DittoWTL"
+            VALUE "ProductVersion", "4.0.0.1"
         END
     END
     BLOCK "VarFileInfo"
