@@ -1455,14 +1455,10 @@ long CGetSetOptions::GetPort()
 
 BOOL CGetSetOptions::GetDisableRecieve()
 {
-	BOOL bDefault = FALSE;
-	if(GetIsPortableDitto())
-		bDefault = TRUE;
-
-	if(GetIsWindowsApp())
-		bDefault = TRUE;
-
-	return GetProfileLong("DisableRecieve", bDefault);
+	// Receiving over the network is opt-in.  Before, only the portable and Store
+	// builds defaulted to off, so an installed Ditto listened on every adapter
+	// (INADDR_ANY:23443) under the built-in "LetMeIn" password.
+	return GetProfileLong("DisableRecieve", TRUE);
 }
 
 void CGetSetOptions::SetDisableRecieve(BOOL bVal)
