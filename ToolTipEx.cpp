@@ -36,8 +36,10 @@ CToolTipEx::CToolTipEx(): m_dwTextStyle(DT_EXPANDTABS | DT_EXTERNALLEADING |
 
 CToolTipEx::~CToolTipEx()
 {
-    m_Font.DeleteObject();
-	m_clipDataFont.DeleteObject();
+    if (!m_Font.IsNull())
+        m_Font.DeleteObject();
+	if (!m_clipDataFont.IsNull())
+		m_clipDataFont.DeleteObject();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -690,7 +692,8 @@ BOOL CToolTipEx::SetLogFont(LPLOGFONT lpLogFont, BOOL bRedraw /*=TRUE*/)
 	LogFont.lfHeight = m_DittoWindow.m_dpi.Scale(LogFont.lfHeight);
 
     // Create the actual font object
-    m_Font.DeleteObject();
+    if (!m_Font.IsNull())
+        m_Font.DeleteObject();
     m_Font.CreateFontIndirect(&LogFont);
 
     if(bRedraw && ::IsWindow(m_hWnd))
@@ -1505,7 +1508,8 @@ LRESULT CToolTipEx::OnDpiChanged(UINT dpiX, UINT dpiY, PRECT prcNewWindow)
 	m_optionsButton.Reset();
 	m_optionsButton.LoadStdImageDPI(m_DittoWindow.m_dpi.GetDPI(), IDB_COG_16_16, IDB_COG_20_20, IDB_COG_24_24, cog_28, IDB_COG_32_32, _T("PNG"));
 
-	m_clipDataFont.DeleteObject();
+	if (!m_clipDataFont.IsNull())
+		m_clipDataFont.DeleteObject();
 	m_clipDataFont.CreateFont(-m_DittoWindow.m_dpi.Scale(8), 0, 0, 0, 400, 0, 0, 0, DEFAULT_CHARSET, 3, 2, 1, 34, _T("Segoe UI"));
 	
 	m_clipDataStatic.SetFont(m_clipDataFont);
@@ -1521,7 +1525,8 @@ LRESULT CToolTipEx::OnDpiChanged(UINT dpiX, UINT dpiY, PRECT prcNewWindow)
 	lf.lfHeight = m_DittoWindow.m_dpi.Scale(m_fontHeight);
 
 	// Create the actual font object
-	m_Font.DeleteObject();
+	if (!m_Font.IsNull())
+		m_Font.DeleteObject();
 	m_Font.CreateFontIndirect(&lf);
 
 	m_RichEdit.SetFont(m_Font);

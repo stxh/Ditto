@@ -26,8 +26,10 @@ CAbout::~CAbout()
 LRESULT CAbout::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	m_List.Attach(GetDlgItem(IDC_LIST));
-	m_HyperLink.Attach(GetDlgItem(IDC_HYPER_LINK));
-	m_Link.Attach(GetDlgItem(IDC_STATIC_LINK));
+	// CHyperLink is CWindowImpl-derived, so it must own a thunk; Attach() would leave
+	// the handle set when the page dies and assert in ~CWindowImplRoot.
+	m_HyperLink.SubclassWindow(GetDlgItem(IDC_HYPER_LINK));
+	m_Link.SubclassWindow(GetDlgItem(IDC_STATIC_LINK));
 
 	m_List.AddString(_T("Ditto"));
 

@@ -85,7 +85,7 @@ private:
 	CEdit m_ClipSeparator;
 	CEdit m_copyAppInclude;
 	CEdit m_copyAppExclude;
-	CHyperLink m_envVarLink;
+	CStatic m_envVarLink;
 	CComboBox m_cbTheme;
 	CButton m_btFont;
 	CButton m_btDefaultButton;

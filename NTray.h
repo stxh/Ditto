@@ -170,6 +170,8 @@ public:
   BOOL RemoveTaskbarIcon(HWND hWnd);
   void MinimiseToTray(HWND hWnd);
   void MaximiseFromTray(HWND hWnd);
+  // static m_wndInvisible must be destroyed before process teardown, see cpp
+  static void ReleaseInvisibleWindow();
 
 //Sets or gets the Tooltip text
   BOOL   SetTooltipText(_In_ LPCTSTR pszTooltipText);

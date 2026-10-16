@@ -1296,6 +1296,12 @@ BOOL CTrayNotifyIcon::RemoveTaskbarIcon(HWND hWnd)
 	return TRUE;
 }
 
+void CTrayNotifyIcon::ReleaseInvisibleWindow()
+{
+	if (::IsWindow(m_wndInvisible.m_hWnd))
+		m_wndInvisible.DestroyWindow();
+}
+
 void CTrayNotifyIcon::MinimiseToTray(HWND hWnd)
 {
 	RemoveTaskbarIcon(hWnd);

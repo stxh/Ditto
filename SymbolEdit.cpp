@@ -399,7 +399,8 @@ void CSymbolEdit::SetPromptFont(CFont& font, BOOL redraw)
 
 void CSymbolEdit::SetPromptFont(const LOGFONT* lpLogFont, BOOL redraw)
 {
-	m_fontPrompt.DeleteObject();
+	if (!m_fontPrompt.IsNull())
+		m_fontPrompt.DeleteObject();
 	m_fontPrompt.CreateFontIndirect(lpLogFont);
 
 	if (redraw)

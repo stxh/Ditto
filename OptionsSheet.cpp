@@ -12,6 +12,7 @@
 #include "About.h"
 #include "OptionFriends.h"
 #include "OptionsCopyBuffers.h"
+#include "OptionsUtilities.h"
 #include "Misc.h"
 #include "QuickPasteKeyboard.h"
 

@@ -16,7 +16,8 @@ COptionsQuickPaste::COptionsQuickPaste()
 
 COptionsQuickPaste::~COptionsQuickPaste()
 {
-	m_Font.DeleteObject();
+	if (!m_Font.IsNull())
+		m_Font.DeleteObject();
 }
 
 LRESULT COptionsQuickPaste::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) 
@@ -169,7 +170,8 @@ LRESULT COptionsQuickPaste::OnButtonFont(WORD, WORD, HWND, BOOL&)
 	CFontDialog dlg(&m_LogFont, (CF_TTONLY | CF_SCREENFONTS), 0, m_hWnd);
 	if(dlg.DoModal() == IDOK)
 	{	
-		m_Font.DeleteObject();
+		if (!m_Font.IsNull())
+			m_Font.DeleteObject();
 
 		memcpy(&m_LogFont, dlg.m_cf.lpLogFont, sizeof(LOGFONT));		
 
@@ -197,7 +199,8 @@ LRESULT COptionsQuickPaste::OnButtonDefaultFault(WORD, WORD, HWND, BOOL&)
 	m_LogFont.lfCharSet = 1;
 	STRCPY(m_LogFont.lfFaceName, _T("Segoe UI"));
 
-	m_Font.DeleteObject();
+	if (!m_Font.IsNull())
+		m_Font.DeleteObject();
 	m_Font.CreateFontIndirect(&m_LogFont);
 
 	m_btFont.SetFont(m_Font);

@@ -996,6 +996,10 @@ int CCP_MainApp::ExitInstance()
 		delete m_pUacPasteThread;
 	}
 
+	// MinimiseToTray reparents the main window onto a static CTrayWnd; it has to be
+	// destroyed here or its destructor runs at process teardown with the window alive.
+	CTrayNotifyIcon::ReleaseInvisibleWindow();
+
 	Gdiplus::GdiplusShutdown(m_gdiplusToken);
 
 	// paired with OleInitialize in InitInstance

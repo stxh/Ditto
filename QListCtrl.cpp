@@ -61,9 +61,11 @@ CQListCtrl::~CQListCtrl()
 	if (m_SmallFont)
 		::DeleteObject(m_SmallFont);
 
-	m_Font.DeleteObject();
+	if (!m_Font.IsNull())
+		m_Font.DeleteObject();
 
-	m_boldFont.DeleteObject();
+	if (!m_boldFont.IsNull())
+		m_boldFont.DeleteObject();
 
 	if (m_pFormatter)
 	{
@@ -1365,8 +1367,10 @@ LRESULT CQListCtrl::OnTimer(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHand
 
 void CQListCtrl::SetLogFont(LOGFONT &font)
 {
-	m_Font.DeleteObject();
-	m_boldFont.DeleteObject();
+	if (!m_Font.IsNull())
+		m_Font.DeleteObject();
+	if (!m_boldFont.IsNull())
+		m_boldFont.DeleteObject();
 
 	m_Font.CreateFontIndirect(&font);
 	font.lfWeight = 600;
