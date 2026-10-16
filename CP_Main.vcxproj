@@ -230,8 +230,8 @@
       <AdditionalIncludeDirectories>$(ProjectDir)wtl\include;$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>xcopy /Y /R "$(ProjectDir)Language\*" "$(OutDir)Language\"
+xcopy /Y /R "$(ProjectDir)Themes\*" "$(OutDir)Themes\"</Command>
     </PostBuildEvent>
     <Manifest>
       <AdditionalManifestFiles>DeclareDPIAware.manifest</AdditionalManifestFiles>
@@ -288,8 +288,8 @@
       <AdditionalIncludeDirectories>$(ProjectDir)wtl\include;$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>xcopy /Y /R "$(ProjectDir)Language\*" "$(OutDir)Language\"
+xcopy /Y /R "$(ProjectDir)Themes\*" "$(OutDir)Themes\"</Command>
     </PostBuildEvent>
     <Manifest>
       <AdditionalManifestFiles>DeclareDPIAware.manifest</AdditionalManifestFiles>
@@ -346,8 +346,8 @@
       <AdditionalIncludeDirectories>$(ProjectDir)wtl\include;$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>xcopy /Y /R "$(ProjectDir)Language\*" "$(OutDir)Language\"
+xcopy /Y /R "$(ProjectDir)Themes\*" "$(OutDir)Themes\"</Command>
     </PostBuildEvent>
     <Manifest>
       <AdditionalManifestFiles>DeclareDPIAware.manifest</AdditionalManifestFiles>
@@ -405,8 +405,8 @@
       <AdditionalIncludeDirectories>$(ProjectDir)wtl\include;$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>xcopy /Y /R "$(ProjectDir)Language\*" "$(OutDir)Language\"
+xcopy /Y /R "$(ProjectDir)Themes\*" "$(OutDir)Themes\"</Command>
     </PostBuildEvent>
     <Manifest>
       <AdditionalManifestFiles>DeclareDPIAware.manifest</AdditionalManifestFiles>
@@ -463,8 +463,8 @@
       <AdditionalIncludeDirectories>$(ProjectDir)wtl\include;$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>xcopy /Y /R "$(ProjectDir)Language\*" "$(OutDir)Language\"
+xcopy /Y /R "$(ProjectDir)Themes\*" "$(OutDir)Themes\"</Command>
     </PostBuildEvent>
     <Manifest>
       <AdditionalManifestFiles>DeclareDPIAware.manifest</AdditionalManifestFiles>
