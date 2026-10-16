@@ -134,7 +134,7 @@
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\Addins\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>E:\PubCode\wtl10\Include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)..\..\wtl\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

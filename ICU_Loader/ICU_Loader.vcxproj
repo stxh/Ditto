@@ -116,7 +116,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)$(Configuration)64\</OutDir>
-    <IncludePath>E:\PubCode\wtl10\Include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)..\wtl\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <LinkIncremental>false</LinkIncremental>
