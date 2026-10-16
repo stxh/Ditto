@@ -51,8 +51,8 @@
 *.tlh
 *.tli
 *.res
-*/*_i.c
-*/*_i.h
+*_i.c
+*_i.h
 Debug/
 Debug64/
 Release/
