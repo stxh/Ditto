@@ -54,24 +54,20 @@ Source: "..\Release\DittoU.exe"; DestDir: "{app}"; DestName: "Ditto.exe"; Flags:
 
 Source: "..\Release\focus.dll"; DestDir: "{app}"; BeforeInstall: BeforeFocusInstall(); Flags: ignoreversion restartreplace
 Source: "..\Release\sqlite3.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\Release\AccessToSqlite.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\zlib\zlib1.dll"; DestDir: "{app}"; Flags: ignoreversion
 
 Source: "Changes.txt"; DestDir: "{app}"
 
-Source: "..\Debug\Language\*"; DestDir: "{app}\Language";
+Source: "..\Language\*"; DestDir: "{app}\Language";
 
 Source: "mfc-crt\*"; DestDir: "{app}"
 
 ;portable app settings stored in an .ini file
 Source: "Ditto.Settings"; DestDir: "{app}"; Flags: onlyifdoesntexist
 
-;Add help files
-Source: "..\Help\*.htm"; DestDir: "{app}\Help"; Flags: ignoreversion
-
 [Run]
 Filename: "{app}\Ditto.exe"; Description: "Launch Ditto"; Flags: nowait postinstall skipifsilent
-Filename: "{app}\Help\DittoGettingStarted.htm"; Description: "View Help"; Flags: nowait postinstall skipifsilent shellexec
+Filename: https://sourceforge.net/p/ditto-cp/wiki/Getting%20Started; Description: "View Help"; Flags: nowait postinstall skipifsilent shellexec
 Filename: "{app}\Changes.txt"; Description: "View Change History"; Flags: nowait postinstall skipifsilent shellexec unchecked
 
 [INI]

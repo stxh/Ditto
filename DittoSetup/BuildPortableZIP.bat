@@ -8,7 +8,6 @@ cd DittoSetup
 Rmdir Ditto /s /q
 
 MkDir Ditto
-MkDir Ditto\Help
 MkDir Ditto\Language
 MkDir Ditto\Themes
 MkDir Ditto\Addins
@@ -42,8 +41,8 @@ copy Changes.txt Ditto\Changes.txt
 
 copy portable Ditto\portable
 
-copy ..\Debug\language\*.xml Ditto\language\
-copy ..\Debug\themes\*.xml Ditto\themes\
+copy ..\Language\*.xml Ditto\language\
+copy ..\Themes\*.xml Ditto\themes\
 
 7z a -tzip Output\%arg1%.zip "Ditto\*" -r
 

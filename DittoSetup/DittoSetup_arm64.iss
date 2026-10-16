@@ -92,8 +92,8 @@ Name: AddFireWallException; Description: Add Windows Firewall exception for Ditt
   ; Source: C:\Windows\SysWOW64\mfc140u.dll;  DestDir: {app}; Flags: ignoreversion
 #endif
 
-Source: ..\Debug\Language\*; DestDir: {app}\Language; BeforeInstall: BeforeLanguageInstall()
-Source: ..\Debug\Themes\*; DestDir: {app}\Themes
+Source: ..\Language\*; DestDir: {app}\Language; BeforeInstall: BeforeLanguageInstall()
+Source: ..\Themes\*; DestDir: {app}\Themes
 
 [Icons]
 Name: {group}\Ditto; Filename: {app}\Ditto.exe
