@@ -12,7 +12,6 @@
 class COptionsGeneral;
 class COptionsKeyBoard;
 class CQuickPasteKeyboard;
-class COptionsUtilities;
 class COptionsStats;
 class COptionsTypes;
 class CAbout;
@@ -49,7 +48,6 @@ protected:
 
 	COptionsGeneral* m_pGeneralOptions;
 	COptionsKeyBoard* m_pKeyBoardOptions;
-	COptionsUtilities* m_pUtilites;
 	COptionsStats* m_pStats;
 	COptionsTypes* m_pTypes;
 	CAbout* m_pAbout;

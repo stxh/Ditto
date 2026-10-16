@@ -40,3 +40,24 @@
 .vs
 *.idb
 *.log
+# MSVC intermediates and generated files
+*.user
+*.ilk
+*.map
+*.exp
+*.idb
+*.recipe
+*.log
+*.tlh
+*.tli
+*.res
+*/*_i.c
+*/*_i.h
+Debug/
+Debug64/
+Release/
+Release64/
+x64/
+Win32/
+*.iobj
+*.ipdb

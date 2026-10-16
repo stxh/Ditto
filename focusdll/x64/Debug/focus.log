@@ -1,4 +1,0 @@
-﻿cl : command line  warning D9035: option 'Gm' has been deprecated and will be removed in a future release
-  focusdll.cpp
-     Creating library E:\PubCode\Ditto\Debug64\focus.lib and object E:\PubCode\Ditto\Debug64\focus.exp
-  focus.vcxproj -> E:\PubCode\Ditto\Debug64\focus.dll
