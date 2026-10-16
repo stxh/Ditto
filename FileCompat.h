@@ -311,7 +311,7 @@ private:
 class CFileFind
 {
 public:
-	CFileFind() : m_hFind(INVALID_HANDLE_VALUE), m_bFound(FALSE), m_bClosed(FALSE)
+	CFileFind() : m_hFind(INVALID_HANDLE_VALUE), m_bFound(FALSE), m_bClosed(FALSE), m_bFirstPending(FALSE)
 	{
 		ZeroMemory(&m_fd, sizeof(m_fd));
 	}
@@ -335,8 +335,10 @@ public:
 			return FALSE;
 		}
 
-		// the first match is already loaded, FindNextFile() moves to the second one
+		// the first match is already loaded, FindNextFile() returns it once
+		// (matching CFileFind semantics) before advancing to the next entry
 		m_bFound = TRUE;
+		m_bFirstPending = TRUE;
 		m_bClosed = FALSE;
 		PopulateNames();
 		return TRUE;
@@ -346,6 +348,13 @@ public:
 	{
 		if (m_hFind == INVALID_HANDLE_VALUE || m_bClosed)
 			return FALSE;
+
+		// the file found by FindFile() is surfaced on the first FindNextFile()
+		if (m_bFirstPending)
+		{
+			m_bFirstPending = FALSE;
+			return TRUE;
+		}
 
 		m_bFound = ::FindNextFile(m_hFind, &m_fd);
 		if (m_bFound)
@@ -365,6 +374,7 @@ public:
 		}
 		m_bClosed = TRUE;
 		m_bFound = FALSE;
+		m_bFirstPending = FALSE;
 	}
 
 	LPCTSTR GetFilePath() const { return m_csFilePath; }
@@ -432,6 +442,7 @@ private:
 
 	HANDLE m_hFind;
 	BOOL m_bFound;
+	BOOL m_bFirstPending;
 	BOOL m_bClosed;
 	WIN32_FIND_DATA m_fd;
 	CString m_csSearch;

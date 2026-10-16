@@ -103,7 +103,6 @@ protected:
 	void DestroyIcon();
 	void RecalcLayout();
 
-	int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	LRESULT OnSetFont(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	HBRUSH CtlColor(CDCHandle dc, HWND hwndEdit);
 	LRESULT OnSetFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
@@ -121,7 +120,6 @@ protected:
 	LRESULT OnTimer(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 
 	BEGIN_MSG_MAP_EX(CSymbolEdit)
-		MSG_WM_CREATE(OnCreate)
 		MESSAGE_HANDLER(WM_PAINT, OnPaint)
 		MESSAGE_HANDLER(WM_SETFONT, OnSetFont)
 		MSG_WM_CTLCOLOREDIT(CtlColor)

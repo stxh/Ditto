@@ -80,7 +80,6 @@ Name: AddFireWallException; Description: Add Windows Firewall exception for Ditt
   Source: C:\Windows\sysnative\vcruntime140.dll;  DestDir: {app}; Flags: ignoreversion
   Source: C:\Windows\sysnative\vcruntime140_1.dll;  DestDir: {app}; Flags: ignoreversion 
   Source: C:\Windows\sysnative\msvcp140.dll;  DestDir: {app}; Flags: ignoreversion
-  Source: C:\Windows\sysnative\mfc140u.dll;  DestDir: {app}; Flags: ignoreversion
 #endif
 #ifndef bit64
   ; Source: ..\Release\Ditto.exe; DestDir: {app}; DestName: Ditto.exe; Flags: ignoreversion; AfterInstall: AddProgramToFirewall(ExpandConstant('{app}\Ditto.exe'), 'Ditto_FromInstaller_32');

@@ -317,17 +317,6 @@ void CSymbolEdit::DestroyIcon()
 		::DestroyIcon(m_hSymbolIcon);
 }
 
-int CSymbolEdit::OnCreate(LPCREATESTRUCT lpCreateStruct)
-{
-	// Superclass of "Edit": the real EDIT window proc must see WM_CREATE to set up
-	// its text buffer, or the control silently refuses keyboard input.  Route it to
-	// the stored super proc (DefWindowProc) before doing our custom margin layout.
-	DefWindowProc(WM_CREATE, (WPARAM)lpCreateStruct, 0);
-
-	RecalcLayout();
-	return 0;
-}
-
 void CSymbolEdit::SetSymbolIcon(HICON hIcon, BOOL redraw)
 {
 	DestroyIcon();

@@ -20,7 +20,6 @@ copy ..\Release\Addins\*.dll Ditto\Addins\
 
 copy "%WINDIR%\SysWOW64\vcruntime140.dll" Ditto\vcruntime140.dll
 copy "%WINDIR%\SysWOW64\msvcp140.dll" Ditto\msvcp140.dll
-copy "%WINDIR%\SysWOW64\mfc140u.dll" Ditto\mfc140u.dll
 
 if "%2"=="" GOTO skipBit64
 if "%2"=="bit32" GOTO skipBit64	
@@ -33,11 +32,10 @@ copy ..\Release64\Addins\*.dll Ditto\Addins\
 copy "%WINDIR%\System32\vcruntime140.dll" Ditto\vcruntime140.dll
 copy "%WINDIR%\System32\vcruntime140_1.dll" Ditto\vcruntime140_1.dll
 copy "%WINDIR%\System32\msvcp140.dll" Ditto\msvcp140.dll
-copy "%WINDIR%\System32\mfc140u.dll" Ditto\mfc140u.dll
 
 :skipBit64
 
-copy Changes.txt Ditto\Changes.txt
+copy ..\Changes.txt Ditto\Changes.txt
 
 copy portable Ditto\portable
 
