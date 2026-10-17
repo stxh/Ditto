@@ -10,7 +10,7 @@
 #include "DittoCopyBuffer.h"
 #include <atlbase.h>
 #include "DrawHTML.h"
-#include "Shared\TextConvert.h"
+#include "..\Shared\TextConvert.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

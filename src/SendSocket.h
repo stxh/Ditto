@@ -9,7 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "EncryptDecrypt\Encryption.h"
+#include "..\EncryptDecrypt\Encryption.h"
 #include "ServerDefines.h"
 #include "FileTransferProgressDlg.h"
 

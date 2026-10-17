@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include ".\theme.h"
-#include "shared/TextConvert.h"
+#include "..\Shared\TextConvert.h"
 #include "Misc.h"
 #include "Options.h"
-#include "shared/Tokenizer.h"
+#include "..\Shared\Tokenizer.h"
 #include "CP_Main.h"
 
 CDittoTheme::CDittoTheme(void)

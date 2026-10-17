@@ -5,7 +5,7 @@
 #include "Clip.h"
 #include "CP_Main.h"
 #include "ConvertRTFToText.h"
-#include "Shared/TextConvert.h"
+#include "..\Shared\TextConvert.h"
 
 #define EVENT_FILE_CHANGED 1
 

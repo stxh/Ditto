@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "CustomFriendsHelper.h"
 #include "CP_Main.h"
-#include "Shared\Tokenizer.h"
-#include "Shared\TextConvert.h"
+#include "..\Shared\Tokenizer.h"
+#include "..\Shared\TextConvert.h"
 
 
 CCustomFriendsHelper::CCustomFriendsHelper()

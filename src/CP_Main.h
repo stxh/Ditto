@@ -3,12 +3,12 @@
 #ifndef __ATLAPP_H__
 #error include 'stdafx.h' before including this file for PCH
 #endif
-#include "resource.h"       // main symbols
+#include "..\resource.h"       // main symbols
 #include "Clip.h"
 #include "DatabaseUtilities.h"
 #include "Misc.h"
 #include "Options.h"
-#include "Shared/ArrayEx.h"
+#include "..\Shared\ArrayEx.h"
 #include "MainFrm.h"
 #include "ProcessPaste.h"
 #include "MultiLanguage.h"

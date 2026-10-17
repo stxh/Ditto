@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "CP_Main.h"
 #include "FriendPromptDlg.h"
-#include "Shared\Tokenizer.h"
+#include "..\Shared\Tokenizer.h"
 
 LRESULT CFriendPromptDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 {

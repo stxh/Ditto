@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "RichEditCtrlEx.h"
-#include "shared/TextConvert.h"
+#include "..\Shared\TextConvert.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <atlctrls.h>
-#include "resource.h"
+#include "..\resource.h"
 #include "Accels.h"
 
 class CGroupTree : public CWindowImpl<CGroupTree, CTreeViewCtrl>

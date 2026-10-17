@@ -6,7 +6,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "Shared/ArrayEx.h"
+#include "..\Shared\ArrayEx.h"
 #include <vector>
 
 #define VK_MOUSE_CLICK 0x01

@@ -11,7 +11,7 @@
 #include <memory>
 //#include <memory>
 #include "tinyxml\tinyxml.h"
-#include "Shared\IClip.h"
+#include "..\Shared\IClip.h"
 #include "Misc.h"
 
 class CClip;

@@ -5,11 +5,11 @@
 #include "stdafx.h"
 #include "cp_main.h"
 #include "Client.h"
-#include "shared/TextConvert.h"
+#include "..\Shared\TextConvert.h"
 #include "RecieveSocket.h"
 #include "FileRecieve.h"
 #include "FileTransferProgressDlg.h"
-#include "Shared/Tokenizer.h"
+#include "..\Shared\Tokenizer.h"
 
 
 #ifdef _DEBUG

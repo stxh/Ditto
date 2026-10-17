@@ -3,7 +3,7 @@
 #include <atlbase.h>
 #include <atlcom.h>
 #include <map>
-#include "Shared/ArrayEx.h"
+#include "..\Shared\ArrayEx.h"
 #include "ToolTipEx.h"
 #include "FormattedTextDraw.h"
 #include "sqlite/CppSQLite3.h"

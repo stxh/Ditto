@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "cp_main.h"
 #include "MainTableFunctions.h"
-#include "shared/Tokenizer.h"
+#include "..\Shared\Tokenizer.h"
 
 #ifdef _DEBUG
 #undef THIS_FILE

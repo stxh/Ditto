@@ -2,7 +2,7 @@
 #include "cp_main.h"
 #include "FileRecieve.h"
 #include "RecieveSocket.h"
-#include "shared/TextConvert.h"
+#include "..\Shared\TextConvert.h"
 #include "Path.h"
 #include "UnicodeMacros.h"
 #include "Md5.h"

@@ -24,7 +24,7 @@
 #include "CF_UnicodeTextAggregator.h"
 #include "CF_TextAggregator.h"
 #include "htmlformataggregator.h"
-#include "shared/Tokenizer.h"
+#include "..\Shared\Tokenizer.h"
 #include <signal.h>
 
 

@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "Resource.h"
+#include "..\resource.h"
 #include "RichEditCtrlEx.h"
 #include "WndEx.h"
 #include "DittoWindow.h"

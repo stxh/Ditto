@@ -5,7 +5,7 @@
 #include "SymbolEdit.h"
 #include "cp_main.h"
 #include "QListCtrl.h"
-#include "Shared\TextConvert.h"
+#include "..\Shared\TextConvert.h"
 
 CSymbolEdit::CSymbolEdit() :
 	m_hSymbolIcon(NULL),

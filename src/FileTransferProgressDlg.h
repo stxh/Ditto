@@ -5,7 +5,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "Resource.h"
+#include "..\resource.h"
 #include <atlbase.h>
 #include <atlwin.h>
 #include <atldlgs.h>

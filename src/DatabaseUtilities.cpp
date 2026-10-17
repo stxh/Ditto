@@ -10,7 +10,7 @@
 #include "Path.h"
 #include "InternetUpdate.h"
 #include "zlib/zlib.h"
-#include "Shared/TextConvert.h"
+#include "..\Shared\TextConvert.h"
 using namespace nsPath;
 
 //////////////////////////////////////////////////////////////////////

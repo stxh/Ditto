@@ -2,7 +2,7 @@
 #include "CP_Main.h"
 #include "ScriptEditor.h"
 #include "ChaiScriptOnCopy.h"
-#include "Shared\TextConvert.h"
+#include "..\Shared\TextConvert.h"
 #include "DittoChaiScript.h"
 
 static BOOL bDummy = FALSE;
