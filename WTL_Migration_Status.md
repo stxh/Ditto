@@ -101,13 +101,13 @@ Win32 之前链接失败（`LNK1181` 找不到 `Release\EncryptDecrypt.lib`，�
 上游自基线 `2ee24aa`（我们全部迁移提交的基础）以来 192 个提交，其中两次整理决定了同步成本结构：
 
 - `054cbb2 "Moved files (#800)"`：全部源码从仓库根搬进 `src\`；
-- 全库行尾/BOM 规范化：单文件 diff 行数虚高（如 `QPasteWnd.cpp` 16746 行，`--ignore-cr-at-eol` 后仅 2347 行）。
+- ~~全库行尾规范化~~（**已证伪**：base→上游单文件 16746 行 diff 实为本地 `core.autocrlf=true` 在 blob 对比时的显示伪象，上游仓库内 blob 仍以 CRLF 存，未做全库行尾转换；核对真实差异请用 `git diff --ignore-cr-at-eol` 或文件级对比，勿信 autocrlf 环境下的管道统计）。
 
-干跑合并（`git merge-tree`）显示 124 个冲突路径：`src\*` 104 个（多为目录搬迁+行尾噪音+我们的 WTL 重写叠加；我们删除的死文件有 63 个上游也已删除，这部分自动消解）、`Language/Themes` XML 9 个（取上游）、工程/资源文件 11 个（手工合）。注意上游新功能均按 MFC 编写，合并即"再 WTL 化"，是本 fork 的长期成本。
+干跑合并（`git merge-tree`）：Phase 1 前为 124 个冲突路径（含大量 rename/delete 形态）；Phase 1 路径对齐后为 155 个，性质全部是"双方均修改"的内容冲突（我们删除的死文件里 63 个上游也已删除，自动消解，不在冲突表内）。注意上游新功能均按 MFC 编写，合并即"再 WTL 化"，是本 fork 的长期成本。
 
 阶段计划：
 
 1. **Phase 0（已完成）**：cherry 框架无关的关键修复（`e6c745c` powrprof 死锁、`43ed9f6` IME 丢字符），见第 4 节。
-2. **Phase 1 结构对齐**：纯机械提交，在我们这边执行同款 root→`src\` 搬迁、`.gitattributes` 统一行尾策略跟随上游，使后续 merge 的 rename 检测可自动配对。
-3. **Phase 2 首次全量 sync**：`sync/upstream-YYYYMM` 分支 merge `upstream/master`，以 `git diff --ignore-cr-at-eol` 过滤噪音逐文件解决，新功能按 WTL 重写；四配置 Rebuild + 第 6 节冒烟清单通过后 PR 回 master。
+2. **Phase 1 结构对齐（已完成，`e5c4ba8`）**：258 个根目录源文件 + `chaiscript/TinyXml/sqlite/zlib` 四目录 `git mv` 进 `src\`；`Resource.h`→`resource.h`（仍留根目录，对齐上游大小写）；include 统一为上游写法（`shared/…`→`..\Shared\…`、`EncryptDecrypt\Encryption.h`→`..\EncryptDecrypt\…`、`resource.h`→`..\resource.h`）；`CP_Main.vcxproj/.filters` 条目加 `src\` 前缀，`zlibstat.lib` 改 `src\zlib\...`；DittoUtil `stdafx.h` 指向 `..\..\src\StdAfx.h`。四配置全量 Rebuild 0 error。纯 rename 文件字节级不变（已验证 `git mv` 未触发 clean filter 改写 blob）。原计划的 `.gitattributes` 行尾统一不需要（行尾规范化已被证伪）。
+3. **Phase 2 首次全量 sync**：`sync/upstream-YYYYMM` 分支 merge `upstream/master`。Phase 1 后干跑合并为 155 个冲突路径（`src\*` ~137、工程/rc/resource 8、Language/Themes XML 9 取上游、其余为双改文件），全部为真实的"双方都改过"内容冲突——路径已对齐，逐文件三方合并解决即可。新功能按 WTL 重写；四配置 Rebuild + 第 6 节冒烟清单通过后 PR 回 master。
 4. **常态**：每逢上游 release tag 执行一次 sync 流程；与 WTL 无关的纯 bug 修复可从 `contrib/*` 分支回贡上游，被接受的提交会缩小后续冲突面。发布 tag 用 `wtl-x.y` 命名空间避免与上游 `3.24.x` 混淆。
