@@ -1,3 +1,3 @@
 #pragma once
 
-#include "..\..\StdAfx.h"
+#include "..\..\src\StdAfx.h"

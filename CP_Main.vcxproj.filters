@@ -1,532 +1,532 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="sqlite\CppSQLite3.cpp">
+    <ClCompile Include="src\sqlite\CppSQLite3.cpp">
       <Filter>sqlite</Filter>
     </ClCompile>
-    <ClCompile Include="ClipboardSaveRestore.cpp">
+    <ClCompile Include="src\ClipboardSaveRestore.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="Clip_ImportExport.cpp">
+    <ClCompile Include="src\Clip_ImportExport.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="Clip.cpp">
+    <ClCompile Include="src\Clip.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="Client.cpp">
+    <ClCompile Include="src\Client.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="CF_UnicodeTextAggregator.cpp">
+    <ClCompile Include="src\CF_UnicodeTextAggregator.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="CF_TextAggregator.cpp">
+    <ClCompile Include="src\CF_TextAggregator.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="CF_HDropAggregator.cpp">
+    <ClCompile Include="src\CF_HDropAggregator.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="BitmapHelper.cpp">
+    <ClCompile Include="src\BitmapHelper.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="AutoSendToClientThread.cpp">
+    <ClCompile Include="src\AutoSendToClientThread.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="AlphaBlend.cpp">
+    <ClCompile Include="src\AlphaBlend.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="AddType.cpp">
+    <ClCompile Include="src\AddType.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="Accels.cpp">
+    <ClCompile Include="src\Accels.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="About.cpp">
+    <ClCompile Include="src\About.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="ClipboardViewer.cpp">
+    <ClCompile Include="src\ClipboardViewer.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="ClipFormatQListCtrl.cpp">
+    <ClCompile Include="src\ClipFormatQListCtrl.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="ClipIds.cpp">
+    <ClCompile Include="src\ClipIds.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="CopyProperties.cpp">
+    <ClCompile Include="src\CopyProperties.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="CopyThread.cpp">
+    <ClCompile Include="src\CopyThread.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="CP_Main.cpp">
+    <ClCompile Include="src\CP_Main.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="Crc32Dynamic.cpp">
+    <ClCompile Include="src\Crc32Dynamic.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="DatabaseUtilities.cpp">
+    <ClCompile Include="src\DatabaseUtilities.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="DialogResizer.cpp">
+    <ClCompile Include="src\DialogResizer.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="DittoAddins.cpp">
+    <ClCompile Include="src\DittoAddins.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="DittoCopyBuffer.cpp">
+    <ClCompile Include="src\DittoCopyBuffer.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="ExternalWindowTracker.cpp">
+    <ClCompile Include="src\ExternalWindowTracker.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="FileRecieve.cpp">
+    <ClCompile Include="src\FileRecieve.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="FileSend.cpp">
+    <ClCompile Include="src\FileSend.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="FileTransferProgressDlg.cpp">
+    <ClCompile Include="src\FileTransferProgressDlg.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="FormattedTextDraw.cpp">
+    <ClCompile Include="src\FormattedTextDraw.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="FriendDetails.cpp">
+    <ClCompile Include="src\FriendDetails.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="GroupCombo.cpp">
+    <ClCompile Include="src\GroupCombo.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="GroupName.cpp">
+    <ClCompile Include="src\GroupName.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="GroupStatic.cpp">
+    <ClCompile Include="src\GroupStatic.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="GroupTree.cpp">
+    <ClCompile Include="src\GroupTree.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="HListBox.cpp">
+    <ClCompile Include="src\HListBox.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="HTMLFormatAggregator.cpp">
+    <ClCompile Include="src\HTMLFormatAggregator.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="HotKeys.cpp">
+    <ClCompile Include="src\HotKeys.cpp">
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="HyperLink.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="InternetUpdate.cpp">
+    <ClCompile Include="src\InternetUpdate.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="MainFrm.cpp">
+    <ClCompile Include="src\MainFrm.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="MainFrmThread.cpp">
+    <ClCompile Include="src\MainFrmThread.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="MainTableFunctions.cpp">
+    <ClCompile Include="src\MainTableFunctions.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="MoveToGroupDlg.cpp">
+    <ClCompile Include="src\MoveToGroupDlg.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="MultiLanguage.cpp">
+    <ClCompile Include="src\MultiLanguage.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="NumberEdit.cpp">
+    <ClCompile Include="src\NumberEdit.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="OleClipSource.cpp">
+    <ClCompile Include="src\OleClipSource.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="OptionFriends.cpp">
+    <ClCompile Include="src\OptionFriends.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="Options.cpp">
+    <ClCompile Include="src\Options.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="OptionsCopyBuffers.cpp">
+    <ClCompile Include="src\OptionsCopyBuffers.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="AdvGeneral.cpp">
+    <ClCompile Include="src\AdvGeneral.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="PropGrid.cpp">
+    <ClCompile Include="src\PropGrid.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="OptionsGeneral.cpp">
+    <ClCompile Include="src\OptionsGeneral.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="OptionsKeyBoard.cpp">
+    <ClCompile Include="src\OptionsKeyBoard.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="OptionsQuickPaste.cpp">
+    <ClCompile Include="src\OptionsQuickPaste.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="OptionsSheet.cpp">
+    <ClCompile Include="src\OptionsSheet.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="OptionsStats.cpp">
+    <ClCompile Include="src\OptionsStats.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="OptionsTypes.cpp">
+    <ClCompile Include="src\OptionsTypes.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="Path.cpp">
+    <ClCompile Include="src\Path.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="PerfTimer.cpp">
+    <ClCompile Include="src\PerfTimer.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="Popup.cpp">
+    <ClCompile Include="src\Popup.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="ProcessPaste.cpp">
+    <ClCompile Include="src\ProcessPaste.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="ProgressWnd.cpp">
+    <ClCompile Include="src\ProgressWnd.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="QListCtrl.cpp">
+    <ClCompile Include="src\QListCtrl.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="QPasteWnd.cpp">
+    <ClCompile Include="src\QPasteWnd.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="QPasteWndThread.cpp">
+    <ClCompile Include="src\QPasteWndThread.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="QuickPaste.cpp">
+    <ClCompile Include="src\QuickPaste.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="RecieveSocket.cpp">
+    <ClCompile Include="src\RecieveSocket.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="RichEditCtrlEx.cpp">
+    <ClCompile Include="src\RichEditCtrlEx.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="RichTextAggregator.cpp">
+    <ClCompile Include="src\RichTextAggregator.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="SaveAnimation.cpp">
+    <ClCompile Include="src\SaveAnimation.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="SearchEditBox.cpp">
+    <ClCompile Include="src\SearchEditBox.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="SendKeys.cpp">
+    <ClCompile Include="src\SendKeys.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="SendSocket.cpp">
+    <ClCompile Include="src\SendSocket.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="Server.cpp">
+    <ClCompile Include="src\Server.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="StdAfx.cpp">
+    <ClCompile Include="src\StdAfx.cpp">
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="Shared\TextConvert.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="Theme.cpp">
+    <ClCompile Include="src\Theme.cpp">
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="Shared\Tokenizer.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="ToolTipEx.cpp">
+    <ClCompile Include="src\ToolTipEx.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="WildCardMatch.cpp">
+    <ClCompile Include="src\WildCardMatch.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="WndEx.cpp">
+    <ClCompile Include="src\WndEx.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="DittoAddin.cpp">
+    <ClCompile Include="src\DittoAddin.cpp">
       <Filter>header</Filter>
     </ClCompile>
-    <ClCompile Include="DittoWindow.cpp">
+    <ClCompile Include="src\DittoWindow.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="EventThread.cpp">
+    <ClCompile Include="src\EventThread.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="FormatSQL.cpp">
+    <ClCompile Include="src\FormatSQL.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="Misc.cpp">
+    <ClCompile Include="src\Misc.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="ShowTaskBarIcon.cpp">
+    <ClCompile Include="src\ShowTaskBarIcon.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="GlobalClips.cpp">
+    <ClCompile Include="src\GlobalClips.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="EditWithButton.cpp">
+    <ClCompile Include="src\EditWithButton.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="GdipButton.cpp">
+    <ClCompile Include="src\GdipButton.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="DPI.cpp">
+    <ClCompile Include="src\DPI.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="GdiImageDrawer.cpp">
+    <ClCompile Include="src\GdiImageDrawer.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="UAC_Helper.cpp">
+    <ClCompile Include="src\UAC_Helper.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="UAC_Thread.cpp">
+    <ClCompile Include="src\UAC_Thread.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="ActionEnums.cpp">
+    <ClCompile Include="src\ActionEnums.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="DeleteClipData.cpp">
+    <ClCompile Include="src\DeleteClipData.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="ClipCompare.cpp">
+    <ClCompile Include="src\ClipCompare.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="DrawHTML.C">
+    <ClCompile Include="src\DrawHTML.C">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="DittoPopupWindow.cpp">
+    <ClCompile Include="src\DittoPopupWindow.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="TrayWnd.cpp">
+    <ClCompile Include="src\TrayWnd.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="SpecialPasteOptions.cpp">
+    <ClCompile Include="src\SpecialPasteOptions.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="ScrollHelper.cpp">
+    <ClCompile Include="src\ScrollHelper.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="QuickPasteKeyboard.cpp">
+    <ClCompile Include="src\QuickPasteKeyboard.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="PowerManager.cpp">
+    <ClCompile Include="src\PowerManager.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="ImageViewer.cpp">
+    <ClCompile Include="src\ImageViewer.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="NTray.cpp">
+    <ClCompile Include="src\NTray.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="TinyXml\tinystr.cpp">
+    <ClCompile Include="src\TinyXml\tinystr.cpp">
       <Filter>tineyxml</Filter>
     </ClCompile>
-    <ClCompile Include="TinyXml\tinyxml.cpp">
+    <ClCompile Include="src\TinyXml\tinyxml.cpp">
       <Filter>tineyxml</Filter>
     </ClCompile>
-    <ClCompile Include="TinyXml\tinyxmlerror.cpp">
+    <ClCompile Include="src\TinyXml\tinyxmlerror.cpp">
       <Filter>tineyxml</Filter>
     </ClCompile>
-    <ClCompile Include="TinyXml\tinyxmlparser.cpp">
+    <ClCompile Include="src\TinyXml\tinyxmlparser.cpp">
       <Filter>tineyxml</Filter>
     </ClCompile>
-    <ClCompile Include="SymbolEdit.cpp" />
-    <ClCompile Include="ChaiScriptOnCopy.cpp">
+    <ClCompile Include="src\SymbolEdit.cpp" />
+    <ClCompile Include="src\ChaiScriptOnCopy.cpp">
       <Filter>ChaiScript</Filter>
     </ClCompile>
-    <ClCompile Include="ChaiScriptXml.cpp">
+    <ClCompile Include="src\ChaiScriptXml.cpp">
       <Filter>ChaiScript</Filter>
     </ClCompile>
-    <ClCompile Include="DittoChaiScript.cpp">
+    <ClCompile Include="src\DittoChaiScript.cpp">
       <Filter>ChaiScript</Filter>
     </ClCompile>
-    <ClCompile Include="SimpleBrowser.cpp">
+    <ClCompile Include="src\SimpleBrowser.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="CustomFriendsHelper.cpp">
+    <ClCompile Include="src\CustomFriendsHelper.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="DimWnd.cpp">
+    <ClCompile Include="src\DimWnd.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="FriendPromptDlg.cpp">
+    <ClCompile Include="src\FriendPromptDlg.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="Md5.cpp">
+    <ClCompile Include="src\Md5.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="RegExFilterHelper.cpp">
+    <ClCompile Include="src\RegExFilterHelper.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="ScriptEditor.cpp">
+    <ClCompile Include="src\ScriptEditor.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="SnapWindow.cpp">
+    <ClCompile Include="src\SnapWindow.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="SymbolEdit.cpp">
+    <ClCompile Include="src\SymbolEdit.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="SendMail.cpp">
+    <ClCompile Include="src\SendMail.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="NoDbFrameWnd.cpp">
+    <ClCompile Include="src\NoDbFrameWnd.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="ICU_String.cpp">
+    <ClCompile Include="src\ICU_String.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="sqlite\sqlite3mc_amalgamation.c">
+    <ClCompile Include="src\sqlite\sqlite3mc_amalgamation.c">
       <Filter>sqlite</Filter>
     </ClCompile>
-    <ClCompile Include="ClipEditThread.cpp">
+    <ClCompile Include="src\ClipEditThread.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="ConvertRTFToText.cpp">
+    <ClCompile Include="src\ConvertRTFToText.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="ImageHelper.cpp">
+    <ClCompile Include="src\ImageHelper.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="ImageFormatAggregator.cpp">
+    <ClCompile Include="src\ImageFormatAggregator.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="sqlite\CppSQLite3.h">
+    <ClInclude Include="src\sqlite\CppSQLite3.h">
       <Filter>sqlite</Filter>
     </ClInclude>
-    <ClInclude Include="About.h">
+    <ClInclude Include="src\About.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="Accels.h">
+    <ClInclude Include="src\Accels.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="AddType.h">
+    <ClInclude Include="src\AddType.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="AlphaBlend.h">
+    <ClInclude Include="src\AlphaBlend.h">
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="ArrayEx.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="AutoSendToClientThread.h">
+    <ClInclude Include="src\AutoSendToClientThread.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="BitmapHelper.h">
+    <ClInclude Include="src\BitmapHelper.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="CF_HDropAggregator.h">
+    <ClInclude Include="src\CF_HDropAggregator.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="CF_TextAggregator.h">
+    <ClInclude Include="src\CF_TextAggregator.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="CF_UnicodeTextAggregator.h">
+    <ClInclude Include="src\CF_UnicodeTextAggregator.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="Client.h">
+    <ClInclude Include="src\Client.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="Clip.h">
+    <ClInclude Include="src\Clip.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="Clip_ImportExport.h">
+    <ClInclude Include="src\Clip_ImportExport.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="ClipboardSaveRestore.h">
+    <ClInclude Include="src\ClipboardSaveRestore.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="ClipboardViewer.h">
+    <ClInclude Include="src\ClipboardViewer.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="ClipFormatQListCtrl.h">
+    <ClInclude Include="src\ClipFormatQListCtrl.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="ClipIds.h">
+    <ClInclude Include="src\ClipIds.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="CopyProperties.h">
+    <ClInclude Include="src\CopyProperties.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="CopyThread.h">
+    <ClInclude Include="src\CopyThread.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="CP_Main.h">
+    <ClInclude Include="src\CP_Main.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="Crc32Dynamic.h">
+    <ClInclude Include="src\Crc32Dynamic.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="DatabaseUtilities.h">
+    <ClInclude Include="src\DatabaseUtilities.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="DialogResizer.h">
+    <ClInclude Include="src\DialogResizer.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="DittoAddin.h">
+    <ClInclude Include="src\DittoAddin.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="DittoAddins.h">
+    <ClInclude Include="src\DittoAddins.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="DittoCopyBuffer.h">
+    <ClInclude Include="src\DittoCopyBuffer.h">
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="Shared\DittoDefines.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="DittoWindow.h">
+    <ClInclude Include="src\DittoWindow.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="EventThread.h">
+    <ClInclude Include="src\EventThread.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="ExternalWindowTracker.h">
+    <ClInclude Include="src\ExternalWindowTracker.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="FileRecieve.h">
+    <ClInclude Include="src\FileRecieve.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="FileSend.h">
+    <ClInclude Include="src\FileSend.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="FileTransferProgressDlg.h">
+    <ClInclude Include="src\FileTransferProgressDlg.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="FormatSQL.h">
+    <ClInclude Include="src\FormatSQL.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="FormattedTextDraw.h">
+    <ClInclude Include="src\FormattedTextDraw.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="FriendDetails.h">
+    <ClInclude Include="src\FriendDetails.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="GroupCombo.h">
+    <ClInclude Include="src\GroupCombo.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="GroupName.h">
+    <ClInclude Include="src\GroupName.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="GroupStatic.h">
+    <ClInclude Include="src\GroupStatic.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="GroupTree.h">
+    <ClInclude Include="src\GroupTree.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="HListBox.h">
+    <ClInclude Include="src\HListBox.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="HotKeys.h">
+    <ClInclude Include="src\HotKeys.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="HTMLFormatAggregator.h">
+    <ClInclude Include="src\HTMLFormatAggregator.h">
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="HyperLink.h">
@@ -538,133 +538,133 @@
     <ClInclude Include="Shared\IClip.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="IClipAggregator.h">
+    <ClInclude Include="src\IClipAggregator.h">
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="RulerRichEditCtrl\ids.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="InternetUpdate.h">
+    <ClInclude Include="src\InternetUpdate.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="MainFrm.h">
+    <ClInclude Include="src\MainFrm.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="MainFrmThread.h">
+    <ClInclude Include="src\MainFrmThread.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="MainTableFunctions.h">
+    <ClInclude Include="src\MainTableFunctions.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="memdc.h">
+    <ClInclude Include="src\memdc.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="Misc.h">
+    <ClInclude Include="src\Misc.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="MoveToGroupDlg.h">
+    <ClInclude Include="src\MoveToGroupDlg.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="MultiLanguage.h">
+    <ClInclude Include="src\MultiLanguage.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="NumberEdit.h">
+    <ClInclude Include="src\NumberEdit.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="OleClipSource.h">
+    <ClInclude Include="src\OleClipSource.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="OptionFriends.h">
+    <ClInclude Include="src\OptionFriends.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="Options.h">
+    <ClInclude Include="src\Options.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="OptionsCopyBuffers.h">
+    <ClInclude Include="src\OptionsCopyBuffers.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="AdvGeneral.h">
+    <ClInclude Include="src\AdvGeneral.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="PropGrid.h">
+    <ClInclude Include="src\PropGrid.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="OptionsGeneral.h">
+    <ClInclude Include="src\OptionsGeneral.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="OptionsKeyBoard.h">
+    <ClInclude Include="src\OptionsKeyBoard.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="OptionsQuickPaste.h">
+    <ClInclude Include="src\OptionsQuickPaste.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="OptionsSheet.h">
+    <ClInclude Include="src\OptionsSheet.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="OptionsStats.h">
+    <ClInclude Include="src\OptionsStats.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="OptionsTypes.h">
+    <ClInclude Include="src\OptionsTypes.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="Path.h">
+    <ClInclude Include="src\Path.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="PerfTimer.h">
+    <ClInclude Include="src\PerfTimer.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="Popup.h">
+    <ClInclude Include="src\Popup.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="ProcessPaste.h">
+    <ClInclude Include="src\ProcessPaste.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="ProgressWnd.h">
+    <ClInclude Include="src\ProgressWnd.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="QListCtrl.h">
+    <ClInclude Include="src\QListCtrl.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="QPasteWnd.h">
+    <ClInclude Include="src\QPasteWnd.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="QPasteWndThread.h">
+    <ClInclude Include="src\QPasteWndThread.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="QuickPaste.h">
+    <ClInclude Include="src\QuickPaste.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="RecieveSocket.h">
+    <ClInclude Include="src\RecieveSocket.h">
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="Resource.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="RichEditCtrlEx.h">
+    <ClInclude Include="src\RichEditCtrlEx.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="RichTextAggregator.h">
+    <ClInclude Include="src\RichTextAggregator.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="SaveAnimation.h">
+    <ClInclude Include="src\SaveAnimation.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="SearchEditBox.h">
+    <ClInclude Include="src\SearchEditBox.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="SendKeys.h">
+    <ClInclude Include="src\SendKeys.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="SendSocket.h">
+    <ClInclude Include="src\SendSocket.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="Server.h">
+    <ClInclude Include="src\Server.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="ServerDefines.h">
+    <ClInclude Include="src\ServerDefines.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="StdAfx.h">
+    <ClInclude Include="src\StdAfx.h">
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="RulerRichEditCtrl\StdGrfx.h">
@@ -673,155 +673,155 @@
     <ClInclude Include="Shared\TextConvert.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="Theme.h">
+    <ClInclude Include="src\Theme.h">
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="Shared\Tokenizer.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="ToolTipEx.h">
+    <ClInclude Include="src\ToolTipEx.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="UnicodeMacros.h">
+    <ClInclude Include="src\UnicodeMacros.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="WildCardMatch.h">
+    <ClInclude Include="src\WildCardMatch.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="WndEx.h">
+    <ClInclude Include="src\WndEx.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="TinyXml\tinyxml.h">
+    <ClInclude Include="src\TinyXml\tinyxml.h">
       <Filter>tineyxml</Filter>
     </ClInclude>
-    <ClInclude Include="TinyXml\tinystr.h">
+    <ClInclude Include="src\TinyXml\tinystr.h">
       <Filter>tineyxml</Filter>
     </ClInclude>
-    <ClInclude Include="ShowTaskBarIcon.h">
+    <ClInclude Include="src\ShowTaskBarIcon.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="GlobalClips.h">
+    <ClInclude Include="src\GlobalClips.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="EditWithButton.h">
+    <ClInclude Include="src\EditWithButton.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="GdipButton.h">
+    <ClInclude Include="src\GdipButton.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="CGdiPlusBitmap.h">
+    <ClInclude Include="src\CGdiPlusBitmap.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="DPI.h">
+    <ClInclude Include="src\DPI.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="GdiImageDrawer.h">
+    <ClInclude Include="src\GdiImageDrawer.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="UAC_Thread.h">
+    <ClInclude Include="src\UAC_Thread.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="UAC_Helper.h">
+    <ClInclude Include="src\UAC_Helper.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="ActionEnums.h">
+    <ClInclude Include="src\ActionEnums.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="DeleteClipData.h">
+    <ClInclude Include="src\DeleteClipData.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="ClipCompare.h">
+    <ClInclude Include="src\ClipCompare.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="DrawHTML.h">
+    <ClInclude Include="src\DrawHTML.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="DittoPopupWindow.h">
+    <ClInclude Include="src\DittoPopupWindow.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="SpecialPasteOptions.h">
+    <ClInclude Include="src\SpecialPasteOptions.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="TrayWnd.h">
+    <ClInclude Include="src\TrayWnd.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="ImageViewer.h">
+    <ClInclude Include="src\ImageViewer.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="PowerManager.h">
+    <ClInclude Include="src\PowerManager.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="QuickPasteKeyboard.h">
+    <ClInclude Include="src\QuickPasteKeyboard.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="ScrollHelper.h">
+    <ClInclude Include="src\ScrollHelper.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="NTray.h">
+    <ClInclude Include="src\NTray.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="SymbolEdit.h" />
-    <ClInclude Include="ChaiScriptOnCopy.h">
+    <ClInclude Include="src\SymbolEdit.h" />
+    <ClInclude Include="src\ChaiScriptOnCopy.h">
       <Filter>ChaiScript</Filter>
     </ClInclude>
-    <ClInclude Include="ChaiScriptXml.h">
+    <ClInclude Include="src\ChaiScriptXml.h">
       <Filter>ChaiScript</Filter>
     </ClInclude>
-    <ClInclude Include="DittoChaiScript.h">
+    <ClInclude Include="src\DittoChaiScript.h">
       <Filter>ChaiScript</Filter>
     </ClInclude>
-    <ClInclude Include="SimpleBrowser.h">
+    <ClInclude Include="src\SimpleBrowser.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="CustomFriendsHelper.h">
+    <ClInclude Include="src\CustomFriendsHelper.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="DimWnd.h">
+    <ClInclude Include="src\DimWnd.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="FriendPromptDlg.h">
+    <ClInclude Include="src\FriendPromptDlg.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="Md5.h">
+    <ClInclude Include="src\Md5.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="RegExFilterHelper.h">
+    <ClInclude Include="src\RegExFilterHelper.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="ScriptEditor.h">
+    <ClInclude Include="src\ScriptEditor.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="SnapWindow.h">
+    <ClInclude Include="src\SnapWindow.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="SymbolEdit.h">
+    <ClInclude Include="src\SymbolEdit.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="SendMail.h">
+    <ClInclude Include="src\SendMail.h">
       <Filter>source</Filter>
     </ClInclude>
-    <ClInclude Include="Slugify.h">
+    <ClInclude Include="src\Slugify.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="NoDbFrameWnd.h">
+    <ClInclude Include="src\NoDbFrameWnd.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="ICU_String.h">
+    <ClInclude Include="src\ICU_String.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="sqlite\sqlite3mc_amalgamation.h">
+    <ClInclude Include="src\sqlite\sqlite3mc_amalgamation.h">
       <Filter>sqlite</Filter>
     </ClInclude>
-    <ClInclude Include="ClipEditThread.h">
+    <ClInclude Include="src\ClipEditThread.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="ConvertRTFToText.h">
+    <ClInclude Include="src\ConvertRTFToText.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="ImageFormatAggregator.h">
+    <ClInclude Include="src\ImageFormatAggregator.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="ImageHelper.h">
+    <ClInclude Include="src\ImageHelper.h">
       <Filter>header</Filter>
     </ClInclude>
   </ItemGroup>
