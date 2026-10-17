@@ -68,6 +68,9 @@ Win32 之前链接失败（`LNK1181` 找不到 `Release\EncryptDecrypt.lib`，�
   - **语言/主题下拉框空白**（`952f6e5`）：`GetPath(PATH_LANGUAGE/PATH_THEMES)` 指向 exe 目录，而清理把 `Language\`、`Themes\` 从 `Debug\` 移到仓库根后，四个输出目录旁都没有数据。给 `CP_Main.vcxproj` 全部配置加 `PostBuildEvent`，把 `$(ProjectDir)Language\*`、`$(ProjectDir)Themes\*` 拷到 `$(OutDir)`。
   - **下拉框少一项（如简体中文不列出）**：`FileCompat.h` 里替换 MFC 的 `CFileFind` 语义错了——MFC 的 `FindNextFile()` 首次调用返回 `FindFile()` 已找到的**第一个**文件，而移植版让 `FindFile()` 载入首个后 `FindNextFile()` 直接前进到第二个，于是每个枚举循环都漏掉第一个匹配项（语言、主题等）。加 `m_bFirstPending` 标志还原 MFC 语义。
   - **打包脚本按新 WTL 版本更新**：`dumpbin -dependents` 确认 `Ditto.exe`/`DittoUtil.dll` 已无 MFC 依赖（只剩 `MSVCP140`/`VCRUNTIME140`）。`BuildPortableZIP.bat` 删除两处 `mfc140u.dll` 拷贝、修正 `Changes.txt` 路径为 `..\Changes.txt`；`DittoSetup_10.iss`、`DittoSetup_arm64.iss` 同样删除 `mfc140u.dll` 源行。
+- 上游修复移植（Phase 0，见第 7 节）：
+  - `e6c745c` Windows 11 powrprof 启动死锁修复移植进 `PowerManager.cpp/.h`：`m_hPowrProf` 作为成员跨生命周期持有，注册期间不 `FreeLibrary`；`PowerUnregisterSuspendResumeNotification` 按值传 `HPOWERNOTIFY`，仅成功注销后才卸载（含评审跟进 `49d5254`）。
+  - `43ed9f6` IME 提交搜索框丢字符修复移植进 `QPasteWnd::PreTranslateMessage`：WM_CHAR 判断改用 `pMsg->hwnd`（而非当前焦点），一批 IME 字符逐个追加而非覆盖，光标置于文本末尾。WTL 适配点：`OnSearchEditChange` 用 handler 签名直接调用。
 
 ## 5. 剩余工作
 
@@ -90,3 +93,21 @@ Win32 之前链接失败（`LNK1181` 找不到 `Release\EncryptDecrypt.lib`，�
 | 5 | About 页 | 版本行显示 `04.00.00.01`；两个链接可点击（mailto / 主页） |
 | 6 | 托盘菜单 Exit | 进程 2 秒内退出，Debug 版无断言对话框 |
 | 7 | 关闭选项后再次粘贴 | 功能不降级（属性页销毁不影响主窗口句柄） |
+
+## 7. 上游同步策略（stxh/Ditto ↔ sabrogden/Ditto）
+
+远端：`upstream` = sabrogden/Ditto（push 已禁用），`origin` = stxh/Ditto（fork，保留上游完整历史）。策略为 **fork + 周期性 merge**，主线永不 rebase。
+
+上游自基线 `2ee24aa`（我们全部迁移提交的基础）以来 192 个提交，其中两次整理决定了同步成本结构：
+
+- `054cbb2 "Moved files (#800)"`：全部源码从仓库根搬进 `src\`；
+- 全库行尾/BOM 规范化：单文件 diff 行数虚高（如 `QPasteWnd.cpp` 16746 行，`--ignore-cr-at-eol` 后仅 2347 行）。
+
+干跑合并（`git merge-tree`）显示 124 个冲突路径：`src\*` 104 个（多为目录搬迁+行尾噪音+我们的 WTL 重写叠加；我们删除的死文件有 63 个上游也已删除，这部分自动消解）、`Language/Themes` XML 9 个（取上游）、工程/资源文件 11 个（手工合）。注意上游新功能均按 MFC 编写，合并即"再 WTL 化"，是本 fork 的长期成本。
+
+阶段计划：
+
+1. **Phase 0（已完成）**：cherry 框架无关的关键修复（`e6c745c` powrprof 死锁、`43ed9f6` IME 丢字符），见第 4 节。
+2. **Phase 1 结构对齐**：纯机械提交，在我们这边执行同款 root→`src\` 搬迁、`.gitattributes` 统一行尾策略跟随上游，使后续 merge 的 rename 检测可自动配对。
+3. **Phase 2 首次全量 sync**：`sync/upstream-YYYYMM` 分支 merge `upstream/master`，以 `git diff --ignore-cr-at-eol` 过滤噪音逐文件解决，新功能按 WTL 重写；四配置 Rebuild + 第 6 节冒烟清单通过后 PR 回 master。
+4. **常态**：每逢上游 release tag 执行一次 sync 流程；与 WTL 无关的纯 bug 修复可从 `contrib/*` 分支回贡上游，被接受的提交会缩小后续冲突面。发布 tag 用 `wtl-x.y` 命名空间避免与上游 `3.24.x` 混淆。
