@@ -42,7 +42,7 @@ Win32 之前链接失败（`LNK1181` 找不到 `Release\EncryptDecrypt.lib`，�
 
 `Addins\DittoUtil` 之前是 Win32 整解决方案构建的阻塞点（`MSB8041`），现已修复（`5a89dc2`）：`Release|Win32` 的 `UseOfMfc` 由 `Dynamic` 改为 `false`（与其他配置一致），并为全部 6 个配置补上内嵌 WTL 的包含目录 `$(SolutionDir)wtl\include`——因为它的 `stdafx.h` 经根目录 `StdAfx.h` 间接引用 WTL 头。至此整解决方案四个配置均可构建。
 
-已知非阻断告警：链接期 `LNK4098`（LIBCMT/LIBCMTD 冲突，历史遗留）、若干 `C4244`/`C4018`/`C4101`/`C4996`/`C4715`；Win32 `focus.vcxproj` 的 `LNK4075`（`/EDITANDCONTINUE` 因 `/SAFESEH` 被忽略）。
+`LNK4098`（LIBCMT/LIBCMTD 与动态 CRT 冲突）已消除——根因是 `EncryptDecrypt.vcxproj` 的 Win32/x64 配置一直没设 `RuntimeLibrary`，MSBuild 默认走静态 CRT（Debug=`/MTd`→LIBCMTD，Release=`/MT`→LIBCMT），而 `CP_Main` 是 `/MDd`/`/MD` 动态 CRT；静态 CRT 库链进动态 CRT 程序会有两套堆，`EncryptDecrypt` 里 ATL/CString 分配的内存在进程调试堆上释放会破坏调试堆链表，表现为启动断言 `debug_heap.cpp: __acrt_last_block == header`。已把 EncryptDecrypt 四个配置改为与 CP_Main 一致（Debug→`/MDd`，Release→`/MD`；ARM64 不构建，保持原样）。剩余告警：若干 `C4244`/`C4018`/`C4101`/`C4996`/`C4715`；Win32 `focus.vcxproj` 的 `LNK4075`（`/EDITANDCONTINUE` 因 `/SAFESEH` 被忽略）。
 
 ## 4. 已完成
 
@@ -74,7 +74,7 @@ Win32 之前链接失败（`LNK1181` 找不到 `Release\EncryptDecrypt.lib`，�
 按风险从低到高：
 
 1. **未注册的 OLE 拖放**：`CQPasteWnd::OnDragEnter/OnDragOver/OnDrop/OnDragLeave` 是空实现，上游 MFC 版本同样如此且 `CMyDropTarget`/`CDittoDropTarget` 从未注册，因此不是迁移丢失，但可顺手清理或真正实现拖放。
-2. **告警治理**：`LNK4098` 与 C4xxx 系列。
+2. **告警治理**：C4xxx 系列（`LNK4098` 已随 CRT 统一消除）。
 3. **运行验证**：第 6 节清单需人工逐项执行，尤其是本轮清理（死文件、旁路项目、产物出仓）之后重跑四个配置的冒烟测试。
 
 ## 6. 手动验证清单
