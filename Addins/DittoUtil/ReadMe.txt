@@ -1,27 +1,26 @@
 ========================================================================
-    MICROSOFT FOUNDATION CLASS LIBRARY : DittoUtil Project Overview
+    DittoUtil Add-in : DLL Project Overview
 ========================================================================
 
 
-AppWizard has created this DittoUtil DLL for you.  This DLL not only
-demonstrates the basics of using the Microsoft Foundation classes but
-is also a starting point for writing your DLL.
+DittoUtil is a Ditto add-in DLL. It is a plain ATL/WTL DLL (CAppModule)
+and does not use MFC (UseOfMfc=false in every configuration). Ditto loads
+it at runtime to provide the extra paste-format commands.
 
 This file contains a summary of what you will find in each of the files that
 make up your DittoUtil DLL.
 
-DittoUtil.vcproj
-    This is the main project file for VC++ projects generated using an Application Wizard. 
-    It contains information about the version of Visual C++ that generated the file, and 
-    information about the platforms, configurations, and project features selected with the
-    Application Wizard.
+DittoUtil.vcxproj
+    This is the main project file. It builds the DLL for Win32, x64 and
+    ARM64 in the Debug and Release configurations.
 
 DittoUtil.h
-    This is the main header file for the DLL.  It declares the
-    CDittoUtilApp class.
+    This is the main header file for the DLL.  It declares the shared ATL
+    app module (_Module).
 
 DittoUtil.cpp
-    This is the main DLL source file.  It contains the class CDittoUtilApp.
+    Implements DllMain: initialises and terminates the ATL module and frees
+    pasted images on unload.
 DittoUtil.rc
     This is a listing of all of the Microsoft Windows resources that the
     program uses.  It includes the icons, bitmaps, and cursors that are stored

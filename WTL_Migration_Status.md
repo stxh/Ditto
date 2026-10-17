@@ -58,7 +58,7 @@ Win32 之前链接失败（`LNK1181` 找不到 `Release\EncryptDecrypt.lib`，�
 - 网络接收改为默认关闭、逐项 opt-in（`9fe3277`）。
 - 迁移过程中被静默丢掉的行为已按 `git show 2ee24aa` 逐一比对恢复。
 - 项目清理（本轮）：
-  - 删除 56 个死代码文件（`e6d0476`），含上游从未编译的 MFC 遗留 `SystemTray`、`MyDropTarget`、`ProcessCopy`、`DittoDropTarget`、`EditWnd`，以及从未被使用的 `OptionsUtilities`。
+  - 删除 56 个死代码文件（`e6d0476`），含上游仍编译但已无引用的 `SystemTray`、`MyDropTarget`，上游从未编译的 `ProcessCopy`、`DittoDropTarget`、`EditWnd`，以及从未被使用的 `OptionsUtilities`。
   - 删除旁路项目目录 `Help\`、`WebSite\`、`U3Stop\`、`AccessToSqlite\`（94 个文件，均不在 `CP_Main_10.sln` 内）。
   - 语言包与主题从输出目录 `Debug\` 移到仓库根 `Language\`、`Themes\`，安装脚本与便携打包脚本同步更新（`b191d2c`）。
   - 约 85 个构建产物（`*.obj/*.lib/*.exe/*.dll/*.map/*.log/*.res/*.recipe/*.ilk/*.idb/*.tlh/*.tli/*.user/CP_Main_i.c/h` 等）从版本控制移除，`.gitignore` 扩展覆盖；`DittoSetup` 的 rcedit/ProjectZip 工具和 `zlib\zlibstat.lib` 属构建输入，保留跟踪。磁盘上的 `Debug/Debug64/Release/Release64/x64/Win32/` 及各项目中间目录已清空（约 2 GB），全部可由构建再生。
@@ -86,7 +86,7 @@ Win32 之前链接失败（`LNK1181` 找不到 `Release\EncryptDecrypt.lib`，�
 | 1 | 启动 `Ditto.exe`，复制一段文本 | 主框架标题与托盘 tooltip 显示 `DittoWTL`；Quick Paste 列表出现该条 |
 | 2 | `Ctrl+~` 打开列表，双击/回车 | 内容粘贴回上一个窗口，格式与复制时一致 |
 | 3 | 打开选项，逐个切换全部 8 个属性页 | 每页控件正常绘制，Debug 版不弹断言 |
-| 4 | Options → General | "Disable Receiving Clips" 默认勾选 |
+| 4 | Options → Friends | "Disable Receiving Clips" 默认勾选 |
 | 5 | About 页 | 版本行显示 `04.00.00.01`；两个链接可点击（mailto / 主页） |
 | 6 | 托盘菜单 Exit | 进程 2 秒内退出，Debug 版无断言对话框 |
 | 7 | 关闭选项后再次粘贴 | 功能不降级（属性页销毁不影响主窗口句柄） |

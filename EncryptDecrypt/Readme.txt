@@ -15,13 +15,10 @@ StdAfx.h, StdAfx.cpp
     named EncryptDecrypt.pch and a precompiled types file named StdAfx.obj.
 
 /////////////////////////////////////////////////////////////////////////////
-The compiler and linker switches have been modified to support MFC. Using the
-MFC ClassWizard with this project requires that you add several files to the 
-project, including "resource.h", "EncryptDecrypt.rc" and a "EncryptDecrypt.h" that 
-includes resource.h. If you add an rc file to a static library, you may 
-experience difficulties due to the limitation that only one rc file may be 
-present in a Dll or Exe. This problem may be overcome by including the 
-library's .rc file into the parent project's .rc file.
+This project is a StaticLibrary with the dynamic CRT (Release:
+MultiThreadedDLL, Debug: MultiThreadedDebugDLL) so that it shares a single 
+heap with Ditto.exe; the ARM64 configurations keep the default static CRT and 
+are not built. MFC is not used.
 
 /////////////////////////////////////////////////////////////////////////////
 Other notes:
