@@ -142,7 +142,7 @@
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_USRDLL;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <AdditionalIncludeDirectories>$(SolutionDir)wtl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -181,7 +181,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_USRDLL;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <AdditionalIncludeDirectories>$(SolutionDir)wtl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -218,7 +218,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_USRDLL;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <AdditionalIncludeDirectories>$(SolutionDir)wtl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -253,7 +253,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_USRDLL;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <AdditionalIncludeDirectories>$(SolutionDir)wtl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -291,7 +291,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_USRDLL;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <AdditionalIncludeDirectories>$(SolutionDir)wtl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -329,7 +329,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_USRDLL;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <AdditionalIncludeDirectories>$(SolutionDir)wtl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
