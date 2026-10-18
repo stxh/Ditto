@@ -11,6 +11,7 @@ CSymbolEdit::CSymbolEdit() :
 	m_hSymbolIcon(NULL),
 	m_bInternalIcon(false),
 	m_colorPromptText(RGB(127, 127, 127)),
+	m_lastBrushColor(-1),
 	m_centerTextDiff(0)
 {
 	m_fontPrompt.CreateFont(
@@ -564,7 +565,8 @@ HBRUSH CSymbolEdit::CtlColor(CDCHandle dc, HWND hwndEdit)
 
 	if (color != m_lastBrushColor)
 	{
-		m_brush.DeleteObject();
+		if (!m_brush.IsNull())
+			m_brush.DeleteObject();
 		m_brush.CreateSolidBrush(color);
 		m_lastBrushColor = color;
 	}

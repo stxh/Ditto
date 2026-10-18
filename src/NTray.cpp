@@ -1109,7 +1109,8 @@ BOOL CTrayNotifyIcon::GetDynamicDCAndBitmap(_In_ CDC* pDC, _In_ CBitmap* pBitmap
     WndScreen.ReleaseDC(DCScreen);
 
     //Free up the bitmap now that we are finished with it
-    pBitmap->DeleteObject();
+    if (!pBitmap->IsNull())
+      pBitmap->DeleteObject();
 
     return FALSE;
   }

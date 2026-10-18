@@ -40,7 +40,8 @@ LRESULT CGroupStatic::OnCtlColorStatic(UINT message, WPARAM wParam, LPARAM lPara
 	{
 		::SetBkMode(hdcChild, TRANSPARENT);
 		::SetBkColor(hdcChild, m_dwBkColor);
-		m_brush.DeleteObject();
+		if (!m_brush.IsNull())
+			m_brush.DeleteObject();
 		m_brush.CreateSolidBrush(m_dwBkColor);
 		return (LRESULT)(HBRUSH)m_brush;
 	}
@@ -74,7 +75,8 @@ LRESULT CGroupStatic::OnCtlColorStatic(UINT message, WPARAM wParam, LPARAM lPara
 
 	// Set the background color and brush based on my parent's color
 	::SetBkColor(hdcChild, clrParentBkground);
-	m_brush.DeleteObject();
+	if (!m_brush.IsNull())
+		m_brush.DeleteObject();
 	m_brush.CreateSolidBrush(clrParentBkground);
 	return (LRESULT)(HBRUSH)m_brush;
 }

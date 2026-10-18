@@ -35,7 +35,8 @@ HGLOBAL CImageFormatAggregator::GetHGlobal()
 	ReleaseDC(hWndDC, hdc);
 	if (bDrawn == FALSE)
 	{
-		bitmap.DeleteObject();
+		if (!bitmap.IsNull())
+			bitmap.DeleteObject();
 		return NULL;
 	}
 

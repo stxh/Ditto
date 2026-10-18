@@ -22,8 +22,10 @@ CEditWithButton::CEditWithButton()
 
 CEditWithButton::~CEditWithButton()
 {
-	m_bmpEmptyEdit.DeleteObject();
-	m_bmpFilledEdit.DeleteObject();
+	if (!m_bmpEmptyEdit.IsNull())
+		m_bmpEmptyEdit.DeleteObject();
+	if (!m_bmpFilledEdit.IsNull())
+		m_bmpFilledEdit.DeleteObject();
 }
 
 
@@ -109,8 +111,10 @@ BOOL CEditWithButton::SetBitmaps(UINT iEmptyEdit, UINT iFilledEdit)
 {
 	BITMAP bmpInfo;
 
-	m_bmpEmptyEdit.DeleteObject();
-	m_bmpFilledEdit.DeleteObject();
+	if (!m_bmpEmptyEdit.IsNull())
+		m_bmpEmptyEdit.DeleteObject();
+	if (!m_bmpFilledEdit.IsNull())
+		m_bmpFilledEdit.DeleteObject();
 
 	m_bmpEmptyEdit.LoadBitmap(iEmptyEdit);
 	m_bmpFilledEdit.LoadBitmap(iFilledEdit);

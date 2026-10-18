@@ -33,7 +33,8 @@ HGLOBAL CClipFormatQListCtrl::GetDibFittingToHeight(HDC hdc, int height)
 	CBitmap Bitmap;
 	if( !CBitmapHelper::GetCBitmap(this, hdc, &Bitmap, height) )
 	{
-		Bitmap.DeleteObject();
+		if (!Bitmap.IsNull())
+			Bitmap.DeleteObject();
 		// the data is useless, so free it.
 		this->Free(); 
 		return FALSE;
