@@ -54,7 +54,7 @@ UINT  MTServerThread(LPVOID pParam)
 		LogSendRecieveInfo("ERROR - theApp.m_sSocket = socket(AF_INET, SOCK_STREAM, 0);");
 		return 0;
 	}
-	if(::bind(theApp.m_sSocket,(sockaddr*)&local,sizeof(local))!=0)
+	if(bind(theApp.m_sSocket,(sockaddr*)&local,sizeof(local))!=0)
 	{
 		LogSendRecieveInfo("ERROR - if(bind(theApp.m_sSocket,(sockaddr*)&local,sizeof(local))!=0)");
 		return 0;
@@ -81,10 +81,7 @@ UINT  MTServerThread(LPVOID pParam)
 
 		if (socket != INVALID_SOCKET)
 		{
-			// Use Windows API instead of MFC AfxBeginThread
-	HANDLE hThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)ClientThread, (LPVOID)pParams, 0, NULL);
-	if (hThread)
-		CloseHandle(hThread);
+			AfxBeginThread(ClientThread, (LPVOID)pParams);
 		}
 		else
 		{
@@ -222,7 +219,14 @@ void CServer::OnStart(CSendInfo &info)
 	m_pClip = new CClip;
 	
 	CString cs;
-	cs.Format(_T("%s\n(%s)(%s)"), m_csDesc, m_csComputerName, m_csIP);
+	if (CGetSetOptions::GetAppendRemoveComputerNameAndIPToDescription())
+	{
+		cs.Format(_T("%s\n(%s)(%s)"), m_csDesc, m_csComputerName, m_csIP);
+	}
+	else
+	{
+		cs = m_csDesc;
+	}
 	
 	if(m_pClip)
 	{

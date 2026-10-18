@@ -14,6 +14,7 @@
 #include <vector>
 
 // CDeleteClipData dialog
+class CToolTipEx;
 
 class CDeleteData
 {
@@ -89,6 +90,8 @@ protected:
 		COMMAND_ID_HANDLER(IDC_CHECK_CREATE_DATE, OnBnClickedCheckCreateDate)
 		COMMAND_ID_HANDLER(IDC_CHECK_LAST_USE_DATE, OnBnClickedCheckLastUseDate)
 		COMMAND_ID_HANDLER(IDC_CHECK_DATA_FORMAT, OnBnClickedCheckDataFormat)
+		MESSAGE_HANDLER(WM_CONTEXTMENU, OnContextMenu)
+		COMMAND_ID_HANDLER(IDC_BT_COMPACT_AND_REPAIR, OnBnClickedCompactRepairCmd)
 		NOTIFY_HANDLER(IDC_LIST2, LVN_KEYDOWN, OnLvnKeydownList2)
 		NOTIFY_HANDLER(IDC_LIST2, LVN_ITEMCHANGED, OnLvnItemchangedList2)
 		NOTIFY_HANDLER(0, HDN_GETDISPINFO, OnHdnGetdispinfoList2)
@@ -97,7 +100,7 @@ protected:
 	END_MSG_MAP()
 
 	CDialogResizer m_Resize;
-	CListViewCtrl	m_List;
+	CListViewCtrl	m_clipList;
 	CSearchEnterEdit m_searchEdit;
 	HWND m_hWndParent;
 	CShowTaskBarIcon m_showTaskbar;
@@ -106,6 +109,7 @@ protected:
 	std::vector<CDeleteData> m_filteredOut;
 	bool m_applyingDelete;
 	bool m_cancelDelete;
+
 
 
 	void InitListCtrlCols();
@@ -118,6 +122,13 @@ protected:
 	void FilterItems();
 	bool MatchesFilter(CDeleteData *pdata);
 	void ApplyDelete();
+	void RemoveAllSelection();
+	BOOL SetCaret(int nRow, BOOL bFocus = 1);
+	BOOL SetSelection(int nRow, BOOL bSelect = 1);
+	void SelectRow(int selectedRow);
+	void CreateAndShowDescriptionWindow();
+	void SetDescriptionWindowText(INT_PTR row);
+	void SaveClipDataItemToFile(CDeleteData item);
 
 public:
 	CString m_clipTitle;
@@ -151,4 +162,17 @@ public:
 	LRESULT OnBnClickedCheckLastUseDate(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnBnClickedCheckDataFormat(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnLvnColumnclickList2(int idCtrl, LPNMHDR pNMHDR, BOOL& bHandled);
+	LRESULT OnContextMenu(UINT, WPARAM, LPARAM, BOOL&);
+	LRESULT OnBnClickedCompactRepairCmd(WORD, WORD, HWND, BOOL&) { OnBnClickedBtCompactAndRepair(); return 0; }
+	void OnBnClickedBtCompactAndRepair();
+	CToolTipEx* m_pDescriptionWindow;
+	void CloseDescriptionWindow();
+	void RemoveAllSelection();
+	BOOL SetCaret(int nRow, BOOL bFocus = 1);
+	BOOL SetSelection(int nRow, BOOL bSelect = 1);
+	void SelectRow(int selectedRow);
+	void CreateAndShowDescriptionWindow();
+	void SetDescriptionWindowText(INT_PTR row);
+	void SaveClipDataItemToFile(CDeleteData item);
+	void ShowClipPropertiesWindow();
 };

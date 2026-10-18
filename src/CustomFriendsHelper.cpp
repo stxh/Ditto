@@ -81,7 +81,7 @@ void CCustomFriendsHelper::Save()
 	CGetSetOptions::SetCustomSendToList(cs);
 }
 
-void CCustomFriendsHelper::AddToMenu(CMenuHandle *pMenu)
+void CCustomFriendsHelper::AddToMenu(CMenu *pMenu)
 {
 	bool addedItem = false;
 	int id = 0;

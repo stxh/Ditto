@@ -6,7 +6,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "..\Shared\ArrayEx.h"
+#include "..\Shared/ArrayEx.h"
 #include <vector>
 
 #define VK_MOUSE_CLICK 0x01
@@ -191,7 +191,7 @@ __int64 FileSize(const TCHAR *fileName);
 
 int FindNoCaseAndInsert(CString& mainStr, CString& findStr, CString preInsert, CString postInsert, int linesPerRow);
 
-void OnInitMenuPopupEx(HMENU hPopupMenu);
+void OnInitMenuPopupEx(CMenu *pPopupMenu, UINT nIndex, BOOL bSysMenu, CWnd *pWnd);
 
 CString InternetEncode(CString text);
 
@@ -215,5 +215,17 @@ BOOL BackupDbPrompt(HWND hwnd);
 BOOL RestoreDbPrompt(HWND hwnd);
 
 int WordCount(const CString& text);
+
+class VersionInfo
+{
+public:
+	int Major;
+	int Minor;
+	int Revision;
+	int Build;
+};
+
+VersionInfo GetRunningVersion();
+CString GetVersionString(VersionInfo version);
 
 #endif // !defined(AFX_CP_GUI_GLOBALS__FBCDED09_A6F2_47EB_873F_50A746EBC86B__INCLUDED_)

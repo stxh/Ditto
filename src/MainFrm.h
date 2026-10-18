@@ -133,7 +133,6 @@ public:
     bool CloseAllOpenDialogs();
     void DoTextOnlyPaste();
     void RefreshShowInTaskBar();
-    void ShowEditWnd(CClipIDs& Ids);
     void ShowQPasteWithActiveWindowCheck();
     void SaveCurrentClipboard();
 

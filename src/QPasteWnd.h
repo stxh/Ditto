@@ -21,6 +21,7 @@
 #include "Popup.h"
 #include "CustomFriendsHelper.h"
 #include "CmdUI.h"
+#include "ModernScrollBar.h"
 #include <shlobj.h>
 #include <oleidl.h>
 
@@ -229,11 +230,13 @@ public:
 		COMMAND_RANGE_HANDLER(3000, 4000, OnAddinSelect)
 		MESSAGE_HANDLER(NM_ALL_SELECTED, OnSelectAll)
 		MESSAGE_HANDLER(NM_SHOW_HIDE_SCROLLBARS, OnShowHideScrollBar)
+		MESSAGE_HANDLER(NM_UPDATE_SCROLLBAR, OnUpdateScrollBar)
 		MESSAGE_HANDLER(NM_CANCEL_SEARCH, OnCancelFilter)
 		MESSAGE_HANDLER(NM_POST_OPTIONS_WINDOW, OnPostOptions)
 		COMMAND_ID_HANDLER(ID_MENU_SEARCHDESCRIPTION, OnMenuSearchDescription)
 		COMMAND_ID_HANDLER(ID_MENU_SEARCHFULLTEXT, OnMenuSearchFullText)
 		COMMAND_ID_HANDLER(ID_MENU_SEARCHQUICKPASTE, OnMenuSearchQuickPaste)
+		COMMAND_ID_HANDLER(ID_MENU_SHOWSTARREDCLIPS, OnMenuShowStarredClips)
 		COMMAND_ID_HANDLER(ID_MENU_CONTAINSTEXTSEARCHONLY, OnMenuSimpleTextSearch)
 		COMMAND_ID_HANDLER(ID_QUICKOPTIONS_SHOWINTASKBAR, OnQuickoptionsShowintaskbar)
 		COMMAND_ID_HANDLER(ID_MENU_VIEWASQRCODE, OnMenuViewasqrcode)
@@ -246,6 +249,7 @@ public:
 		MESSAGE_HANDLER(NM_DELETE_ID, OnDeleteId)
 		COMMAND_ID_HANDLER(ID_MENU_REGULAREXPRESSIONSEARCH, OnMenuRegularexpressionsearch)
 		COMMAND_ID_HANDLER(ID_IMPORT_EXPORTTOGOOGLETRANSLATE, OnImportExporttogoogletranslate)
+		COMMAND_ID_HANDLER(ID_IMPORT_EXPORTTOWEBSEARCH, OnImportExporttowebsearch)
 		COMMAND_ID_HANDLER(ID_IMPORT_EXPORTCLIP_BITMAP, OnImportExportclipBitmap)
 		COMMAND_ID_HANDLER(ID_MENU_WILDCARDSEARCH, OnMenuWildcardsearch)
 		COMMAND_ID_HANDLER(ID_MENU_SAVECURRENTCLIPBOARD, OnMenuSavecurrentclipboard)
@@ -254,6 +258,7 @@ public:
 		COMMAND_ID_HANDLER(ID_CLIPORDER_MOVEDOWN, OnCliporderMovedown)
 		COMMAND_ID_HANDLER(ID_CLIPORDER_MOVETOTOP, OnCliporderMovetotop)
 		COMMAND_ID_HANDLER(ID_MENU_FILTERON, OnMenuFilteron)
+		COMMAND_ID_HANDLER(ID_MENU_GOTOENTRY, OnMenuGoToEntry)
 		COMMAND_ID_HANDLER(ON_TOP_WARNING, OnAlwaysOnTopClicked)
 		COMMAND_ID_HANDLER(ID_SPECIALPASTE_UPPERCASE, OnSpecialpasteUppercase)
 		COMMAND_ID_HANDLER(ID_SPECIALPASTE_LOWERCASE, OnSpecialpasteLowercase)
@@ -285,6 +290,9 @@ public:
 		COMMAND_ID_HANDLER(ID_CLIPORDER_MOVETOLAST, OnCliporderMovetolast)
 		COMMAND_ID_HANDLER(ID_SPECIALPASTE_PASTE32945, OnSpecialpastePasteDontUpdateOrder)
 		COMMAND_ID_HANDLER(ID_SPECIALPASTE_TRIM, OnSpecialpasteTrim)
+		COMMAND_ID_HANDLER(ID_SPECIALPASTE_POSIXIFY_PATHS, OnSpecialpastePosixifyPaths)
+		COMMAND_ID_HANDLER(ID_SPECIALPASTE_PASTENEWGUID, OnSpecialpastePastenewguid)
+		COMMAND_ID_HANDLER(ID_SPECIALPASTE_PASTEASIMAGE, OnSpecialpastePasteAsImage)
 		COMMAND_ID_HANDLER(ID_TRANSPARENCY_INCREASE, OnTransparencyIncrease)
 		COMMAND_ID_HANDLER(ID_TRANSPARENCY_DECREASE, OnTransparencyDecrease)
 		COMMAND_ID_HANDLER(ID_TRANSPARENCY_TOGGLE, OnTransparencyToggle)
@@ -380,6 +388,9 @@ public:
 	CAccels m_toolTipActions;
 	CAccels m_modifierKeyActions;
 	bool m_showScrollBars;
+	bool m_bShowStarredClips;
+	CModernScrollBar m_modernScrollBar;
+	CModernScrollBar m_modernScrollBarHorz;
 	int m_leftSelectedCompareId;
 	INT64 m_extraDataCounter;
 	CPopup m_popupMsg;
@@ -412,6 +423,7 @@ public:
     void SetTransparency(int percent);
     void OnUpdateLinesPerRow(CmdUI *pCmdUI, int nValue);
     void OnUpdateTransparency(CmdUI *pCmdUI, int nValue);
+    void AddShowStarredClipsMenuItem(CMenuHandle *pMenu);
     void SetMenuChecks(CMenuHandle *pMenu);
     void SetSendToMenu(CMenuHandle *pMenu, int nMenuID, int nArrayPos);
 	void SetFriendChecks(CMenuHandle *pMenu);
@@ -441,6 +453,8 @@ public:
 	bool DoActionShowDescription();
 	bool DoActionNextDescription(); 
 	bool DoActionPrevDescription();
+	bool DoActionPastePosixifyPaths();
+	bool DoPasteAsImage();
 	bool DoActionShowMenu();
 	bool DoActionShowSystemMenu();
 	bool DoActionNewGroup();
@@ -479,6 +493,7 @@ public:
 	bool DoSelectLeftSideCompare();
 	bool DoSelectRightSideAndDoCompare();
 	bool DoExportToQRCode();
+	bool DoExportToWebSearch();
 	bool DoExportToTextFile();
 	bool DoExportToGoogleTranslate();
 	bool DoExportToBitMapFile();
@@ -672,9 +687,11 @@ public:
 	LRESULT OnChaiScriptPaste(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
     LRESULT OnSelectAll(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT OnShowHideScrollBar(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnUpdateScrollBar(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT OnMenuSearchDescription(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnMenuSearchFullText(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnMenuSearchQuickPaste(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnMenuShowStarredClips(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnMenuSimpleTextSearch(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnPostOptions(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT OnMakeTopStickyClip(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
@@ -709,6 +726,8 @@ public:
 	void OnUpdateCliporderMovetotop(CmdUI *pCmdUI);
 	LRESULT OnMenuFilteron(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	void OnUpdateMenuFilteron(CmdUI *pCmdUI);
+	LRESULT OnMenuGoToEntry(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateMenuGoToEntry(CmdUI *pCmdUI);
 	LRESULT OnAlwaysOnTopClicked(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	//afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 	LRESULT OnSpecialpasteUppercase(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
@@ -811,4 +830,12 @@ public:
 	void OnUpdateSpecialpasteMultipleImagesVert(CmdUI *pCmdUI);
 	LRESULT OnSpecialpasteAsciitextonly(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	void OnUpdateSpecialpasteAsciitextonly(CmdUI *pCmdUI);
+	LRESULT OnSpecialpastePosixifyPaths(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateSpecialPosixifyPaths(CmdUI *pCmdUI);
+	LRESULT OnImportExporttowebsearch(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateImportExporttowebsearch(CmdUI *pCmdUI);
+	LRESULT OnSpecialpastePastenewguid(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateSpecialpastePastenewguid(CmdUI *pCmdUI);
+	LRESULT OnSpecialpastePasteAsImage(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	void OnUpdateSpecialpastePasteAsImage(CmdUI *pCmdUI);
 };

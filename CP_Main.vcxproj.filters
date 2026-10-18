@@ -1,55 +1,79 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="src\sqlite\CppSQLite3.cpp">
-      <Filter>sqlite</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ClipboardSaveRestore.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Clip_ImportExport.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Clip.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Client.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\CF_UnicodeTextAggregator.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\CF_TextAggregator.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\CF_HDropAggregator.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BitmapHelper.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\AutoSendToClientThread.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\AlphaBlend.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\AddType.cpp">
+    <ClCompile Include="src\About.cpp">
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="src\Accels.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="src\About.cpp">
+    <ClCompile Include="src\ActionEnums.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="src\ClipboardViewer.cpp">
+    <ClCompile Include="src\AddType.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AdvGeneral.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AutoSendToClientThread.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BitmapHelper.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ClipEditThread.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CF_HDropAggregator.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CF_TextAggregator.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CF_UnicodeTextAggregator.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ChaiScriptOnCopy.cpp">
+      <Filter>ChaiScript</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ChaiScriptXml.cpp">
+      <Filter>ChaiScript</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ConvertRTFToText.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ImageFormatAggregator.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Clip.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ClipCompare.cpp">
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="src\ClipFormatQListCtrl.cpp">
       <Filter>source</Filter>
     </ClCompile>
+    <ClCompile Include="src\Clip_ImportExport.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ClipboardSaveRestore.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ClipboardViewer.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
     <ClCompile Include="src\ClipIds.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ICU_String.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ImageHelper.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NoDbFrameWnd.cpp">
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="src\CopyProperties.cpp">
@@ -61,14 +85,116 @@
     <ClCompile Include="src\CP_Main.cpp">
       <Filter>source</Filter>
     </ClCompile>
+    <ClCompile Include="src\CreateQRCodeImage.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CustomFriendsHelper.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DeleteClipData.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DimWnd.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DittoChaiScript.cpp">
+      <Filter>ChaiScript</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DittoPopupWindow.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DPI.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DrawHTML.C">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EditWithButton.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EventThread.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FriendPromptDlg.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GdiImageDrawer.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GdipButton.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GlobalClips.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HotKeys.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ImageViewer.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MainFrmThread.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Md5.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NTray.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Popup.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PowerManager.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\QPasteWndThread.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\QuickPasteKeyboard.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RegExFilterHelper.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ScriptEditor.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ScrollHelper.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SendMail.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="Shared\TextConvert.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="Shared\Tokenizer.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ShowTaskBarIcon.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SimpleBrowser.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SnapWindow.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SpecialPasteOptions.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sqlite\CppSQLite3.cpp">
+      <Filter>sqlite</Filter>
+    </ClCompile>
     <ClCompile Include="src\Crc32Dynamic.cpp">
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="src\DatabaseUtilities.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="src\DialogResizer.cpp">
-      <Filter>source</Filter>
+    <ClCompile Include="src\DittoAddin.cpp">
+      <Filter>header</Filter>
     </ClCompile>
     <ClCompile Include="src\DittoAddins.cpp">
       <Filter>source</Filter>
@@ -76,19 +202,16 @@
     <ClCompile Include="src\DittoCopyBuffer.cpp">
       <Filter>source</Filter>
     </ClCompile>
+    <ClCompile Include="src\DittoWindow.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
     <ClCompile Include="src\ExternalWindowTracker.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\FileRecieve.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\FileSend.cpp">
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="src\FileTransferProgressDlg.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="src\FormattedTextDraw.cpp">
+    <ClCompile Include="src\FormatSQL.cpp">
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="src\FriendDetails.cpp">
@@ -100,9 +223,6 @@
     <ClCompile Include="src\GroupName.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="src\GroupStatic.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
     <ClCompile Include="src\GroupTree.cpp">
       <Filter>source</Filter>
     </ClCompile>
@@ -112,31 +232,25 @@
     <ClCompile Include="src\HTMLFormatAggregator.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="src\HotKeys.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="HyperLink.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
     <ClCompile Include="src\InternetUpdate.cpp">
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="src\MainFrm.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="src\MainFrmThread.cpp">
+    <ClCompile Include="src\MainTableFunctions.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="src\MainTableFunctions.cpp">
+    <ClCompile Include="src\Misc.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ModernScrollBar.cpp">
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="src\MoveToGroupDlg.cpp">
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="src\MultiLanguage.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\NumberEdit.cpp">
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="src\OleClipSource.cpp">
@@ -149,9 +263,6 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="src\OptionsCopyBuffers.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\AdvGeneral.cpp">
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="src\PropGrid.cpp">
@@ -181,31 +292,52 @@
     <ClCompile Include="src\PerfTimer.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="src\Popup.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
     <ClCompile Include="src\ProcessPaste.cpp">
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="src\ProgressWnd.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="src\QListCtrl.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
     <ClCompile Include="src\QPasteWnd.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="src\QPasteWndThread.cpp">
+    <ClCompile Include="src\QRCode\bitstream.c">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\QRCode\mask.c">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\QRCode\mmask.c">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\QRCode\mqrspec.c">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\QRCode\qrenc.c">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\QRCode\qrencode.c">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\QRCode\QRGenerator.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\QRCode\qrinput.c">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\QRCode\qrspec.c">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\QRCode\rscode.c">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\QRCode\rsecc.c">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\QRCode\split.c">
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="src\QuickPaste.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\RecieveSocket.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\RichEditCtrlEx.cpp">
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="src\RichTextAggregator.cpp">
@@ -214,112 +346,43 @@
     <ClCompile Include="src\SaveAnimation.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="src\SearchEditBox.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
     <ClCompile Include="src\SendKeys.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="src\SendSocket.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Server.cpp">
-      <Filter>source</Filter>
+    <ClCompile Include="src\sqlite\sqlite3mc_amalgamation.c">
+      <Filter>sqlite</Filter>
     </ClCompile>
     <ClCompile Include="src\StdAfx.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="Shared\TextConvert.cpp">
+    <ClCompile Include="src\SymbolEdit.cpp">
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="src\Theme.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="Shared\Tokenizer.cpp">
+    <ClCompile Include="src\AlphaBlend.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="src\ToolTipEx.cpp">
+    <ClCompile Include="src\DialogResizer.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="src\WildCardMatch.cpp">
+    <ClCompile Include="src\FormattedTextDraw.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="src\WndEx.cpp">
+    <ClCompile Include="src\GroupStatic.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="src\DittoAddin.cpp">
-      <Filter>header</Filter>
-    </ClCompile>
-    <ClCompile Include="src\DittoWindow.cpp">
+    <ClCompile Include="src\NumberEdit.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="src\EventThread.cpp">
+    <ClCompile Include="src\QListCtrl.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="src\FormatSQL.cpp">
+    <ClCompile Include="src\RichEditCtrlEx.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="src\Misc.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ShowTaskBarIcon.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GlobalClips.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\EditWithButton.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GdipButton.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\DPI.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GdiImageDrawer.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\UAC_Helper.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\UAC_Thread.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ActionEnums.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\DeleteClipData.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ClipCompare.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\DrawHTML.C">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\DittoPopupWindow.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TrayWnd.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SpecialPasteOptions.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ScrollHelper.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\QuickPasteKeyboard.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PowerManager.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ImageViewer.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\NTray.cpp">
+    <ClCompile Include="src\SearchEditBox.cpp">
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="src\TinyXml\tinystr.cpp">
@@ -334,79 +397,56 @@
     <ClCompile Include="src\TinyXml\tinyxmlparser.cpp">
       <Filter>tineyxml</Filter>
     </ClCompile>
-    <ClCompile Include="src\SymbolEdit.cpp" />
-    <ClCompile Include="src\ChaiScriptOnCopy.cpp">
-      <Filter>ChaiScript</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ChaiScriptXml.cpp">
-      <Filter>ChaiScript</Filter>
-    </ClCompile>
-    <ClCompile Include="src\DittoChaiScript.cpp">
-      <Filter>ChaiScript</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SimpleBrowser.cpp">
+    <ClCompile Include="src\ToolTipEx.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="src\CustomFriendsHelper.cpp">
+    <ClCompile Include="src\TrayWnd.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="src\DimWnd.cpp">
+    <ClCompile Include="src\UAC_Helper.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="src\FriendPromptDlg.cpp">
+    <ClCompile Include="src\UAC_Thread.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="src\Md5.cpp">
+    <ClCompile Include="src\WildCardMatch.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="src\RegExFilterHelper.cpp">
+    <ClCompile Include="src\WndEx.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="src\ScriptEditor.cpp">
+    <ClCompile Include="src\Client.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="src\SnapWindow.cpp">
+    <ClCompile Include="src\FileRecieve.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="src\SymbolEdit.cpp">
+    <ClCompile Include="src\FileSend.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="src\SendMail.cpp">
+    <ClCompile Include="src\RecieveSocket.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="src\NoDbFrameWnd.cpp">
+    <ClCompile Include="src\SendSocket.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="src\ICU_String.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\sqlite\sqlite3mc_amalgamation.c">
-      <Filter>sqlite</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ClipEditThread.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ConvertRTFToText.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ImageHelper.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ImageFormatAggregator.cpp">
+    <ClCompile Include="src\Server.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\sqlite\CppSQLite3.h">
-      <Filter>sqlite</Filter>
-    </ClInclude>
-    <ClInclude Include="src\About.h">
-      <Filter>header</Filter>
-    </ClInclude>
+    <ResourceCompile Include="CP_Main.rc">
+      <Filter>res</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
     <ClInclude Include="src\Accels.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="src\AddType.h">
+    <ClInclude Include="src\ActionEnums.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\AdvGeneral.h">
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="src\AlphaBlend.h">
@@ -416,6 +456,210 @@
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="src\AutoSendToClientThread.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ClipEditThread.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CGdiPlusBitmap.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ChaiScriptOnCopy.h">
+      <Filter>ChaiScript</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ChaiScriptXml.h">
+      <Filter>ChaiScript</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ConvertRTFToText.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ImageFormatAggregator.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ClipCompare.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ClipFormatQListCtrl.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ICU_String.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ImageHelper.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\NoDbFrameWnd.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CreateQRCodeImage.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CustomFriendsHelper.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DeleteClipData.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DimWnd.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DittoChaiScript.h">
+      <Filter>ChaiScript</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DittoPopupWindow.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DPI.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DrawHTML.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EditWithButton.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EventThread.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FormattedTextDraw.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FriendPromptDlg.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GdiImageDrawer.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GdipButton.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GlobalClips.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GroupStatic.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\HotKeys.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ImageViewer.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MainFrmThread.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Md5.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\memdc.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\NTray.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\NumberEdit.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Popup.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PowerManager.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\QListCtrl.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\QPasteWndThread.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\QuickPasteKeyboard.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RegExFilterHelper.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RichEditCtrlEx.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ScriptEditor.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ScrollHelper.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SearchEditBox.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SendMail.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared\TextConvert.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared\Tokenizer.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ShowTaskBarIcon.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SimpleBrowser.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Slugify.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SnapWindow.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SpecialPasteOptions.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sqlite\sqlite3mc_amalgamation.h">
+      <Filter>sqlite</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SymbolEdit.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ToolTipEx.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TrayWnd.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UAC_Helper.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UAC_Thread.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\WildCardMatch.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\WndEx.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Client.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FileRecieve.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FileSend.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RecieveSocket.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SendSocket.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Server.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\About.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\AddType.h">
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="src\BitmapHelper.h">
@@ -430,9 +674,6 @@
     <ClInclude Include="src\CF_UnicodeTextAggregator.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="src\Client.h">
-      <Filter>header</Filter>
-    </ClInclude>
     <ClInclude Include="src\Clip.h">
       <Filter>header</Filter>
     </ClInclude>
@@ -443,9 +684,6 @@
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="src\ClipboardViewer.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ClipFormatQListCtrl.h">
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="src\ClipIds.h">
@@ -459,6 +697,9 @@
     </ClInclude>
     <ClInclude Include="src\CP_Main.h">
       <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sqlite\CppSQLite3.h">
+      <Filter>sqlite</Filter>
     </ClInclude>
     <ClInclude Include="src\Crc32Dynamic.h">
       <Filter>header</Filter>
@@ -484,25 +725,13 @@
     <ClInclude Include="src\DittoWindow.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="src\EventThread.h">
-      <Filter>header</Filter>
-    </ClInclude>
     <ClInclude Include="src\ExternalWindowTracker.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\FileRecieve.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\FileSend.h">
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="src\FileTransferProgressDlg.h">
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="src\FormatSQL.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\FormattedTextDraw.h">
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="src\FriendDetails.h">
@@ -514,22 +743,13 @@
     <ClInclude Include="src\GroupName.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="src\GroupStatic.h">
-      <Filter>header</Filter>
-    </ClInclude>
     <ClInclude Include="src\GroupTree.h">
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="src\HListBox.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="src\HotKeys.h">
-      <Filter>header</Filter>
-    </ClInclude>
     <ClInclude Include="src\HTMLFormatAggregator.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="HyperLink.h">
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="Shared\IAddinExports.h">
@@ -541,34 +761,25 @@
     <ClInclude Include="src\IClipAggregator.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="RulerRichEditCtrl\ids.h">
-      <Filter>header</Filter>
-    </ClInclude>
     <ClInclude Include="src\InternetUpdate.h">
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="src\MainFrm.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="src\MainFrmThread.h">
-      <Filter>header</Filter>
-    </ClInclude>
     <ClInclude Include="src\MainTableFunctions.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="src\memdc.h">
+    <ClInclude Include="src\Misc.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="src\Misc.h">
+    <ClInclude Include="src\ModernScrollBar.h">
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="src\MoveToGroupDlg.h">
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="src\MultiLanguage.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\NumberEdit.h">
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="src\OleClipSource.h">
@@ -581,9 +792,6 @@
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="src\OptionsCopyBuffers.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\AdvGeneral.h">
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="src\PropGrid.h">
@@ -613,34 +821,58 @@
     <ClInclude Include="src\PerfTimer.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="src\Popup.h">
-      <Filter>header</Filter>
-    </ClInclude>
     <ClInclude Include="src\ProcessPaste.h">
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="src\ProgressWnd.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="src\QListCtrl.h">
-      <Filter>header</Filter>
-    </ClInclude>
     <ClInclude Include="src\QPasteWnd.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="src\QPasteWndThread.h">
+    <ClInclude Include="src\httplib.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\QRCode\bitstream.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\QRCode\config.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\QRCode\mask.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\QRCode\mmask.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\QRCode\mqrspec.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\QRCode\qrencode.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\QRCode\qrencode_inner.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\QRCode\qrinput.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\QRCode\qrspec.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\QRCode\rscode.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\QRCode\rsecc.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\QRCode\split.h">
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="src\QuickPaste.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="src\RecieveSocket.h">
-      <Filter>header</Filter>
-    </ClInclude>
     <ClInclude Include="Resource.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RichEditCtrlEx.h">
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="src\RichTextAggregator.h">
@@ -649,16 +881,7 @@
     <ClInclude Include="src\SaveAnimation.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="src\SearchEditBox.h">
-      <Filter>header</Filter>
-    </ClInclude>
     <ClInclude Include="src\SendKeys.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\SendSocket.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Server.h">
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="src\ServerDefines.h">
@@ -667,175 +890,28 @@
     <ClInclude Include="src\StdAfx.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="RulerRichEditCtrl\StdGrfx.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="Shared\TextConvert.h">
-      <Filter>header</Filter>
-    </ClInclude>
     <ClInclude Include="src\Theme.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="Shared\Tokenizer.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ToolTipEx.h">
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="src\UnicodeMacros.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="src\WildCardMatch.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\WndEx.h">
-      <Filter>header</Filter>
+    <ClInclude Include="src\TinyXml\tinystr.h">
+      <Filter>tineyxml</Filter>
     </ClInclude>
     <ClInclude Include="src\TinyXml\tinyxml.h">
       <Filter>tineyxml</Filter>
     </ClInclude>
-    <ClInclude Include="src\TinyXml\tinystr.h">
-      <Filter>tineyxml</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ShowTaskBarIcon.h">
+    <ClInclude Include="RulerRichEditCtrl\ids.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="src\GlobalClips.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\EditWithButton.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GdipButton.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\CGdiPlusBitmap.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\DPI.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GdiImageDrawer.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\UAC_Thread.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\UAC_Helper.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ActionEnums.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\DeleteClipData.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ClipCompare.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\DrawHTML.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\DittoPopupWindow.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\SpecialPasteOptions.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\TrayWnd.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ImageViewer.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\PowerManager.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\QuickPasteKeyboard.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ScrollHelper.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\NTray.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\SymbolEdit.h" />
-    <ClInclude Include="src\ChaiScriptOnCopy.h">
-      <Filter>ChaiScript</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ChaiScriptXml.h">
-      <Filter>ChaiScript</Filter>
-    </ClInclude>
-    <ClInclude Include="src\DittoChaiScript.h">
-      <Filter>ChaiScript</Filter>
-    </ClInclude>
-    <ClInclude Include="src\SimpleBrowser.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\CustomFriendsHelper.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\DimWnd.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\FriendPromptDlg.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Md5.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RegExFilterHelper.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ScriptEditor.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\SnapWindow.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\SymbolEdit.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\SendMail.h">
-      <Filter>source</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Slugify.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\NoDbFrameWnd.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ICU_String.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\sqlite\sqlite3mc_amalgamation.h">
-      <Filter>sqlite</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ClipEditThread.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ConvertRTFToText.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ImageFormatAggregator.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ImageHelper.h">
+    <ClInclude Include="RulerRichEditCtrl\StdGrfx.h">
       <Filter>header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="CP_Main.rc">
-      <Filter>res</Filter>
-    </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="RulerRichEditCtrl\toolbar.bmp">
-      <Filter>res</Filter>
-    </CustomBuild>
-  </ItemGroup>
-  <ItemGroup>
+    <None Include="CP_Main.rgs" />
+    <None Include="packages.config" />
     <None Include="res\back.bmp">
       <Filter>res</Filter>
     </None>
@@ -857,263 +933,34 @@
     <None Include="res\bmp00003.bmp">
       <Filter>res</Filter>
     </None>
-    <None Include="res\closed_f.bmp">
+    <None Include="res\bmp00004.bmp">
       <Filter>res</Filter>
     </None>
-    <None Include="res\CP_Main.ico">
+    <None Include="res\bmp00005.bmp">
       <Filter>res</Filter>
     </None>
-    <None Include="res\CP_Main.rc2">
+    <None Include="res\bmp00006.bmp">
       <Filter>res</Filter>
     </None>
-    <None Include="res\CP_MainDoc.ico">
+    <None Include="res\bmp00007.bmp">
       <Filter>res</Filter>
     </None>
-    <None Include="res\Ditto.ico">
+    <None Include="res\bmp00008.bmp">
       <Filter>res</Filter>
     </None>
-    <None Include="res\Ditto_NoCopyCb.ico">
+    <None Include="res\bmp00009.bmp">
       <Filter>res</Filter>
     </None>
-    <None Include="res\FILECOPY.AVI">
+    <None Include="res\bmp00010.bmp">
       <Filter>res</Filter>
     </None>
-    <None Include="res\mainfram.bmp">
+    <None Include="res\bmp00011.bmp">
       <Filter>res</Filter>
     </None>
-    <None Include="res\open_fol.bmp">
+    <None Include="res\bmp00012.bmp">
       <Filter>res</Filter>
     </None>
-    <None Include="res\Toolbar.bmp">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\toolbar1.bmp">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\DittoNew.ico">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\Ditto2.ico">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\Ditto2_NoCopyCb.ico">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\search_close.bmp">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\search_normal.bmp">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\folder_open.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\search_close_125.bmp">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\search_normal_200.bmp">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\search_close_150.bmp">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\search_close_200.bmp">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\search_normal_125.bmp">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\search_normal_150.bmp">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\left-blue.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\shortcut.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\chevron_bottom_8_8.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\chevron_bottom_10_10.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\chevron_bottom_12_12.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\chevron_bottom_16_16.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\chevron_left_8_8.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\chevron_left_10_10.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\chevron_left_12_12.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\chevron_left_16_16.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\chevron_right_8_8.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\chevron_right_10_10.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\chevron_right_12_12.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\chevron_right_16_16.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\chevron_top_8_8.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\chevron_top_10_10.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\chevron_top_12_12.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\chevron_top_16_16.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\close_8_8.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\close_10_10.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\close_12_12.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\close_16_16.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\cog_16_16.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\cog_20_20.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\cog_22_22.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\cog_24_24.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\cog_32_32.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\left_arrow_16_16.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\left_arrow_20_20.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\left_arrow_24_24.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\left_arrow_32_32.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\opened_folder_16_16.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\opened_folder_20_20.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\opened_folder_24_24.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\opened_folder_32_32.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\maximize_10_10.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\maximize_8_8.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\maximize_12_12.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\maximize_16_16.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\in_folder_16_16.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\in_folder_20_20.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\in_folder_24_24.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\in_folder_32_32.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\key_stroke_16_16.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\key_stroke_20_20.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\key_stroke_24_24.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\key_stroke_32_32.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\Sticky_16_16.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\Sticky_20_20.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\Sticky_24_24.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\Sticky_32_32.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\yellow_star_16_16.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\yellow_star_20_20.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\yellow_star_24_24.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\yellow_star_32_32.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="CP_Main.rgs" />
-    <None Include="res\Hamburger_16_16.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\Hamburger_20_20.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\Hamburger_24_24.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\Hamburger_32_32.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\system_menu_16_16.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\system_menu_20_20.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\system_menu_24_24.png">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\system_menu_32_32.png">
+    <None Include="res\edit_wnd.bmp">
       <Filter>res</Filter>
     </None>
     <None Include="res\ChevronLeft_Black_16_16.png">
@@ -1146,6 +993,69 @@
     <None Include="res\ChevronRight_Black_32_32.png">
       <Filter>res</Filter>
     </None>
+    <None Include="res\chevron_right_16_16.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\chevron_right_10_10.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\chevron_right_12_12.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\chevron_right_8_8.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\chevron_left_16_16.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\chevron_left_10_10.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\chevron_left_12_12.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\chevron_left_8_8.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\chevron_top_16_16.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\chevron_top_10_10.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\chevron_top_12_12.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\chevron_top_8_8.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\chevron_bottom_16_16.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\chevron_bottom_10_10.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\chevron_bottom_12_12.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\chevron_bottom_8_8.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\closed_f.bmp">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\close_10_10.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\close_12_12.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\close_16_16.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\close_8_8.png">
+      <Filter>res</Filter>
+    </None>
     <None Include="res\Close_Black_16_16.png">
       <Filter>res</Filter>
     </None>
@@ -1161,6 +1071,120 @@
     <None Include="res\Close_Black_32_32.png">
       <Filter>res</Filter>
     </None>
+    <None Include="res\cog_16_16.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\cog_20_20.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\cog_22_22.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\cog_24_24.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\cog_28.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\cog_32_32.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\CP_Main.ico">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\CP_Main.rc2">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\CP_MainDoc.ico">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\cursor1.cur">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\cursor2.cur">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\cursor_zoom_in.cur">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\Ditto.ico">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\Ditto2_NoCopyCb.ico">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\DittoNew.ico">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\Ditto_NoCopyCb.ico">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\folder_open.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\Hamburger_16_16.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\Hamburger_20_20.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\Hamburger_24_24.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\Hamburger_32_32.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\in_folder_16_16.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\in_folder_20_20.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\in_folder_24_24.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\in_folder_32_32.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\key_stroke_16_16.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\key_stroke_20_20.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\key_stroke_24_24.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\key_stroke_32_32.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\left-blue.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\left_arrow_16_16.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\left_arrow_20_20.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\left_arrow_24_24.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\left_arrow_32_32.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\mainfram.bmp">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\maximize_10_10.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\maximize_12_12.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\maximize_16_16.png">
+      <Filter>res</Filter>
+    </None>
     <None Include="res\maximize_20.png">
       <Filter>res</Filter>
     </None>
@@ -1171,6 +1195,9 @@
       <Filter>res</Filter>
     </None>
     <None Include="res\maximize_32.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\maximize_8_8.png">
       <Filter>res</Filter>
     </None>
     <None Include="res\minimize_16.png">
@@ -1204,6 +1231,24 @@
       <Filter>res</Filter>
     </None>
     <None Include="res\Open Folder-32.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\opened_folder_16_16.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\opened_folder_20_20.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\opened_folder_24_24.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\opened_folder_32_32.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\open_fol.bmp">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\Ditto2.ico">
       <Filter>res</Filter>
     </None>
     <None Include="res\open_folder_24.png">
@@ -1251,7 +1296,55 @@
     <None Include="res\Search_32.png">
       <Filter>res</Filter>
     </None>
+    <None Include="res\search_close.bmp">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\search_close_125.bmp">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\search_close_150.bmp">
+      <Filter>res</Filter>
+    </None>
     <None Include="res\search_close_16.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\search_close_200.bmp">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\search_normal.bmp">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\search_normal_125.bmp">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\search_normal_150.bmp">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\search_normal_200.bmp">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\shortcut.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\Sticky_16_16.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\Sticky_20_20.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\Sticky_24_24.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\Sticky_32_32.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\system_menu_16_16.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\system_menu_20_20.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\system_menu_24_24.png">
       <Filter>res</Filter>
     </None>
     <None Include="res\system_menu_2_24.png">
@@ -1281,19 +1374,206 @@
     <None Include="res\system_menu_2_64_64.png">
       <Filter>res</Filter>
     </None>
-    <None Include="res\cog_28.png">
+    <None Include="res\system_menu_32_32.png">
       <Filter>res</Filter>
     </None>
-    <None Include="res\cursor1.cur">
+    <None Include="res\Toolbar.bmp">
       <Filter>res</Filter>
     </None>
-    <None Include="res\cursor2.cur">
+    <None Include="res\toolbar1.bmp">
       <Filter>res</Filter>
     </None>
-    <None Include="res\cursor_zoom_in.cur">
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="RulerRichEditCtrl\toolbar.bmp">
+      <Filter>res</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\FILECOPY.AVI">
       <Filter>res</Filter>
     </None>
-    <None Include="packages.config" />
+    <None Include="res\yellow_star_16_16.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\yellow_star_20_20.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\yellow_star_24_24.png">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\yellow_star_32_32.png">
+      <Filter>res</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="CP_Main.idl">
+      <Filter>source</Filter>
+    </Midl>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\ChevronLeft_Black_36.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\ChevronLeft_Black_40.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\ChevronLeft_Black_44.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\ChevronLeft_Black_48.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\ChevronLeft_Black_52.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\ChevronLeft_Black_56.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\ChevronRight_Black_36.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\ChevronRight_Black_40.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\ChevronRight_Black_44.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\ChevronRight_Black_48.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\ChevronRight_Black_52.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\ChevronRight_Black_56.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\close_36.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\close_40.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\close_44.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\close_48.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\close_52.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\close_56.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\Ditto2_NoDb.ico">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\down_16.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\down_20.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\down_24.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\down_28.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\down_32.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\icon3.ico">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\maximize_36.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\maximize_40.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\maximize_44.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\maximize_48.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\maximize_512.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\maximize_52.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\maximize_56.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\minimize_36.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\minimize_40.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\minimize_44.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\minimize_48.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\minimize_52.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\minimize_56.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\open_folder_54.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\open_folder_60.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\open_folder_66.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\open_folder_72.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\open_folder_78.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\open_folder_84.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\search_close_20.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\search_close_24.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\search_close_28.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\search_close_32.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\system_menu_54.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\system_menu_60.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\system_menu_66.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\system_menu_72.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\system_menu_78.png">
+      <Filter>res</Filter>
+    </Image>
+    <Image Include="res\system_menu_84.png">
+      <Filter>res</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="sqlite">

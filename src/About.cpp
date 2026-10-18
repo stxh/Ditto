@@ -6,7 +6,7 @@
 #include "stdafx.h"
 #include "cp_main.h"
 #include "About.h"
-#include "InternetUpdate.h"
+#include "misc.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CAbout property page
@@ -33,10 +33,8 @@ LRESULT CAbout::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHan
 
 	m_List.AddString(_T("DittoWTL"));
 
-	CInternetUpdate update;
-
-	auto runningVersion = update.GetRunningVersion();
-	CString cs = update.GetVersionString(runningVersion);
+	auto runningVersion = GetRunningVersion();
+	CString cs = GetVersionString(runningVersion);
 
 	CString csText;
 	csText = "    Version " + cs;

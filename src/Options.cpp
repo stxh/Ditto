@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "Options.h"
 #include "AlphaBlend.h"
 #include "Misc.h"
@@ -31,6 +31,7 @@ BOOL CGetSetOptions::m_bAllowDuplicates;
 BOOL CGetSetOptions::m_bUpdateTimeOnPaste;
 BOOL CGetSetOptions::m_bSaveMultiPaste;
 BOOL CGetSetOptions::m_bShowPersistent;
+BOOL CGetSetOptions::m_bHideDittoOnPaste;
 long CGetSetOptions::m_bDescTextSize;
 BOOL CGetSetOptions::m_bDescShowLeadingWhiteSpace;
 BOOL CGetSetOptions::m_bAllwaysShowDescription;
@@ -51,7 +52,7 @@ CStringA CGetSetOptions::m_csPassword;
 BOOL CGetSetOptions::m_bDrawRTF;
 BOOL CGetSetOptions::m_bMultiPasteReverse;
 CString CGetSetOptions::m_csPlaySoundOnCopy;
-std::vector<CString> CGetSetOptions::m_csNetworkPasswordArray;
+CStringArray CGetSetOptions::m_csNetworkPasswordArray;
 BOOL CGetSetOptions::m_bSendPasteMessageAfterSelection;
 BOOL CGetSetOptions::m_bFindAsYouType;
 BOOL CGetSetOptions::m_bEnsureEntireWindowCanBeSeen;
@@ -69,8 +70,9 @@ bool CGetSetOptions::m_windowsApp = false;
 bool CGetSetOptions::m_chocolateyApp = false;
 CString CGetSetOptions::m_csIniFileName;
 __int64 CGetSetOptions::nLastDbWriteTime = 0;
-CDittoTheme CGetSetOptions::m_Theme;
+CTheme CGetSetOptions::m_Theme;
 BOOL CGetSetOptions::m_showScrollBar = false;
+BOOL CGetSetOptions::m_useModernScrollBar = TRUE;
 BOOL CGetSetOptions::m_bShowAlwaysOnTopWarning = TRUE;
 CRegExFilterHelper CGetSetOptions::m_regexHelper;
 CString CGetSetOptions::m_ignoreAnnoyingCFDIB = "";
@@ -88,6 +90,10 @@ CString CGetSetOptions::m_tempDragFileName = "";
 CTime CGetSetOptions::m_tempDragFileNameSetTime;
 BOOL CGetSetOptions::m_refreshViewAfterPasting = TRUE;
 BOOL CGetSetOptions::m_supportAllTypes = FALSE;
+int CGetSetOptions::m_clipEditSaveDelayAfterLoadSeconds = 3;
+int CGetSetOptions::m_clipEditSaveDelayAfterSaveSeconds = 3;
+BOOL CGetSetOptions::m_bDoNotHideOnDeactivate = FALSE;
+BOOL CGetSetOptions::m_enforceClipboardIgnoreFormats = TRUE;
 
 
 CGetSetOptions::CGetSetOptions()
@@ -253,6 +259,7 @@ void CGetSetOptions::LoadSettings()
 	m_bUpdateTimeOnPaste = GetUpdateTimeOnPaste();
 	m_bSaveMultiPaste = GetSaveMultiPaste();
 	m_bShowPersistent = GetShowPersistent();
+	m_bHideDittoOnPaste = GetHideDittoOnPaste();
 	m_bDescTextSize = GetDescTextSize();
 	m_bDescShowLeadingWhiteSpace = GetDescShowLeadingWhiteSpace();
 	m_bAllwaysShowDescription = GetAllwaysShowDescription();
@@ -282,6 +289,7 @@ void CGetSetOptions::LoadSettings()
 	m_outputDebugStringLogging = GetEnableOutputDebugStringLogging();
 	m_bEnsureConnectToClipboard = GetEnsureConnectToClipboard();
 	m_showScrollBar = GetShowScrollBar();
+	m_useModernScrollBar = GetUseModernScrollBar();
 	m_bShowAlwaysOnTopWarning = GetShowAlwaysOnTopWarning();
 	m_ignoreAnnoyingCFDIB = GetIgnoreAnnoyingCFDIB();
 	m_doubleKeyStrokeTimeout = GetDoubleKeyStrokeTimeout();
@@ -290,6 +298,10 @@ void CGetSetOptions::LoadSettings()
 	m_moveSelectionOnOpenHotkey = GetMoveSelectionOnOpenHotkey();
 	m_allowBackToBackDuplicates = GetAllowBackToBackDuplicates();
 	m_maintainSearchView = GetMaintainSearchView();
+	m_clipEditSaveDelayAfterLoadSeconds = GetClipEditSaveDelayAfterLoadSeconds();
+	m_clipEditSaveDelayAfterSaveSeconds = GetClipEditSaveDelayAfterSaveSeconds();
+	m_bDoNotHideOnDeactivate = GetDoNotHideOnDeactivate();
+	m_enforceClipboardIgnoreFormats = GetEnforceClipboardIgnoreFormats();
 
 	GetExtraNetworkPassword(true);
 
@@ -1257,6 +1269,16 @@ BOOL CGetSetOptions::GetShowPersistent()
 	return GetProfileLong("ShowPersistent", 0); 
 }
 
+void CGetSetOptions::SetHideDittoOnPaste(BOOL bVal)	
+{	
+	SetProfileLong("HideDittoOnPaste", bVal); 
+	m_bHideDittoOnPaste = bVal; 
+}
+BOOL CGetSetOptions::GetHideDittoOnPaste()			
+{	
+	return GetProfileLong("HideDittoOnPaste", 1); 
+}
+
 void CGetSetOptions::SetShowTextForFirstTenHotKeys(BOOL bVal)	
 {	
 	SetProfileLong("ShowTextForFirstTenHotKeys", bVal);			
@@ -1455,10 +1477,14 @@ long CGetSetOptions::GetPort()
 
 BOOL CGetSetOptions::GetDisableRecieve()
 {
-	// Receiving over the network is opt-in.  Before, only the portable and Store
-	// builds defaulted to off, so an installed Ditto listened on every adapter
-	// (INADDR_ANY:23443) under the built-in "LetMeIn" password.
-	return GetProfileLong("DisableRecieve", TRUE);
+	BOOL bDefault = FALSE;
+	if(GetIsPortableDitto())
+		bDefault = TRUE;
+
+	if(GetIsWindowsApp())
+		bDefault = TRUE;
+
+	return GetProfileLong("DisableRecieve", bDefault);
 }
 
 void CGetSetOptions::SetDisableRecieve(BOOL bVal)
@@ -1557,7 +1583,7 @@ CString CGetSetOptions::GetExtraNetworkPassword(bool bFillArray)
 
 	if(bFillArray)
 	{
-		m_csNetworkPasswordArray.clear();
+		m_csNetworkPasswordArray.RemoveAll();
 
 		TCHAR seps[]   = _T(",");
 		TCHAR *token;
@@ -1572,7 +1598,7 @@ CString CGetSetOptions::GetExtraNetworkPassword(bool bFillArray)
 			cs.TrimLeft();
 			cs.TrimRight();
 
-			m_csNetworkPasswordArray.push_back(cs);
+			m_csNetworkPasswordArray.Add(cs);
 
 			// Get next token
 			token = STRTOK(NULL, seps);
@@ -1593,7 +1619,7 @@ void CGetSetOptions::SetNetworkPassword(CString csPassword)
 CStringA CGetSetOptions::GetNetworkPassword()
 {
 	CString cs = GetProfileString("NetworkStringPassword", "LetMeIn");
-	CString csReturn = CTextConvert::UnicodeToUTF8(cs);
+	CStringA csReturn = CTextConvert::UnicodeToUTF8(cs);
 	return csReturn;
 }
 
@@ -2277,6 +2303,17 @@ BOOL CGetSetOptions::GetShowScrollBar()
 	return GetProfileLong(_T("ShowScrollBar"), 0);
 }
 
+void CGetSetOptions::SetUseModernScrollBar(BOOL val)
+{
+	m_useModernScrollBar = val;
+	SetProfileLong(_T("UseModernScrollBar"), val);
+}
+
+BOOL CGetSetOptions::GetUseModernScrollBar()
+{
+	return GetProfileLong(_T("UseModernScrollBar"), TRUE);
+}
+
 void CGetSetOptions::SetPasteAsAdmin(BOOL val)
 {
 	SetProfileLong(_T("PasteAsAdmin"), val);
@@ -2353,6 +2390,16 @@ BOOL CGetSetOptions::GetShowInTaskBar()
 	return GetProfileLong(_T("ShowInTaskBar"), FALSE);
 }
 
+void CGetSetOptions::SetHideTaskbarIconOnClose(BOOL val)
+{
+	SetProfileLong(_T("HideTaskbarIconOnClose"), val);
+}
+
+BOOL CGetSetOptions::GetHideTaskbarIconOnClose()
+{
+	return GetProfileLong(_T("HideTaskbarIconOnClose"), TRUE);
+}
+
 void CGetSetOptions::SetDiffApp(CString val)
 {
 	SetProfileString(_T("DiffApp"), val);
@@ -2376,6 +2423,24 @@ int CGetSetOptions::GetQRCodeBorderPixels()
 CString	CGetSetOptions::GetTranslateUrl()
 {
 	return GetProfileString(_T("TranslateUrl"), _T("https://translate.google.com/?text=%s"));
+}
+
+CString	CGetSetOptions::GetWebSearchUrl()
+{
+	CString default = _T("https://www.google.com/search?q=%s");
+	CString val = GetProfileString(_T("WebSearchUrl"), default);
+
+	if (val == _T(""))
+	{
+		val = default;
+	}
+
+	return val;
+}
+
+void CGetSetOptions::SetWebSearchUrl(CString val)
+{
+	SetProfileString(_T("WebSearchUrl"), val);
 }
 
 void CGetSetOptions::SetNetworkReadTimeoutMS(int val)
@@ -2460,12 +2525,12 @@ int CGetSetOptions::GetWindowsResumeDelayReOpenDbMS()
 
 BOOL CGetSetOptions::GetShowMsgWndOnCopyToGroup()
 {
-	return GetProfileLong(_T("ShowMsgWndOnCopyToGroup"), TRUE);
+	return GetProfileLong("ShowMsgWndOnCopyToGroup", TRUE);
 }
 
 void CGetSetOptions::SetShowMsgWndOnCopyToGroup(BOOL val)
 {
-	SetProfileLong(_T("ShowMsgWndOnCopyToGroup"), val);
+	SetProfileLong("ShowMsgWndOnCopyToGroup", val);
 }
 
 int CGetSetOptions::GetActionShortCutA(DWORD action, int pos, CString refData)
@@ -3029,10 +3094,10 @@ void CGetSetOptions::SetIgnoreAnnoyingCFDIB(CString val)
 	SetProfileString("IgnoreAnnoyingCFDIB", val);
 }
 
-std::set<CString> CGetSetOptions::GetIgnoreAnnoyingCFDIBSet(BOOL useCache)
+set<CString> CGetSetOptions::GetIgnoreAnnoyingCFDIBSet(BOOL useCache)
 {
 	CString rawString = CGetSetOptions::GetIgnoreAnnoyingCFDIB(useCache);
-	std:set<CString> processSet;
+	set<CString> processSet;
 	CTokenizer token(rawString, _T(";"));
 	CString process;
 	while (token.Next(process))
@@ -3089,6 +3154,16 @@ CString CGetSetOptions::GetTextEditorPath()
 	return GetProfileString("TextEditorPath", _T(""));
 }
 
+BOOL CGetSetOptions::SetImageEditorPath(CString path)
+{
+	return SetProfileString("ImageEditorPath", path);
+}
+
+CString CGetSetOptions::GetImageEditorPath()
+{
+	return GetProfileString("ImageEditorPath", _T(""));
+}
+
 BOOL CGetSetOptions::SetRTFEditorPath(CString path)
 {
 	return SetProfileString("RTFEditorPath", path);
@@ -3106,12 +3181,108 @@ BOOL CGetSetOptions::SetQRCodeUrl(CString path)
 
 CString CGetSetOptions::GetQRCodeUrl()
 {
-	auto defaultUrl = _T("https://zxing.org/w/chart?cht=qr&chs=500x500&chl=");
-	auto url = GetProfileString("QRCodeUrl", defaultUrl);
-	if (url == _T(""))
-	{
-		url = defaultUrl;
-	}
+	return GetProfileString("QRCodeUrl", _T(""));
+}
 
-	return url;
+void CGetSetOptions::SetAppendRemoveComputerNameAndIPToDescription(BOOL val)
+{
+	SetProfileLong("AppendRemoveComputerNameAndIPToDescription", val);	
+}
+
+BOOL CGetSetOptions::GetAppendRemoveComputerNameAndIPToDescription()
+{
+	return GetProfileLong("AppendRemoveComputerNameAndIPToDescription", TRUE);
+}
+
+void CGetSetOptions::SetPreferUtf8ForCompare(BOOL val)
+{
+	SetProfileLong("PreferUtf8ForCompare", val);
+}
+
+BOOL CGetSetOptions::GetPreferUtf8ForCompare()
+{
+	return GetProfileLong("PreferUtf8ForCompare", TRUE);
+}
+
+void CGetSetOptions::SetClipEditSaveDelayAfterLoadSeconds(int val)
+{
+	m_clipEditSaveDelayAfterLoadSeconds = val;
+	SetProfileLong("ClipEditSaveDelayAfterLoadSeconds", val);
+}
+
+int CGetSetOptions::GetClipEditSaveDelayAfterLoadSeconds()
+{
+	return GetProfileLong("ClipEditSaveDelayAfterLoadSeconds", 3);
+}
+
+void CGetSetOptions::SetClipEditSaveDelayAfterSaveSeconds(int val)
+{
+	m_clipEditSaveDelayAfterSaveSeconds = val;
+	SetProfileLong("ClipEditSaveDelayAfterSaveSeconds", val);
+}
+
+BOOL CGetSetOptions::GetClipEditSaveDelayAfterSaveSeconds()
+{
+	return GetProfileLong("ClipEditSaveDelayAfterSaveSeconds", 3);
+}
+
+BOOL CGetSetOptions::SetEditWndSize(CSize size)
+{
+	BOOL bRet = SetResolutionProfileLong("EditWndCX", size.cx);
+	bRet = SetResolutionProfileLong("EditWndCY", size.cy);
+
+	return bRet;
+}
+
+void CGetSetOptions::GetEditWndSize(CSize& size)
+{
+	size.cx = GetResolutionProfileLong("EditWndCX", 600);
+	size.cy = GetResolutionProfileLong("EditWndCY", 600);
+	if (size.cx <= 0 && size.cy <= 0)
+	{
+		size.cx = 600;
+		size.cy = 600;
+	}
+}
+
+BOOL CGetSetOptions::SetEditWndPoint(CPoint point)
+{
+	BOOL bRet = SetResolutionProfileLong("EditWndX", point.x);
+	bRet = SetResolutionProfileLong("EditWndY", point.y);
+
+	return bRet;
+}
+
+void CGetSetOptions::GetEditWndPoint(CPoint& point)
+{
+	point.x = GetResolutionProfileLong("EditWndX", 100);
+	point.y = GetResolutionProfileLong("EditWndY", 100);
+
+	if (point.x <= 0 && point.y <= 0)
+	{
+		point.x = 100;
+		point.y = 100;
+	}
+}
+
+void CGetSetOptions::SetDoNotHideOnDeactivate(BOOL val)
+{
+	SetProfileLong("DoNotHideOnDeactivate", val);
+	m_bDoNotHideOnDeactivate = val;
+}
+
+BOOL CGetSetOptions::GetDoNotHideOnDeactivate()
+{
+	return GetProfileLong("DoNotHideOnDeactivate", FALSE);
+}
+
+void CGetSetOptions::SetEnforceClipboardIgnoreFormats(BOOL val)
+{
+	SetProfileLong("EnforceClipboardIgnoreFormats", val);
+	m_enforceClipboardIgnoreFormats = val;
+}
+
+BOOL CGetSetOptions::GetEnforceClipboardIgnoreFormats()
+{
+	return GetProfileLong("EnforceClipboardIgnoreFormats", TRUE);
 }

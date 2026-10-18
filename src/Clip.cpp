@@ -9,7 +9,7 @@
 #include "Crc32Dynamic.h"
 #include "sqlite\CppSQLite3.h"
 #include "..\Shared\TextConvert.h"
-#include "zlib/zlib.h"
+#include "zlib.h"
 #include "Misc.h"
 #include "Md5.h"
 #include "ChaiScriptOnCopy.h"
@@ -160,7 +160,7 @@ void CClipFormat::Free()
 
 Gdiplus::Bitmap *CClipFormat::CreateGdiplusBitmap()
 {
-	if (this->m_cfType != CF_DIB && this->m_cfType == theApp.m_PNG_Format)
+	if (this->m_cfType != CF_DIB && this->m_cfType != theApp.m_PNG_Format)
 		return NULL;
 
 	Gdiplus::Bitmap *gdipBitmap;
@@ -360,12 +360,22 @@ int CClip::LoadFromClipboard(CClipTypes* pClipTypes, bool checkClipboardIgnore, 
 
 	// m_Formats should be empty when this is called.
 	ASSERT(m_Formats.GetSize() == 0);
-	
+
 	// If the data is supposed to be private, then return
-	if(::IsClipboardFormatAvailable(theApp.m_cfIgnoreClipboard))
+	if (::IsClipboardFormatAvailable(theApp.m_cfIgnoreClipboard))
 	{
 		Log(_T("Clipboard ignore type is on the clipboard, skipping this clipboard change"));
 		return FALSE;
+	}
+	
+	if (CGetSetOptions::m_enforceClipboardIgnoreFormats)
+	{
+		//https://learn.microsoft.com/en-us/windows/win32/dataxchg/clipboard-formats
+		if (::IsClipboardFormatAvailable(theApp.m_excludeClipboardContentFromMonitorProcessing))
+		{
+			Log(_T("ExcludeClipboardContentFromMonitorProcessing type is on the clipboard, skipping this clipboard change"));
+			return FALSE;
+		}
 	}
 
 	//If we are saving a multi paste then delay us connecting to the clipboard
@@ -375,7 +385,7 @@ int CClip::LoadFromClipboard(CClipTypes* pClipTypes, bool checkClipboardIgnore, 
 		Log(_T("Delay clipboard type is on the clipboard, delaying 1500 ms to allow ctrl-v to work"));
 		Sleep(1500);
 	}
-		
+
 	//Attach to the clipboard
 	if(!oleData.AttachClipboard())
 	{
@@ -385,8 +395,37 @@ int CClip::LoadFromClipboard(CClipTypes* pClipTypes, bool checkClipboardIgnore, 
 	}
 	
 	oleData.EnsureClipboardObject();
-	
-	
+
+	//https://learn.microsoft.com/en-us/windows/win32/dataxchg/clipboard-formats
+	if (CGetSetOptions::m_enforceClipboardIgnoreFormats &&
+		oleData.IsDataAvailable(theApp.m_canIncludeInClipboardHistory))
+	{
+		HGLOBAL includeInHistory = oleData.GetGlobalData(theApp.m_canIncludeInClipboardHistory);
+		if (includeInHistory != nullptr)
+		{
+			bool doReturn = false;
+
+			DWORD* data = static_cast<DWORD*>(GlobalLock(includeInHistory));
+			if (data != nullptr)
+			{			
+				if(*data == 0)
+				{
+					Log(_T("CanIncludeInClipboardHistory is 0, skipping this clipboard change"));
+					doReturn = true;
+				}
+
+				GlobalUnlock(includeInHistory);				
+			}
+
+			GlobalFree(includeInHistory);
+			if (doReturn)
+			{
+				oleData.Release();
+				return FALSE;
+			}
+		}
+	}
+		
 	m_Desc = "[Ditto Error] BAD DESCRIPTION";
 	
 	// Get Description String
@@ -649,7 +688,7 @@ bool CClip::SetDescFromText(HGLOBAL hgData, bool unicode)
 		TCHAR* text = (TCHAR *) GlobalLock(hgData);
 		bufLen = GlobalSize(hgData);
 
-		m_Desc = CString(text, bufLen/(sizeof(wchar_t)));
+		m_Desc = CString(text, (int)(bufLen/(sizeof(wchar_t))));
 		bRet = true;
 	}
 	else
@@ -657,7 +696,7 @@ bool CClip::SetDescFromText(HGLOBAL hgData, bool unicode)
 		char* text = (char *) GlobalLock(hgData);
 		bufLen = GlobalSize(hgData);
 	
-		m_Desc = CString(text, bufLen);
+		m_Desc = CString(text, (int)bufLen);
 		bRet = true;
 	}
 		
@@ -920,8 +959,8 @@ bool CClip::AddToMainTable()
 
 		CString cs;
 		cs.Format(_T("INSERT into Main (lDate, mText, lShortCut, lDontAutoDelete, CRC, bIsGroup, lParentID, QuickPasteText, clipOrder, clipGroupOrder, globalShortCut, lastPasteDate, stickyClipOrder, stickyClipGroupOrder, MoveToGroupShortCut, GlobalMoveToGroupShortCut) ")
-						_T("values(%d, '%s', %d, %d, %d, %d, %d, '%s', %f, %f, %d, %d, %f, %f, %d, %d);"),
-							(int)m_Time,
+						_T("values(%lld, '%s', %d, %d, %d, %d, %d, '%s', %f, %f, %d, %lld, %f, %f, %d, %d);"),
+							(long long)m_Time,
 							m_Desc,
 							m_shortCut,
 							m_dontAutoDelete,
@@ -932,7 +971,7 @@ bool CClip::AddToMainTable()
 							m_clipOrder,
 							m_clipGroupOrder,
 							m_globalShortCut,
-							(int)CTime::GetCurrentTime().GetTime(),
+							CTime::GetCurrentTime().GetTime(),
 							m_stickyClipOrder,
 							m_stickyClipGroupOrder,
 							m_moveToGroupShortCut,
@@ -1317,7 +1356,7 @@ bool CClip::RemoveStickySetting(int clipId, int parentId)
 	return reset;
 }
 
-double CClip::GetExistingTopStickyClipId(int parentId)
+int CClip::GetExistingTopStickyClipId(int parentId)
 {
 	int existingTopClipId = -1;
 
@@ -1419,7 +1458,7 @@ double CClip::GetNewLastSticky(int parentId, int clipId)
 	}
 	CATCH_SQLITE_EXCEPTION
 
-		return newOrder;
+	return newOrder;
 }
 
 void CClip::MakeLatestOrder()
@@ -1527,7 +1566,7 @@ BOOL CClip::LoadMainTable(int id)
 
 		if(q.eof() == false)
 		{
-			m_Time = q.getIntField(_T("lDate"));
+			m_Time = q.getInt64Field(_T("lDate"));
 			m_Desc = q.getStringField(_T("mText"));
 			m_CRC = q.getIntField(_T("CRC"));
 			m_parentId = q.getIntField(_T("lParentID"));
@@ -1538,7 +1577,7 @@ BOOL CClip::LoadMainTable(int id)
 			m_clipOrder = q.getFloatField(_T("clipOrder"));
 			m_clipGroupOrder = q.getFloatField(_T("clipGroupOrder"));
 			m_globalShortCut = q.getIntField(_T("globalShortCut"));
-			m_lastPasteDate = q.getIntField(_T("lastPasteDate"));
+			m_lastPasteDate = q.getInt64Field(_T("lastPasteDate"));
 			m_stickyClipOrder = q.getFloatField(_T("stickyClipOrder"));
 			m_stickyClipGroupOrder = q.getFloatField(_T("stickyClipGroupOrder"));
 			m_moveToGroupShortCut = q.getIntField(_T("MoveToGroupShortCut"));
@@ -1591,7 +1630,7 @@ HGLOBAL CClip::LoadFormat(int id, UINT cfType)
 	return hGlobal;
 }
 
-bool CClip::LoadFormats(int id, bool bOnlyLoad_CF_TEXT, bool includeRichTextForTextOnly)
+bool CClip::LoadFormats(int id, bool bOnlyLoad_CF_TEXT, bool includeRichTextForTextOnly, int dataId)
 {
 	DWORD startTick = GetTickCount();
 	CClipFormat cf;
@@ -1621,9 +1660,17 @@ bool CClip::LoadFormats(int id, bool bOnlyLoad_CF_TEXT, bool includeRichTextForT
 			}
 		}
 
+		CString dataIdFilter = _T("");
+		if (dataId >= 0)
+		{
+			dataIdFilter.Format(_T("AND lID = %d "), dataId);
+
+
+		}
+
 		csSQL.Format(
 			_T("SELECT lID, lParentID, strClipBoardFormat, ooData FROM Data ")
-			_T("WHERE %s lParentID = %d ORDER BY Data.lID desc"), textFilter, id);
+			_T("WHERE %s lParentID = %d %s ORDER BY Data.lID desc"), textFilter, id, dataIdFilter);
 
 		CppSQLite3Query q = theApp.m_db.execQuery(csSQL);
 
@@ -1734,7 +1781,7 @@ BOOL CClip::ContainsClipFormat(CLIPFORMAT clipFormat)
 	return this->Clips()->FindFormatEx(clipFormat) != NULL;
 }
 
-BOOL CClip::WriteTextToFile(CString path, BOOL unicode, BOOL asci, BOOL rtf, BOOL forceUnicode)
+BOOL CClip::WriteTextToFile(CString path, BOOL unicode, BOOL asci, BOOL rtf, BOOL forceUnicode, BOOL utf8)
 {
 	BOOL ret = false;
 
@@ -1745,7 +1792,14 @@ BOOL CClip::WriteTextToFile(CString path, BOOL unicode, BOOL asci, BOOL rtf, BOO
 		CStringA a = GetCFTextTextFormat();
 		CStringA rtfA = GetRTFTextFormat();		
 
-		if(unicode && (w != _T("") || forceUnicode))
+		if (utf8 && w != _T(""))
+		{
+			CStringA utf8Data = CTextConvert::UnicodeToUTF8(w);
+			f.Write(utf8Data.GetBuffer(), utf8Data.GetLength());
+
+			ret = true;
+		}
+		else if(unicode && (w != _T("") || forceUnicode))
 		{
 			std::byte header[2];
 			header[0] = (std::byte)0xFF;
@@ -1805,7 +1859,7 @@ BOOL CClip::WriteTextToHtmlFile(CString path)
 	return ret;
 }
 
-BOOL CClip::SaveFormats(CString *unicode, CStringA *asci, CStringA *rtf, BOOL updateDescription)
+BOOL CClip::SaveFormats(CString *unicode, CStringA *asci, CStringA *rtf, BOOL updateDescription, std::vector<BYTE> *cf_dibBytes, std::vector<BYTE>* pngBytes)
 {
 	ARRAY deletedData;
 	for (INT_PTR i = m_Formats.GetSize() - 1; i >= 0; i--)
@@ -1814,6 +1868,16 @@ BOOL CClip::SaveFormats(CString *unicode, CStringA *asci, CStringA *rtf, BOOL up
 	}
 
 	EmptyFormats();
+
+	if (cf_dibBytes != nullptr && cf_dibBytes->size() > 0)
+	{
+		AddFormat(CF_DIB, cf_dibBytes->data(), cf_dibBytes->size(), false);
+	}
+
+	if (pngBytes != nullptr && pngBytes->size() > 0)
+	{
+		AddFormat(theApp.m_PNG_Format, pngBytes->data(), pngBytes->size(), false);
+	}
 
 	if (rtf != nullptr)
 	{
@@ -1845,8 +1909,6 @@ BOOL CClip::SaveFormats(CString *unicode, CStringA *asci, CStringA *rtf, BOOL up
 			int count = theApp.m_db.execDMLEx(_T("DELETE FROM Data WHERE lID = %d;"), deletedData[i]);
 		}
 
-		AddToDataTable();
-
 		if (m_id >= 0)
 		{
 			if (updateDescription)
@@ -1860,6 +1922,8 @@ BOOL CClip::SaveFormats(CString *unicode, CStringA *asci, CStringA *rtf, BOOL up
 			MakeLatestGroupOrder();
 			AddToMainTable();
 		}
+
+		AddToDataTable();
 
 		theApp.m_db.execDML(_T("commit transaction;"));
 	}
@@ -2042,6 +2106,35 @@ Gdiplus::Bitmap *CClip::CreateGdiplusBitmap()
 	CClipFormat *dib = this->m_Formats.FindFormat(CF_DIB);
 	if (dib != NULL)
 		return dib->CreateGdiplusBitmap();
+
+	return nullptr;
+}
+
+bool CClip::SaveFromEditWnd(BOOL bUpdateDesc)
+{
+	bool bRet = false;
+
+	try
+	{
+		theApp.m_db.execDMLEx(_T("DELETE FROM Data WHERE lParentID = %d;"), m_id);
+
+		DWORD CRC = GenerateCRC();
+
+		AddToDataTable();
+
+		theApp.m_db.execDMLEx(_T("UPDATE Main SET CRC = %d WHERE lID = %d"), CRC, m_id);
+
+		if (bUpdateDesc)
+		{
+			m_Desc.Replace(_T("'"), _T("''"));
+			theApp.m_db.execDMLEx(_T("UPDATE Main SET mText = '%s' WHERE lID = %d"), m_Desc, m_id);
+		}
+
+		bRet = true;
+	}
+	CATCH_SQLITE_EXCEPTION
+
+		return bRet;
 }
 
 /*----------------------------------------------------------------------------*\

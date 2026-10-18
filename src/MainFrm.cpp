@@ -6,7 +6,6 @@
 #include "MainFrm.h"
 #include "Misc.h"
 #include "CopyProperties.h"
-#include "InternetUpdate.h"
 #include ".\mainfrm.h"
 #include <atlctrlx.h>
 #include "tinyxml\tinyxml.h"
@@ -581,8 +580,11 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
     {
         case HIDE_ICON_TIMER:
         {
-            m_trayIcon.Hide();
             KillTimer(nIDEvent);
+            if (!CGetSetOptions::GetShowIconInSysTray())
+            {
+                m_trayIcon.Hide();
+            }
         }
         break;
 
@@ -823,6 +825,8 @@ bool CMainFrame::CloseAllOpenDialogs()
     DWORD dwordChildWindowProcessId;
     GetWindowThreadProcessId(this->m_hWnd, &dwordProcessId);
 
+    std::vector<HWND> openDialogs;
+
     HWND hTempWnd = GetDesktopWindow();
     hTempWnd = ::GetWindow(hTempWnd, GW_CHILD);
     while((hTempWnd = ::GetWindow(hTempWnd, GW_HWNDNEXT)) != NULL)
@@ -841,11 +845,16 @@ bool CMainFrame::CloseAllOpenDialogs()
             // #32770 is class name for dialogs so don't process the message if it is a dialog
             if(STRCMP(szTemp, _T("#32770")) == 0)
             {
-                ::SendMessage(hTempWnd, WM_CLOSE, 0, 0);
+                openDialogs.push_back(hTempWnd);
                 bRet = true;
             }
         }
     }
+
+	for (size_t i = 0; i < openDialogs.size(); i++)
+	{
+		::PostMessage(openDialogs[i], WM_CLOSE, 0, 0);
+	}
 
     MSG msg;
     while(PeekMessage(&msg, NULL, NULL, NULL, PM_REMOVE))
@@ -1335,8 +1344,8 @@ LRESULT CMainFrame::OnRestoreDb(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& b
 
 LRESULT CMainFrame::OnFirstDeleteallnonusedclips(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
-    int nRet = MessageBox(theApp.m_Language.GetString(_T("Delete_All_Non_Used_Clips"), _T("Delete all clips that are not groups, in groups, marked as never auto delete, has a shortcut key or marked as sticky.\r\n\r\nThis cannot be undone.")), _T("DittoWTL"), MB_YESNO | MB_TOPMOST);
-    if(nRet == IDNO)
+    int nRet = MessageBox(theApp.m_Language.GetString(_T("Delete_All_Non_Used_Clips"), _T("Delete all clips that are not groups, in groups, marked as never auto delete, has a shortcut key or marked as sticky.\r\n\r\nThis cannot be undone.")), _T("DittoWTL"), MB_OKCANCEL | MB_TOPMOST);
+    if(nRet != IDOK)
     {
         return 0;
     }
@@ -1368,4 +1377,4 @@ LRESULT CMainFrame::OnEditClip(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bH
 }
 void CMainFrame::OnSetFocus(HWND hWndOldFocus)
 {
-}
+}

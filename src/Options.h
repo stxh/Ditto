@@ -4,7 +4,6 @@
 #include "RegExFilterHelper.h"
 #include "ChaiScriptXml.h"
 #include <set>
-#include <vector>
 
 #define MAX_SEND_CLIENTS	15
 class CSendClients
@@ -73,7 +72,7 @@ public:
 	static bool m_bFromIni;
 	static CString m_csIniFileName;
 	static bool m_bInConversion;
-	static CDittoTheme m_Theme;
+	static CTheme m_Theme;
 	static bool m_portable;
 	static bool m_windowsApp;
 	static bool m_chocolateyApp;
@@ -199,6 +198,10 @@ public:
 	static BOOL		m_bShowPersistent;
 	static void		SetShowPersistent(BOOL bVal);
 	static BOOL		GetShowPersistent();
+
+	static BOOL		m_bHideDittoOnPaste;
+	static void		SetHideDittoOnPaste(BOOL bVal);
+	static BOOL		GetHideDittoOnPaste();
 
 	static void		SetShowTextForFirstTenHotKeys(BOOL bVal);
 	static BOOL		GetShowTextForFirstTenHotKeys();
@@ -346,7 +349,7 @@ public:
 	static BOOL		GetEnableOutputDebugStringLogging();
 	static void		SetEnableOutputDebugStringLogging(BOOL bSet);
 
-	static std::vector<CString> m_csNetworkPasswordArray;
+	static CStringArray m_csNetworkPasswordArray;
 
 	static CString  GetPath(long lPathID);
 
@@ -461,6 +464,10 @@ public:
 	static BOOL		GetShowScrollBar();
 	static BOOL		m_showScrollBar;
 
+	static void		SetUseModernScrollBar(BOOL val);
+	static BOOL		GetUseModernScrollBar();
+	static BOOL		m_useModernScrollBar;
+
 	static void		SetPasteAsAdmin(BOOL val);
 	static BOOL		GetPasteAsAdmin();
 
@@ -482,6 +489,9 @@ public:
 	static void		SetShowInTaskBar(BOOL val);
 	static BOOL		GetShowInTaskBar();
 
+	static void		SetHideTaskbarIconOnClose(BOOL val);
+	static BOOL		GetHideTaskbarIconOnClose();
+
 	static void		SetDiffApp(CString val);
 	static CString	GetDiffApp();
 
@@ -492,6 +502,9 @@ public:
 	static void SetRegExTextSearch(BOOL val);
 
 	static CString GetTranslateUrl();
+
+	static CString GetWebSearchUrl();
+	static void SetWebSearchUrl(CString val);
 
 	static void SetNetworkReadTimeoutMS(int val);
 	static int GetNetworkReadTimeoutMS();
@@ -677,7 +690,7 @@ public:
 	static CString GetIgnoreAnnoyingCFDIB(BOOL useCache = FALSE);
 	static CString m_ignoreAnnoyingCFDIB;
 	static void SetIgnoreAnnoyingCFDIB(CString val);
-	static std::set<CString> GetIgnoreAnnoyingCFDIBSet(BOOL useCache = FALSE);
+	static set<CString> GetIgnoreAnnoyingCFDIBSet(BOOL useCache = FALSE);
 
 	static BOOL GetRegexCaseInsensitive();
 	static void SetRegexCaseInsensitive(BOOL val);
@@ -694,11 +707,42 @@ public:
 	static BOOL SetTextEditorPath(CString path);
 	static CString GetTextEditorPath();
 
+	static BOOL SetImageEditorPath(CString path);
+	static CString GetImageEditorPath();
+
 	static BOOL SetRTFEditorPath(CString path);
 	static CString GetRTFEditorPath();
 
 	static BOOL SetQRCodeUrl(CString path);
 	static CString GetQRCodeUrl();
+
+	static void SetAppendRemoveComputerNameAndIPToDescription(BOOL val);
+	static BOOL GetAppendRemoveComputerNameAndIPToDescription();
+
+	static void SetPreferUtf8ForCompare(BOOL val);
+	static BOOL GetPreferUtf8ForCompare();
+
+	static int	m_clipEditSaveDelayAfterLoadSeconds;
+	static void SetClipEditSaveDelayAfterLoadSeconds(int val);
+	static BOOL GetClipEditSaveDelayAfterLoadSeconds();
+
+	static int	m_clipEditSaveDelayAfterSaveSeconds;
+	static void SetClipEditSaveDelayAfterSaveSeconds(int val);
+	static BOOL GetClipEditSaveDelayAfterSaveSeconds();
+
+	static BOOL m_bDoNotHideOnDeactivate;
+	static void SetDoNotHideOnDeactivate(BOOL val);
+	static BOOL GetDoNotHideOnDeactivate();
+
+	static BOOL SetEditWndSize(CSize size);
+	static void GetEditWndSize(CSize& size);
+
+	static BOOL SetEditWndPoint(CPoint point);
+	static void GetEditWndPoint(CPoint& point);
+
+	static BOOL m_enforceClipboardIgnoreFormats;
+	static void SetEnforceClipboardIgnoreFormats(BOOL val);
+	static BOOL GetEnforceClipboardIgnoreFormats();
 };
 
 // global for easy access and for initialization of fast access variables

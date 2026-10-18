@@ -5,7 +5,6 @@
 #include ".\cp_main.h"
 #include "server.h"
 #include "Client.h"
-#include "InternetUpdate.h"
 #include <io.h>
 #include "Path.h"
 #include "Clip_ImportExport.h"
@@ -77,7 +76,7 @@ public:
 			{
 				m_plainTextPaste = TRUE;
 			}
-			else if (wcsnicmp(pszParam, _T("paste"), 5) == 0)
+			else if (_wcsnicmp(pszParam, _T("paste"), 5) == 0)
 			{
 				CString pidCommand(pszParam);
 				long sep = pidCommand.ReverseFind(':');
@@ -88,7 +87,7 @@ public:
 					m_pasteClip = TRUE;
 				}
 			}
-			else if (wcsnicmp(pszParam, _T("edit"), 4) == 0)
+			else if (_wcsnicmp(pszParam, _T("edit"), 4) == 0)
 			{
 				CString pidCommand(pszParam);
 				long sep = pidCommand.ReverseFind(':');
@@ -99,7 +98,7 @@ public:
 					m_editClip = TRUE;
 				}
 			}
-			else if (wcsnicmp(pszParam, _T("RestartByRestartManager"), 23) == 0)
+			else if (_wcsnicmp(pszParam, _T("RestartByRestartManager"), 23) == 0)
 			{
 				m_restartFromRestartManager = true;
 			}
@@ -197,6 +196,12 @@ CCP_MainApp::CCP_MainApp()
 	m_RemoteCF_HDROP = ::RegisterClipboardFormat(_T("Ditto Remote CF_HDROP"));
 	m_DittoFileData = ::RegisterClipboardFormat(_T("Ditto File Data"));
 	m_PNG_Format = GetFormatID(_T("PNG"));
+
+	//https://learn.microsoft.com/en-us/windows/win32/dataxchg/clipboard-formats
+	m_excludeClipboardContentFromMonitorProcessing = RegisterClipboardFormat(L"ExcludeClipboardContentFromMonitorProcessing");
+
+	//https://learn.microsoft.com/en-us/windows/win32/dataxchg/clipboard-formats
+	m_canIncludeInClipboardHistory = RegisterClipboardFormat(L"CanIncludeInClipboardHistory");
 
 	m_pNoDbMainFrame = NULL;
 	m_databaseOnNetworkShare = false;
@@ -391,12 +396,10 @@ BOOL CCP_MainApp::InitInstance(HINSTANCE hInstance, int nCmdShow)
 		}
 
 		return FALSE;
-	}	
+	}		
 
-	CInternetUpdate update;
-
-	auto runningVersion = update.GetRunningVersion();
-	CString cs = update.GetVersionString(runningVersion);
+	auto runningVersion = GetRunningVersion();
+	CString cs = GetVersionString(runningVersion);
 	cs.Insert(0, _T("InitInstance  -  Running Version - "));
 	Log(cs);
 
@@ -1166,8 +1169,6 @@ BOOL CCP_MainApp::GetClipData(long parentId, CClipFormat &Clip)
 	return bRet;
 }
 
-
-
 bool CCP_MainApp::EditItems(CClipIDs &Ids, bool bShowError, bool forceTextEdit)
 {
 	bool ret = false;	
@@ -1179,7 +1180,7 @@ bool CCP_MainApp::EditItems(CClipIDs &Ids, bool bShowError, bool forceTextEdit)
 		const int id = Ids[i];		
 
 		CClip clip;
-		if (id >= 0 && clip.LoadFormats(id, true, true) == false)
+		if (id >= 0 && clip.LoadFormats(id) == false)
 		{
 			Log(StrF(_T("Failed to load formats for clipId: %d"), id));
 			continue;
@@ -1188,6 +1189,7 @@ bool CCP_MainApp::EditItems(CClipIDs &Ids, bool bShowError, bool forceTextEdit)
 		bool unicodeFile = false;
 		bool asciFile = false;
 		bool rtfFile = false;
+		bool imageFile = false;
 		CString exePath;
 		CString extension;
 		if (forceTextEdit == false && clip.ContainsClipFormat(theApp.m_RTFFormat))
@@ -1214,9 +1216,28 @@ bool CCP_MainApp::EditItems(CClipIDs &Ids, bool bShowError, bool forceTextEdit)
 			unicodeFile = true;
 			exePath = CGetSetOptions::GetTextEditorPath();
 		}
+		else if (clip.ContainsClipFormat(theApp.m_PNG_Format))
+		{
+			imageFile = true;
+			extension = _T("png");
+			exePath = CGetSetOptions::GetImageEditorPath();
+		}
+		else if (clip.ContainsClipFormat(CF_DIB))
+		{
+			imageFile = true;
+			extension = _T("bmp");
+			exePath = CGetSetOptions::GetImageEditorPath();
+		}		
 		else
 		{
 			continue;
+		}
+
+		if((unicodeFile || asciFile || rtfFile) && exePath == _T(""))
+		{
+			// Upstream opens Ditto's internal MFC editor here (CEditFrameWnd/CEditWnd);
+			// not ported to WTL, so fall through to the system-associated editor below.
+			Log(StrF(_T("Clip id %d is a text or rtf file without a specific editor set, using system default editor"), Ids[i]));
 		}
 
 		CString startingFilePath = StrF(_T("%sEditClip_%d.%s"), CGetSetOptions::GetPath(PATH_EDIT_CLIPS), id, extension);
@@ -1249,7 +1270,14 @@ bool CCP_MainApp::EditItems(CClipIDs &Ids, bool bShowError, bool forceTextEdit)
 
 		m_editThread.WatchFile(savePath);
 
-		clip.WriteTextToFile(savePath, unicodeFile, asciFile, rtfFile, (id == -1));
+		if (imageFile)
+		{
+			clip.WriteImageToFile(savePath);
+		}
+		else
+		{
+			clip.WriteTextToFile(savePath, unicodeFile, asciFile, rtfFile, (id == -1));
+		}		
 
 		SHELLEXECUTEINFO sei = { sizeof(sei) };
 		sei.fMask = SEE_MASK_NOCLOSEPROCESS;
@@ -1291,7 +1319,7 @@ bool CCP_MainApp::EditItems(CClipIDs &Ids, bool bShowError, bool forceTextEdit)
 		ret = true;
 	}
 
-	return true;
+	return ret;
 }
 
 void CCP_MainApp::PumpMessageEx(HWND hWnd)

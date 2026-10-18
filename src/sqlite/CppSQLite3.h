@@ -35,11 +35,7 @@
 
 #define CPPSQLITE_ERROR 1000
 
-#ifdef _UNICODE
-	#define SQLITE3_ERRMSG(mpDB) const TCHAR* szError = (const TCHAR*)sqlite3_errmsg16(mpDB)
-#else							
-	#define SQLITE3_ERRMSG(mpDB) const TCHAR* szError = sqlite3_errmsg(mpDB)
-#endif		
+#define SQLITE3_ERRMSG(mpDB) const TCHAR* szError = (const TCHAR*)sqlite3_errmsg16(mpDB)
 
 int sqlite3_encode_binary(const unsigned char *in, int n, unsigned char *out);
 int sqlite3_decode_binary(const unsigned char *in, unsigned char *out);
@@ -98,6 +94,9 @@ public:
 
     int getIntField(int nField, int nNullValue=0);
     int getIntField(const TCHAR* szField, int nNullValue=0);
+
+    __int64 getInt64Field(int nField, __int64 nNullValue=0);
+    __int64 getInt64Field(const TCHAR* szField, __int64 nNullValue=0);
 
     double getFloatField(int nField, double fNullValue=0.0);
     double getFloatField(const TCHAR* szField, double fNullValue=0.0);

@@ -44,7 +44,7 @@ BOOL CFileSend::SendClientFiles(SOCKET sock, CClipList *pClipList)
 	CSendInfo Info;
 	BOOL bRet = FALSE;
 
-	std::vector<CString> CopyFiles;
+	CStringArray CopyFiles;
 
 	CClipFormat *pFormat = GetCF_HDROP_Data(pClipList);
 	if(pFormat)
@@ -59,7 +59,7 @@ BOOL CFileSend::SendClientFiles(SOCKET sock, CClipList *pClipList)
  			{
 				if(PathIsDirectory(file) == FALSE)
 				{
-					CopyFiles.push_back(file);
+					CopyFiles.Add(file);
 				}
  			}
  		}
@@ -67,7 +67,7 @@ BOOL CFileSend::SendClientFiles(SOCKET sock, CClipList *pClipList)
 		GlobalUnlock(pFormat->m_hgData);
 	}
 
-	Info.m_lParameter1 = (long)CopyFiles.size();
+	Info.m_lParameter1 = (long)CopyFiles.GetSize();
 	if(Info.m_lParameter1 > 0)
 	{
 		if(m_Send.SendCSendData(Info, MyEnums::START))
@@ -87,11 +87,17 @@ BOOL CFileSend::SendClientFiles(SOCKET sock, CClipList *pClipList)
 
 CClipFormat* CFileSend::GetCF_HDROP_Data(CClipList *pClipList)
 {
-	for (CClip* pClip : pClipList->m_ClipList)
+	CClip* pClip;
+	CClipFormat* pCF;
+	POSITION pos;
+	
+	pos = pClipList->GetHeadPosition();
+	while(pos)
 	{
+		pClip = pClipList->GetNext(pos);
 		if(pClip)
 		{
-			CClipFormat* pCF = pClip->m_Formats.FindFormat(CF_HDROP);
+			pCF = pClip->m_Formats.FindFormat(CF_HDROP);
 			if(pCF)
 				return pCF;
 		}
@@ -163,7 +169,7 @@ BOOL CFileSend::SendFile(CString csFile)
 					FILETIME lastAccessTime;
 					FILETIME lastWriteTime;
 
-					if (GetFileTime(file.m_hFile, &creationTime, &lastAccessTime, &lastWriteTime))
+					if (GetFileTime(file, &creationTime, &lastAccessTime, &lastWriteTime))
 					{
 						Info.m_lParameter1 = lastWriteTime.dwLowDateTime;
 						Info.m_lParameter2 = lastWriteTime.dwHighDateTime;

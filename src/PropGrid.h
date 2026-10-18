@@ -81,6 +81,9 @@ public:
 	BOOL IsEditing() const				{ return m_bEditing; }
 	const std::vector<Row>& Rows() const	{ return m_rows; }
 	int SelectedRow() const				{ return m_nSelected; }
+	// Search support: select the next row whose name contains szTextLower after nStartAfter (wraps).
+	int SelectNextMatch(LPCTSTR szTextLower, int nStartAfter);
+	void SelectFirst();
 
 private:
 	int OnCreate(LPCREATESTRUCT lpCreateStruct);

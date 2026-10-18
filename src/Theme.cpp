@@ -6,7 +6,7 @@
 #include "..\Shared\Tokenizer.h"
 #include "CP_Main.h"
 
-CDittoTheme::CDittoTheme(void)
+CTheme::CTheme(void)
 {
 	m_lFileVersion = 0;
 	m_LastWriteTime = 0;
@@ -15,12 +15,12 @@ CDittoTheme::CDittoTheme(void)
 	LoadDefaults();
 }
 
-CDittoTheme::~CDittoTheme(void)
+CTheme::~CTheme(void)
 {
 }
 
 
-void CDittoTheme::LoadDefaults()
+void CTheme::LoadDefaults()
 {
 	m_CaptionLeft = RGB(255, 255, 255);
 	m_CaptionRight = RGB(204, 204, 204);
@@ -62,11 +62,16 @@ void CDittoTheme::LoadDefaults()
 
 	m_descriptionWindowText = RGB(0, 0, 0);
 
+	// Modern scrollbar defaults - rounded look
+	m_scrollBarThumb = RGB(180, 180, 180);
+	m_scrollBarThumbHover = RGB(140, 140, 140);
+	m_scrollBarTrack = RGB(240, 240, 240);
+
 	m_captionSize = 25;
 	m_captionFontSize = 19;
 }
 
-bool CDittoTheme::Load(CString csTheme, bool bHeaderOnly, bool bCheckLastWriteTime)
+bool CTheme::Load(CString csTheme, bool bHeaderOnly, bool bCheckLastWriteTime)
 {
 	bool followWindows10Theme = false;
 	if (csTheme.IsEmpty())
@@ -181,6 +186,11 @@ bool CDittoTheme::Load(CString csTheme, bool bHeaderOnly, bool bCheckLastWriteTi
 	LoadColor(ItemHeader, "DescriptionWindowBG", m_descriptionWindowBG);
 	LoadColor(ItemHeader, "DescriptionWindowText", m_descriptionWindowText);
 
+	// Modern scrollbar colors
+	LoadColor(ItemHeader, "ScrollBarThumb", m_scrollBarThumb);
+	LoadColor(ItemHeader, "ScrollBarThumbHover", m_scrollBarThumbHover);
+	LoadColor(ItemHeader, "ScrollBarTrack", m_scrollBarTrack);
+
 	if (followWindows10Theme)
 	{
 		LoadWindowsAccentColor();
@@ -189,7 +199,7 @@ bool CDittoTheme::Load(CString csTheme, bool bHeaderOnly, bool bCheckLastWriteTi
 	return true;
 }
 
-void CDittoTheme::LoadWindowsAccentColor()
+void CTheme::LoadWindowsAccentColor()
 {
 	DWORD accent = Windows10AccentColor();
 	if (accent != -1)
@@ -212,19 +222,53 @@ void CDittoTheme::LoadWindowsAccentColor()
 	}
 }
 
-bool CDittoTheme::LoadColor(TiXmlElement *pParent, CStringA csNode, COLORREF &Color)
+COLORREF HslToRgb(float h, float s, float l)
+{
+	if (s == 0.0f)
+	{
+		// Grayscale, achromatic
+		BYTE gray = static_cast<BYTE>(l * 255.0f + 0.5f);
+		return RGB(gray, gray, gray);
+	}
+
+	auto hueToRgb = [](float p, float q, float t) -> float
+	{
+		if (t < 0.0f) t += 1.0f;
+		if (t > 1.0f) t -= 1.0f;
+		if (t < 1.0f / 6.0f) return p + (q - p) * 6.0f * t;
+		if (t < 1.0f / 2.0f) return q;
+		if (t < 2.0f / 3.0f) return p + (q - p) * (2.0f / 3.0f - t) * 6.0f;
+		return p;
+	};
+
+	float q = l < 0.5f ? l * (1.0f + s) : l + s - l * s;
+	float p = 2.0f * l - q;
+	float h_norm = h / 360.0f;
+
+	float r_f = hueToRgb(p, q, h_norm + 1.0f / 3.0f);
+	float g_f = hueToRgb(p, q, h_norm);
+	float b_f = hueToRgb(p, q, h_norm - 1.0f / 3.0f);
+
+	BYTE r = static_cast<BYTE>(r_f * 255.0f + 0.5f);
+	BYTE g = static_cast<BYTE>(g_f * 255.0f + 0.5f);
+	BYTE b = static_cast<BYTE>(b_f * 255.0f + 0.5f);
+
+	return RGB(r, g, b);
+}
+
+bool CTheme::LoadColor(TiXmlElement *pParent, CStringA csNode, COLORREF &Color)
 {
 	int intValue = 0;
 	return LoadElement(pParent, csNode, Color, intValue);
 }
 
-bool CDittoTheme::LoadInt(TiXmlElement *pParent, CStringA csNode, int &intValue)
+bool CTheme::LoadInt(TiXmlElement *pParent, CStringA csNode, int &intValue)
 {
 	COLORREF colorValue = 0;
 	return LoadElement(pParent, csNode, colorValue, intValue);
 }
 
-bool CDittoTheme::LoadElement(TiXmlElement *pParent, CStringA csNode, COLORREF &Color, int &intValue)
+bool CTheme::LoadElement(TiXmlElement *pParent, CStringA csNode, COLORREF &Color, int &intValue)
 {
 	TiXmlElement *pColorNode = pParent->FirstChildElement(csNode);
 	if(pColorNode == NULL)
@@ -243,44 +287,90 @@ bool CDittoTheme::LoadElement(TiXmlElement *pParent, CStringA csNode, COLORREF &
 	}
 	
 	CString csColor = pColor->Value();
+	csColor.Trim();
 
-	if (csColor == _T(""))
+	if (csColor.IsEmpty())
 	{
 		return false;
 	}
 
-	if (csColor.Find(_T("RGB")) >= 0)
+	if (csColor.GetLength() > 4 && csColor.Left(4).CompareNoCase(_T("rgb(")) == 0)
 	{
-		csColor = csColor.Trim();
-		csColor.Replace(_T("RGB("), _T(""));
-		csColor.Replace(_T(")"), _T(""));
+		CString values = csColor.Mid(4, csColor.GetLength() - 5);
+		values.Trim();
 
-		CTokenizer token(csColor, _T(","));
-		CString csR;
-		CString csG;
-		CString csB;
+		CTokenizer token(values, _T(", "));
+		CString csR, csG, csB;
 
 		token.Next(csR);
 		token.Next(csG);
 		token.Next(csB);
 
-		csR = csR.Trim();
-		csG = csG.Trim();
-		csB = csB.Trim();
+		csR.Trim();
+		csG.Trim();
+		csB.Trim();
 
-		//Only the first is valid they entered the RGB value as a single number
-		if (csR != "" && csG == "" && csB == "")
+		if (!csR.IsEmpty() && csG.IsEmpty() && csB.IsEmpty())
 		{
 			Color = ATOI(csR);
 		}
-		else
+		else if (!csR.IsEmpty() && !csG.IsEmpty() && !csB.IsEmpty())
 		{
 			Color = RGB(ATOI(csR), ATOI(csG), ATOI(csB));
 		}
+		else
+		{
+			m_csLastError.Format(_T("Theme Load, malformed/incomplete RGB value for Node = %s, Value = %s"), csNode, csColor);
+			Log(m_csLastError);
+			return false;
+		}
+	}
+	else if (csColor.GetLength() > 4 && csColor.Left(4).CompareNoCase(_T("hsl(")) == 0)
+	{
+		CString values = csColor.Mid(4, csColor.GetLength() - 5);
+		values.Trim();
+
+		CTokenizer token(values, _T(", %"));
+		CString csH, csS, csL;
+
+		token.Next(csH);
+		token.Next(csS);
+		token.Next(csL);
+
+		csH.Trim();
+		csS.Trim();
+		csL.Trim();
+
+		if (!csH.IsEmpty() && !csS.IsEmpty() && !csL.IsEmpty())
+		{
+			float h = (float)_tstof(csH);
+			float s = (float)_tstof(csS);
+			float l = (float)_tstof(csL);
+
+			s = max(0.0f, min(100.0f, s)) / 100.0f;
+			l = max(0.0f, min(100.0f, l)) / 100.0f;
+
+			Color = HslToRgb(h, s, l);
+		}
+		else
+		{
+			m_csLastError.Format(_T("Theme Load, malformed/incomplete HSL value for Node = %s, Value = %s"), csNode, csColor);
+			Log(m_csLastError);
+			return false;
+		}
+	}
+	else if (csColor.GetAt(0) == _T('#') && csColor.GetLength() == 7)
+	{
+		long r = _tcstol(csColor.Mid(1, 2), NULL, 16);
+		long g = _tcstol(csColor.Mid(3, 2), NULL, 16);
+		long b = _tcstol(csColor.Mid(5, 2), NULL, 16);
+
+		Color = RGB(r, g, b);
 	}
 	else
 	{
 		intValue = ATOI(csColor);
+		Color = (COLORREF)intValue;
 	}
 
 	return true;

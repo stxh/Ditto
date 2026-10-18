@@ -207,6 +207,7 @@ public:
 	DWORD GenerateCRC();
 	void MoveUp(int parentId);
 	void MoveDown(int parentId);
+	bool SaveFromEditWnd(BOOL bUpdateDesc);
 
 	CStringW GetUnicodeTextFormat();
 	CStringA GetCFTextTextFormat();
@@ -214,16 +215,16 @@ public:
 
 	BOOL ContainsClipFormat(CLIPFORMAT clipFormat);
 
-	BOOL WriteTextToFile(CString path, BOOL unicode, BOOL asci, BOOL rtf, BOOL forceUnicode = FALSE);
+	BOOL WriteTextToFile(CString path, BOOL unicode, BOOL asci, BOOL rtf, BOOL forceUnicode = FALSE, BOOL utf8 = FALSE);
 	BOOL WriteImageToFile(CString path);
 	BOOL WriteTextToHtmlFile(CString path);
 
-	BOOL SaveFormats(CString* unicode, CStringA* asci, CStringA* rtf, BOOL updateDescription);
+	BOOL SaveFormats(CString* unicode, CStringA* asci, CStringA* rtf, BOOL updateDescription, std::vector<BYTE>* cf_dibBytes = nullptr, std::vector<BYTE>* pngBytes = nullptr);
 
 	// Allocates a Global containing the requested Clip's Format Data
 	static HGLOBAL LoadFormat(int id, UINT cfType);
 	// Fills "formats" with the Data of all Formats in the db for the given Clip ID
-	bool LoadFormats(int id, bool bOnlyLoad_CF_TEXT = false, bool includeRichTextForTextOnly = false);
+	bool LoadFormats(int id, bool bOnlyLoad_CF_TEXT = false, bool includeRichTextForTextOnly = false, int dataId = -1);
 	// Fills "types" with all Types in the db for the given Clip ID
 	static void LoadTypes(int id, CClipTypes& types);
 
@@ -231,7 +232,7 @@ public:
 	double GetNewLastOrder(int parentId, int clipId);
 	static double GetNewTopSticky(int parentId, int clipId);
 	static double GetNewLastSticky(int parentId, int clipId);
-	static double GetExistingTopStickyClipId(int parentId);
+	static int GetExistingTopStickyClipId(int parentId);
 	static bool RemoveStickySetting(int clipId, int parentId);
 
 	bool AddFileDataToData(CString &errorMessage);

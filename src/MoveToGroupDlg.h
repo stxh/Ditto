@@ -7,7 +7,7 @@ class CMoveToGroupDlg : public CDialogImpl<CMoveToGroupDlg>
 public:
     enum { IDD = IDD_MOVE_TO_GROUP };
 
-    CMoveToGroupDlg();
+    CMoveToGroupDlg(CString windowTitle = _T(""));
 
     int GetSelectedGroup() const { return m_nSelectedGroup; }
     void SetSelectedGroup(int nGroup) { m_nSelectedGroup = nGroup; }
@@ -32,4 +32,5 @@ public:
 private:
     CGroupTree m_Tree;
     int m_nSelectedGroup;
+    CString m_windowTitle;
 };

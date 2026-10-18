@@ -34,6 +34,7 @@
 #define NM_REFRESH_ROW				(WM_USER+0x120)
 #define NM_REFRESH_ROW_EXTRA_DATA	(WM_USER+0x121)
 #define NM_SHOW_HIDE_SCROLLBARS		(WM_USER+0x122)
+#define NM_UPDATE_SCROLLBAR			(WM_USER+0x131)
 #define NM_CANCEL_SEARCH			(WM_USER+0x123)
 #define NM_POST_OPTIONS_WINDOW		(WM_USER+0x124)
 #define NM_SHOW_PROPERTIES			(WM_USER+0x125)
@@ -149,6 +150,9 @@ protected:
 	BOOL DrawBitMap(int nItem, CRect &crRect, HDC hDC, const CString &csDescription);
 	void MeasureItem(LPMEASUREITEMSTRUCT lpMeasureItemStruct);
 	void DrawCopiedColorCode(CString &csText, CRect &rcText, HDC hDC);
+	bool IsHexString(const CString &str);
+	COLORREF HslToRgb(double h, double s, double l);
+	void DrawCheckerboard(HDC hDC, CRect rect);
 	void LoadDittoCopyBufferHotkeys();
 	bool MouseInScrollBarArea(CRect crWindow, CPoint point);
 	BOOL DrawRtfText(int nItem, CRect &crRect, HDC hDC);
@@ -186,6 +190,7 @@ protected:
 	LRESULT OnTimer(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT OnMouseHWheel(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnVScrollNotify(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT OnSysKeyDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT OnEraseBkgnd(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT OnKillFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
@@ -201,6 +206,7 @@ protected:
 		MESSAGE_HANDLER(WM_TIMER, OnTimer)
 		MESSAGE_HANDLER(WM_MOUSEMOVE, OnMouseMove)
 		MESSAGE_HANDLER(WM_MOUSEHWHEEL, OnMouseHWheel)
+		MESSAGE_HANDLER(WM_VSCROLL, OnVScrollNotify)
 		MESSAGE_HANDLER(WM_SYSKEYDOWN, OnSysKeyDown)
 		MESSAGE_HANDLER(WM_ERASEBKGND, OnEraseBkgnd)
 		MESSAGE_HANDLER(WM_KILLFOCUS, OnKillFocus)

@@ -1,4 +1,4 @@
-﻿// QListCtrl.cpp : implementation file
+// QListCtrl.cpp : implementation file
 //
 
 #include "stdafx.h"
@@ -11,6 +11,13 @@
 #include <atlbase.h>
 #include "DrawHTML.h"
 #include "..\Shared\TextConvert.h"
+#include <cmath>
+#include <vector>
+#include <string>
+#include <cwchar>   // For swscanf
+#include <algorithm> // For std::round
+#include <mutex>
+#include <gdiplus.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -29,6 +36,165 @@ static char THIS_FILE[] = __FILE__;
 
 #define VALID_TOOLTIP (m_pToolTip && ::IsWindow(m_pToolTip->m_hWnd))
 
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
+// Static map to hold W3C color names and their RGB values
+static std::map<CString, COLORREF> g_colorNameMap;
+static std::mutex g_colorNameMapMutex;
+
+// Initializes the color map on first use
+void InitializeColorNameMap()
+{
+	std::lock_guard<std::mutex> lock(g_colorNameMapMutex);
+	if (g_colorNameMap.empty())
+	{
+        // Populate the map with W3C named colors
+        // A comprehensive list of 148 colors
+        g_colorNameMap[_T("black")] = RGB(0, 0, 0);
+        g_colorNameMap[_T("silver")] = RGB(192, 192, 192);
+        g_colorNameMap[_T("gray")] = RGB(128, 128, 128);
+        g_colorNameMap[_T("white")] = RGB(255, 255, 255);
+        g_colorNameMap[_T("maroon")] = RGB(128, 0, 0);
+        g_colorNameMap[_T("red")] = RGB(255, 0, 0);
+        g_colorNameMap[_T("purple")] = RGB(128, 0, 128);
+        g_colorNameMap[_T("fuchsia")] = RGB(255, 0, 255);
+        g_colorNameMap[_T("green")] = RGB(0, 128, 0);
+        g_colorNameMap[_T("lime")] = RGB(0, 255, 0);
+        g_colorNameMap[_T("olive")] = RGB(128, 128, 0);
+        g_colorNameMap[_T("yellow")] = RGB(255, 255, 0);
+        g_colorNameMap[_T("navy")] = RGB(0, 0, 128);
+        g_colorNameMap[_T("blue")] = RGB(0, 0, 255);
+        g_colorNameMap[_T("teal")] = RGB(0, 128, 128);
+        g_colorNameMap[_T("aqua")] = RGB(0, 255, 255);
+        g_colorNameMap[_T("aliceblue")] = RGB(240, 248, 255);
+        g_colorNameMap[_T("antiquewhite")] = RGB(250, 235, 215);
+        g_colorNameMap[_T("aquamarine")] = RGB(127, 255, 212);
+        g_colorNameMap[_T("azure")] = RGB(240, 255, 255);
+        g_colorNameMap[_T("beige")] = RGB(245, 245, 220);
+        g_colorNameMap[_T("bisque")] = RGB(255, 228, 196);
+        g_colorNameMap[_T("blanchedalmond")] = RGB(255, 235, 205);
+        g_colorNameMap[_T("blueviolet")] = RGB(138, 43, 226);
+        g_colorNameMap[_T("brown")] = RGB(165, 42, 42);
+        g_colorNameMap[_T("burlywood")] = RGB(222, 184, 135);
+        g_colorNameMap[_T("cadetblue")] = RGB(95, 158, 160);
+        g_colorNameMap[_T("chartreuse")] = RGB(127, 255, 0);
+        g_colorNameMap[_T("chocolate")] = RGB(210, 105, 30);
+        g_colorNameMap[_T("coral")] = RGB(255, 127, 80);
+        g_colorNameMap[_T("cornflowerblue")] = RGB(100, 149, 237);
+        g_colorNameMap[_T("cornsilk")] = RGB(255, 248, 220);
+        g_colorNameMap[_T("crimson")] = RGB(220, 20, 60);
+        g_colorNameMap[_T("cyan")] = RGB(0, 255, 255);
+        g_colorNameMap[_T("darkblue")] = RGB(0, 0, 139);
+        g_colorNameMap[_T("darkcyan")] = RGB(0, 139, 139);
+        g_colorNameMap[_T("darkgoldenrod")] = RGB(184, 134, 11);
+        g_colorNameMap[_T("darkgray")] = RGB(169, 169, 169);
+        g_colorNameMap[_T("darkgreen")] = RGB(0, 100, 0);
+        g_colorNameMap[_T("darkkhaki")] = RGB(189, 183, 107);
+        g_colorNameMap[_T("darkmagenta")] = RGB(139, 0, 139);
+        g_colorNameMap[_T("darkolivegreen")] = RGB(85, 107, 47);
+        g_colorNameMap[_T("darkorange")] = RGB(255, 140, 0);
+        g_colorNameMap[_T("darkorchid")] = RGB(153, 50, 204);
+        g_colorNameMap[_T("darkred")] = RGB(139, 0, 0);
+        g_colorNameMap[_T("darksalmon")] = RGB(233, 150, 122);
+        g_colorNameMap[_T("darkseagreen")] = RGB(143, 188, 143);
+        g_colorNameMap[_T("darkslateblue")] = RGB(72, 61, 139);
+        g_colorNameMap[_T("darkslategray")] = RGB(47, 79, 79);
+        g_colorNameMap[_T("darkturquoise")] = RGB(0, 206, 209);
+        g_colorNameMap[_T("darkviolet")] = RGB(148, 0, 211);
+        g_colorNameMap[_T("deeppink")] = RGB(255, 20, 147);
+        g_colorNameMap[_T("deepskyblue")] = RGB(0, 191, 255);
+        g_colorNameMap[_T("dimgray")] = RGB(105, 105, 105);
+        g_colorNameMap[_T("dodgerblue")] = RGB(30, 144, 255);
+        g_colorNameMap[_T("firebrick")] = RGB(178, 34, 34);
+        g_colorNameMap[_T("floralwhite")] = RGB(255, 250, 240);
+        g_colorNameMap[_T("forestgreen")] = RGB(34, 139, 34);
+        g_colorNameMap[_T("gainsboro")] = RGB(220, 220, 220);
+        g_colorNameMap[_T("ghostwhite")] = RGB(248, 248, 255);
+        g_colorNameMap[_T("gold")] = RGB(255, 215, 0);
+        g_colorNameMap[_T("goldenrod")] = RGB(218, 165, 32);
+        g_colorNameMap[_T("greenyellow")] = RGB(173, 255, 47);
+        g_colorNameMap[_T("honeydew")] = RGB(240, 255, 240);
+        g_colorNameMap[_T("hotpink")] = RGB(255, 105, 180);
+        g_colorNameMap[_T("indianred")] = RGB(205, 92, 92);
+        g_colorNameMap[_T("indigo")] = RGB(75, 0, 130);
+        g_colorNameMap[_T("ivory")] = RGB(255, 255, 240);
+        g_colorNameMap[_T("khaki")] = RGB(240, 230, 140);
+        g_colorNameMap[_T("lavender")] = RGB(230, 230, 250);
+        g_colorNameMap[_T("lavenderblush")] = RGB(255, 240, 245);
+        g_colorNameMap[_T("lawngreen")] = RGB(124, 252, 0);
+        g_colorNameMap[_T("lemonchiffon")] = RGB(255, 250, 205);
+        g_colorNameMap[_T("lightblue")] = RGB(173, 216, 230);
+        g_colorNameMap[_T("lightcoral")] = RGB(240, 128, 128);
+        g_colorNameMap[_T("lightcyan")] = RGB(224, 255, 255);
+        g_colorNameMap[_T("lightgoldenrodyellow")] = RGB(250, 250, 210);
+        g_colorNameMap[_T("lightgray")] = RGB(211, 211, 211);
+        g_colorNameMap[_T("lightgreen")] = RGB(144, 238, 144);
+        g_colorNameMap[_T("lightpink")] = RGB(255, 182, 193);
+        g_colorNameMap[_T("lightsalmon")] = RGB(255, 160, 122);
+        g_colorNameMap[_T("lightseagreen")] = RGB(32, 178, 170);
+        g_colorNameMap[_T("lightskyblue")] = RGB(135, 206, 250);
+        g_colorNameMap[_T("lightslategray")] = RGB(119, 136, 153);
+        g_colorNameMap[_T("lightsteelblue")] = RGB(176, 196, 222);
+        g_colorNameMap[_T("lightyellow")] = RGB(255, 255, 224);
+        g_colorNameMap[_T("limegreen")] = RGB(50, 205, 50);
+        g_colorNameMap[_T("linen")] = RGB(250, 240, 230);
+        g_colorNameMap[_T("magenta")] = RGB(255, 0, 255);
+        g_colorNameMap[_T("mediumaquamarine")] = RGB(102, 205, 170);
+        g_colorNameMap[_T("mediumblue")] = RGB(0, 0, 205);
+        g_colorNameMap[_T("mediumorchid")] = RGB(186, 85, 211);
+        g_colorNameMap[_T("mediumpurple")] = RGB(147, 112, 219);
+        g_colorNameMap[_T("mediumseagreen")] = RGB(60, 179, 113);
+        g_colorNameMap[_T("mediumslateblue")] = RGB(123, 104, 238);
+        g_colorNameMap[_T("mediumspringgreen")] = RGB(0, 250, 154);
+        g_colorNameMap[_T("mediumturquoise")] = RGB(72, 209, 204);
+        g_colorNameMap[_T("mediumvioletred")] = RGB(199, 21, 133);
+        g_colorNameMap[_T("midnightblue")] = RGB(25, 25, 112);
+        g_colorNameMap[_T("mintcream")] = RGB(245, 255, 250);
+        g_colorNameMap[_T("mistyrose")] = RGB(255, 228, 225);
+        g_colorNameMap[_T("moccasin")] = RGB(255, 228, 181);
+        g_colorNameMap[_T("navajowhite")] = RGB(255, 222, 173);
+        g_colorNameMap[_T("oldlace")] = RGB(253, 245, 230);
+        g_colorNameMap[_T("olivedrab")] = RGB(107, 142, 35);
+        g_colorNameMap[_T("orange")] = RGB(255, 165, 0);
+        g_colorNameMap[_T("orangered")] = RGB(255, 69, 0);
+        g_colorNameMap[_T("orchid")] = RGB(218, 112, 214);
+        g_colorNameMap[_T("palegoldenrod")] = RGB(238, 232, 170);
+        g_colorNameMap[_T("palegreen")] = RGB(152, 251, 152);
+        g_colorNameMap[_T("paleturquoise")] = RGB(175, 238, 238);
+        g_colorNameMap[_T("palevioletred")] = RGB(219, 112, 147);
+        g_colorNameMap[_T("papayawhip")] = RGB(255, 239, 213);
+        g_colorNameMap[_T("peachpuff")] = RGB(255, 218, 185);
+        g_colorNameMap[_T("peru")] = RGB(205, 133, 63);
+        g_colorNameMap[_T("pink")] = RGB(255, 192, 203);
+        g_colorNameMap[_T("plum")] = RGB(221, 160, 221);
+        g_colorNameMap[_T("powderblue")] = RGB(176, 224, 230);
+        g_colorNameMap[_T("rebeccapurple")] = RGB(102, 51, 153);
+        g_colorNameMap[_T("rosybrown")] = RGB(188, 143, 143);
+        g_colorNameMap[_T("royalblue")] = RGB(65, 105, 225);
+        g_colorNameMap[_T("saddlebrown")] = RGB(139, 69, 19);
+        g_colorNameMap[_T("salmon")] = RGB(250, 128, 114);
+        g_colorNameMap[_T("sandybrown")] = RGB(244, 164, 96);
+        g_colorNameMap[_T("seagreen")] = RGB(46, 139, 87);
+        g_colorNameMap[_T("seashell")] = RGB(255, 245, 238);
+        g_colorNameMap[_T("sienna")] = RGB(160, 82, 45);
+        g_colorNameMap[_T("skyblue")] = RGB(135, 206, 235);
+        g_colorNameMap[_T("slateblue")] = RGB(106, 90, 205);
+        g_colorNameMap[_T("slategray")] = RGB(112, 128, 144);
+        g_colorNameMap[_T("snow")] = RGB(255, 250, 250);
+        g_colorNameMap[_T("springgreen")] = RGB(0, 255, 127);
+        g_colorNameMap[_T("steelblue")] = RGB(70, 130, 180);
+        g_colorNameMap[_T("tan")] = RGB(210, 180, 140);
+        g_colorNameMap[_T("thistle")] = RGB(216, 191, 216);
+        g_colorNameMap[_T("tomato")] = RGB(255, 99, 71);
+        g_colorNameMap[_T("turquoise")] = RGB(64, 224, 208);
+        g_colorNameMap[_T("violet")] = RGB(238, 130, 238);
+        g_colorNameMap[_T("wheat")] = RGB(245, 222, 179);
+        g_colorNameMap[_T("whitesmoke")] = RGB(245, 245, 245);
+        g_colorNameMap[_T("yellowgreen")] = RGB(154, 205, 50);
+	}
+}
 
 /////////////////////////////////////////////////////////////////////////////
 // CQListCtrl
@@ -73,7 +239,6 @@ CQListCtrl::~CQListCtrl()
 		m_pFormatter = NULL;
 	}
 
-	DeleteObject(m_SmallFont);
 }
 
 // returns the position 1-10 if the index is in the FirstTen block else -1
@@ -104,7 +269,7 @@ LRESULT CQListCtrl::OnKeydown(LPNMHDR pNMHDR)
 	return 0;
 }
 
-void CQListCtrl::GetSelectionIndexes(ARRAY &arr)
+void CQListCtrl::GetSelectionIndexes(ARRAY& arr)
 {
 	arr.RemoveAll();
 
@@ -127,7 +292,7 @@ bool CQListCtrl::PutSelectedItemOnDittoCopyBuffer(long lBuffer)
 	return bRet;
 }
 
-void CQListCtrl::GetSelectionItemData(ARRAY &arr)
+void CQListCtrl::GetSelectionItemData(ARRAY& arr)
 {
 	DWORD dwData;
 	arr.RemoveAll();
@@ -442,56 +607,461 @@ LRESULT CQListCtrl::OnCustomdrawList(LPNMHDR pNMHDR)
 	return 0;
 }
 
+
+// Helper function implementation to check for valid hex characters
+bool CQListCtrl::IsHexString(const CString& str)
+{
+	if (str.IsEmpty()) {
+		return false;
+	}
+	for (int i = 0; i < str.GetLength(); ++i) {
+		if (!iswxdigit(str[i])) {
+			return false;
+		}
+	}
+	return true;
+}
+
+// Helper function implementation for HSL to RGB conversion
+COLORREF CQListCtrl::HslToRgb(double h, double s, double l)
+{
+	// Input h(0-360), s(0-1), l(0-1)
+	// Output COLORREF (RGB)
+
+	double r, g, b;
+
+	if (s == 0)
+	{
+		r = g = b = l; // Achromatic (gray)
+	}
+	else
+	{
+		auto hue2rgb = [&](double p, double q, double t)
+			{
+				if (t < 0) t += 1;
+				if (t > 1) t -= 1;
+				if (t < 1.0 / 6.0) return p + (q - p) * 6 * t;
+				if (t < 1.0 / 2.0) return q;
+				if (t < 2.0 / 3.0) return p + (q - p) * (2.0 / 3.0 - t) * 6;
+				return p;
+			};
+
+		// Normalize h to 0-1 range
+		double h_norm = h / 360.0;
+
+		double q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+		double p = 2 * l - q;
+		r = hue2rgb(p, q, h_norm + 1.0 / 3.0);
+		g = hue2rgb(p, q, h_norm);
+		b = hue2rgb(p, q, h_norm - 1.0 / 3.0);
+	}
+
+	// Scale RGB values to 0-255 and round
+	int R = static_cast<int>(std::round(r * 255));
+	int G = static_cast<int>(std::round(g * 255));
+	int B = static_cast<int>(std::round(b * 255));
+
+	// Clamp values to 0-255 just in case of floating point inaccuracies
+	R = max(0, min(255, R));
+	G = max(0, min(255, G));
+	B = max(0, min(255, B));
+
+	return RGB(R, G, B);
+}
+
+
+// Helper function to parse a CSS numeric value which can be a percentage or a number
+static bool ParseCssValue(const CString& token, double& value)
+{
+	CString localToken = token;
+	localToken.Trim();
+	if (localToken.IsEmpty()) return false;
+
+	bool isPercent = (localToken.Right(1) == _T('%'));
+	if (isPercent)
+	{
+		localToken.TrimRight(_T('%'));
+	}
+
+	if (_stscanf(localToken, _T("%lf"), &value) == 1)
+	{
+		return true;
+	}
+	return false;
+}
+
+
+// Converts a color from OKLCH color space to sRGB.
+// l: 0-1, c: 0-0.4 (theoretically unbounded, but practically small), h: 0-360
+static COLORREF OklchToRgb(double l, double c, double h)
+{
+	// 1. Convert OKLCH to OKLAB
+	double h_rad = h * M_PI / 180.0;
+	double a = c * cos(h_rad);
+	double b = c * sin(h_rad);
+
+	// 2. Convert OKLAB to XYZ
+	// First, convert to an intermediate non-linear LMS-like space
+	double l_ = l + 0.3963377774 * a + 0.2158037573 * b;
+	double m_ = l - 0.1055613458 * a - 0.0638541728 * b;
+	double s_ = l - 0.0894841775 * a - 1.2914855480 * b;
+
+	// Then, convert to linear LMS by undoing the cube-root non-linearity
+	double l_linear = l_ * l_ * l_;
+	double m_linear = m_ * m_ * m_;
+	double s_linear = s_ * s_ * s_;
+
+	// Finally, convert linear LMS to XYZ color space
+	double x = +1.2270138511 * l_linear - 0.5577999807 * m_linear + 0.2812561490 * s_linear;
+	double y = -0.0405801784 * l_linear + 1.1122568696 * m_linear - 0.0716766787 * s_linear;
+	double z = -0.0763812845 * l_linear - 0.4214819784 * m_linear + 1.5861632204 * s_linear;
+
+	// 3. Convert XYZ to linear sRGB
+	double r_linear = +3.2404542 * x - 1.5371385 * y - 0.4985314 * z;
+	double g_linear = -0.9692660 * x + 1.8760108 * y + 0.0415560 * z;
+	double b_linear = +0.0556434 * x - 0.2040259 * y + 1.0572252 * z;
+
+	// 4. Convert linear sRGB to gamma-corrected sRGB
+	auto ToSrgb = [](double val) {
+		if (val <= 0.0031308) {
+			return 12.92 * val;
+		}
+		return 1.055 * pow(val, 1.0 / 2.4) - 0.055;
+	};
+
+	double r_srgb = ToSrgb(r_linear);
+	double g_srgb = ToSrgb(g_linear);
+	double b_srgb = ToSrgb(b_linear);
+
+	// 5. Scale to 0-255 and clamp (for out-of-gamut colors)
+	int R = static_cast<int>(std::round(r_srgb * 255.0));
+	int G = static_cast<int>(std::round(g_srgb * 255.0));
+	int B = static_cast<int>(std::round(b_srgb * 255.0));
+
+	R = max(0, min(255, R));
+	G = max(0, min(255, G));
+	B = max(0, min(255, B));
+
+	return RGB(R, G, B);
+}
+
+
+void CQListCtrl::DrawCheckerboard(HDC hDC, CRect rect)
+{
+	COLORREF color1 = RGB(255, 255, 255); // White
+	COLORREF color2 = RGB(204, 204, 204); // Light grey
+	int squareSize = m_windowDpi->Scale(4);
+	if (squareSize <= 0)
+	{
+		squareSize = 4;
+	}
+
+	for (int y = rect.top; y < rect.bottom; y += squareSize)
+	{
+		for (int x = rect.left; x < rect.right; x += squareSize)
+		{
+			COLORREF color = ((( (x - rect.left) / squareSize) + ((y - rect.top) / squareSize)) % 2 == 0) ? color1 : color2;
+			CRect square(x, y, min(x + squareSize, rect.right), min(y + squareSize, rect.bottom));
+			CDCHandle(hDC).FillSolidRect(square, color);
+		}
+	}
+}
+
+
 void CQListCtrl::DrawCopiedColorCode(CString& csText, CRect& rcText, HDC hDC)
 {
-	if (CGetSetOptions::m_bDrawCopiedColorCode == FALSE)
+	if (CGetSetOptions::m_bDrawCopiedColorCode == FALSE || csText.IsEmpty())
 		return;
 
-	CString trimmedText = CString(csText).Trim(L'»').Trim().Trim('#');
+	// 1. Initial Cleaning and Prep
+	CString cleanedText = csText;
+	cleanedText.Trim(_T("»"));
+	cleanedText.Trim();
+	cleanedText.TrimRight(_T(";"));
+	cleanedText.Trim();
 
-	//draw hex color copied like #FF0000, FF0000, FF0000 other text with a space before other text
-	if (trimmedText.GetLength() == 6 ||
-		trimmedText.Find(' ') == 6)
+	if (cleanedText.IsEmpty())
+		return;
+
+	CString originalCleanedText = cleanedText;
+	CString parseText = cleanedText;
+	parseText.MakeLower();
+
+	// 2. Helper lambda to draw the color box
+	auto DrawColorBox = [&](COLORREF color, int alpha = 255)
 	{
-		int r, g, b;
-		int scanRet = swscanf(trimmedText, _T("%02x%02x%02x"), &r, &g, &b);
-		if (scanRet == 3)
+		CRect pastedRect(rcText);
+		int boxSize = rcText.Height();
+		pastedRect.right = pastedRect.left + boxSize;
+		pastedRect.bottom = pastedRect.top + boxSize;
+
+		if (alpha < 255)
 		{
-			CRect pastedRect(rcText);
-			pastedRect.right = pastedRect.left + m_windowDpi->Scale(rcText.Height());
+			DrawCheckerboard(hDC, pastedRect);
 
-			CDCHandle(hDC).FillSolidRect(pastedRect, RGB(r, g, b));
+			// Use GDI+ for alpha blending
+			Gdiplus::Graphics graphics(hDC);
+			Gdiplus::Color gdiplusColor(alpha, GetRValue(color), GetGValue(color), GetBValue(color));
+			Gdiplus::SolidBrush brush(gdiplusColor);
+			graphics.FillRectangle(&brush, Gdiplus::Rect(pastedRect.left, pastedRect.top, pastedRect.Width(), pastedRect.Height()));
+		}
+		else
+		{
+			// Opaque color is faster with FillSolidRect and doesn't need a checkerboard.
+			CDCHandle(hDC).FillSolidRect(pastedRect, color);
+		}
 
-			rcText.left += m_windowDpi->Scale(rcText.Height());
-			rcText.left += m_windowDpi->Scale(ROW_LEFT_BORDER);
+		rcText.left += boxSize + m_windowDpi->Scale(ROW_LEFT_BORDER);
+		csText = originalCleanedText;
+	};
+
+	// 3. Check for formats with unique signatures first
+
+	// Check for W3C Named Colors
+	InitializeColorNameMap();
+	auto it = g_colorNameMap.find(parseText);
+	if (it != g_colorNameMap.end())
+	{
+		DrawColorBox(it->second);
+		return;
+	}
+
+	// Check for Hex Colors with # or 0x prefix
+	if (parseText.Left(1) == _T('#') || parseText.Left(2) == _T("0x"))
+	{
+		CString hexString = parseText;
+		if (hexString.Left(1) == _T('#')) hexString.Delete(0, 1);
+		else if (hexString.Left(2) == _T("0x")) hexString.Delete(0, 2);
+
+		int len = hexString.GetLength();
+		if (len == 3 || len == 4) // Expand shorthand
+		{
+			CString expanded;
+			for (int i = 0; i < len; ++i) { expanded += hexString[i]; expanded += hexString[i]; }
+			hexString = expanded;
+		}
+
+		if (IsHexString(hexString) && (hexString.GetLength() == 6 || hexString.GetLength() == 8))
+		{
+			unsigned int r = 0, g = 0, b = 0, a = 255;
+			if (hexString.GetLength() == 8)
+			{
+				if (swscanf(hexString, _T("%2x%2x%2x%2x"), &r, &g, &b, &a) == 4)
+				{
+					DrawColorBox(RGB(r, g, b), a);
+					return;
+				}
+			}
+			else // length is 6
+			{
+				if (swscanf(hexString, _T("%2x%2x%2x"), &r, &g, &b) == 3)
+				{
+					DrawColorBox(RGB(r, g, b)); // default alpha
+					return;
+				}
+			}
 		}
 	}
 
-	// draw rgb color copied like 255,0,0 and rgb(255,0,0)
-	int firstCommaPos = trimmedText.Find(',');
-	if (firstCommaPos >= 0)
+	// Check for W3C notations: rgb(...), hsl(...), and oklch(...)
+	if (parseText.Right(1) == _T(")"))
 	{
-		int secondCommaPos = trimmedText.Find(',', firstCommaPos+1);
-		if (secondCommaPos)
+		if (parseText.Left(3) == _T("rgb"))
 		{
-			int noThirdCommaPos = trimmedText.Find(',', secondCommaPos+1);
-			
-			if (noThirdCommaPos < 0)
+			CString content;
+			int prefixLen = (parseText.Left(4) == _T("rgba")) ? 5 : 4;
+			content = parseText.Mid(prefixLen, parseText.GetLength() - prefixLen - 1);
+			content.Replace(_T(','), _T(' '));
+			content.Replace(_T('/'), _T(' '));
+
+			std::vector<CString> tokens;
+			int curPos = 0;
+			CString token;
+			while (!(token = content.Tokenize(_T(" "), curPos)).IsEmpty())
 			{
-				int r, g, b;
-				CString noRGB = trimmedText.MakeLower().Trim(_T("rgb(")).Trim(')');
-				int scanRet = swscanf(noRGB, _T("%d,%d,%d"), &r, &g, &b);
-				if (scanRet == 3)
+				tokens.push_back(token);
+			}
+
+			if (tokens.size() >= 3)
+			{
+				double r_val, g_val, b_val;
+				if (ParseCssValue(tokens[0], r_val) && ParseCssValue(tokens[1], g_val) && ParseCssValue(tokens[2], b_val))
 				{
-					CRect pastedRect(rcText);
-					pastedRect.right = pastedRect.left + m_windowDpi->Scale(rcText.Height());
+					if (tokens[0].Find('%') != -1)
+					{
+						r_val = std::round(r_val * 2.55);
+						g_val = std::round(g_val * 2.55);
+						b_val = std::round(b_val * 2.55);
+					}
 
-					CDCHandle(hDC).FillSolidRect(pastedRect, RGB(r, g, b));
+					int alpha = 255;
+					double a_val = 1.0;
+					if (tokens.size() >= 4 && ParseCssValue(tokens[3], a_val))
+					{
+						if (tokens[3].Find('%') != -1)
+						{
+							a_val /= 100.0;
+						}
+						a_val = max(0.0, min(1.0, a_val));
+						alpha = static_cast<int>(std::round(a_val * 255.0));
+					}
 
-					rcText.left += m_windowDpi->Scale(rcText.Height());
-					rcText.left += m_windowDpi->Scale(ROW_LEFT_BORDER);
+					if (r_val >= 0 && r_val <= 255 && g_val >= 0 && g_val <= 255 && b_val >= 0 && b_val <= 255)
+					{
+						DrawColorBox(RGB((int)r_val, (int)g_val, (int)b_val), alpha);
+						return;
+					}
 				}
 			}
+		}
+		else if (parseText.Left(3) == _T("hsl"))
+		{
+			CString content;
+			int prefixLen = (parseText.Left(4) == _T("hsla")) ? 5 : 4;
+			content = parseText.Mid(prefixLen, parseText.GetLength() - prefixLen - 1);
+			content.Replace(_T(','), _T(' '));
+			content.Replace(_T('/'), _T(' '));
+			content.Replace(_T("deg"), _T(""));
+
+			std::vector<CString> tokens;
+			int curPos = 0;
+			CString token;
+			while (!(token = content.Tokenize(_T(" "), curPos)).IsEmpty())
+			{
+				tokens.push_back(token);
+			}
+
+			if (tokens.size() >= 3)
+			{
+				double h_val, s_val, l_val;
+				if (ParseCssValue(tokens[0], h_val) && ParseCssValue(tokens[1], s_val) && ParseCssValue(tokens[2], l_val))
+				{
+					int alpha = 255;
+					double a_val = 1.0;
+					if (tokens.size() >= 4 && ParseCssValue(tokens[3], a_val))
+					{
+						if (tokens[3].Find('%') != -1)
+						{
+							a_val /= 100.0;
+						}
+						a_val = max(0.0, min(1.0, a_val));
+						alpha = static_cast<int>(std::round(a_val * 255.0));
+					}
+
+					if (s_val >= 0 && s_val <= 100 && l_val >= 0 && l_val <= 100)
+					{
+						h_val = fmod(h_val, 360.0);
+						if (h_val < 0) h_val += 360.0;
+						DrawColorBox(HslToRgb(h_val, s_val / 100.0, l_val / 100.0), alpha);
+						return;
+					}
+				}
+			}
+		}
+		else if (parseText.Left(5) == _T("oklch"))
+		{
+			CString content;
+			content = parseText.Mid(6, parseText.GetLength() - 7);
+			content.Replace(_T(','), _T(' '));
+			content.Replace(_T('/'), _T(' '));
+
+			std::vector<CString> tokens;
+			int curPos = 0;
+			CString token;
+			while (!(token = content.Tokenize(_T(" "), curPos)).IsEmpty())
+			{
+				tokens.push_back(token);
+			}
+
+			if (tokens.size() >= 3)
+			{
+				double l_val, c_val, h_val;
+				if (ParseCssValue(tokens[0], l_val) && ParseCssValue(tokens[1], c_val) && ParseCssValue(tokens[2], h_val))
+				{
+					bool l_is_percent = tokens[0].Find('%') != -1;
+
+					double l_normalized = l_val;
+					if (l_is_percent)
+					{
+						l_normalized = l_val / 100.0;
+					}
+					
+					int alpha = 255;
+					double a_val = 1.0;
+					if (tokens.size() >= 4 && ParseCssValue(tokens[3], a_val))
+					{
+						if (tokens[3].Find('%') != -1)
+						{
+							a_val /= 100.0;
+						}
+						a_val = max(0.0, min(1.0, a_val));
+						alpha = static_cast<int>(std::round(a_val * 255.0));
+					}
+
+					if (l_normalized >= 0 && l_normalized <= 1.0 && c_val >= 0)
+					{
+						DrawColorBox(OklchToRgb(l_normalized, c_val, h_val), alpha);
+						return;
+					}
+				}
+			}
+		}
+	}
+
+	// 4. --- Non-W3C Format Parsing ---
+	int r, g, b, chars_consumed = 0;
+
+	// Check for parenthesized RGB: "(255, 128, 0)" or "(255 128 0)"
+	if (parseText.Left(1) == _T("(") && parseText.Right(1) == _T(")"))
+	{
+		CString content = parseText.Mid(1, parseText.GetLength() - 2);
+		content.Trim();
+		content.Replace(_T(','), _T(' '));
+
+		if (swscanf(content, _T("%d %d %d %n"), &r, &g, &b, &chars_consumed) == 3)
+		{
+			CString remainingText = content.Mid(chars_consumed);
+			remainingText.Trim();
+
+			if (remainingText.IsEmpty())
+			{
+				if (r >= 0 && r <= 255 && g >= 0 && g <= 255 && b >= 0 && b <= 255)
+				{
+					DrawColorBox(RGB(r, g, b));
+					return;
+				}
+			}
+		}
+	}
+
+	// Check for comma-separated RGB: "255, 0, 0"
+	if (swscanf(parseText, _T("%d , %d , %d %n"), &r, &g, &b, &chars_consumed) == 3 && chars_consumed == parseText.GetLength())
+	{
+		if (r >= 0 && r <= 255 && g >= 0 && g <= 255 && b >= 0 && b <= 255)
+		{
+			DrawColorBox(RGB(r, g, b));
+			return;
+		}
+	}
+
+	// Check for space-separated RGB: "255 128 0"
+	if (swscanf(parseText, _T("%d %d %d %n"), &r, &g, &b, &chars_consumed) == 3 && chars_consumed == parseText.GetLength())
+	{
+		if (r >= 0 && r <= 255 && g >= 0 && g <= 255 && b >= 0 && b <= 255)
+		{
+			DrawColorBox(RGB(r, g, b));
+			return;
+		}
+	}
+
+	// Check for 6-digit hex: "FF00CC"
+	if (parseText.GetLength() == 6 && IsHexString(parseText))
+	{
+		// Use %n here as well for consistency, though length check is sufficient.
+		if (swscanf(parseText, _T("%2x%2x%2x%n"), &r, &g, &b, &chars_consumed) == 3 && chars_consumed == 6)
+		{
+			DrawColorBox(RGB(r, g, b));
+			return;
 		}
 	}
 }
@@ -550,7 +1120,7 @@ BOOL CQListCtrl::DrawBitMap(int nItem, CRect &crRect, HDC hDC, const CString &cs
 	if (CGetSetOptions::m_bDrawThumbnail == FALSE)
 		return FALSE;
 
-	CClipFormatQListCtrl *format = GetItem_CF_DIB_ClipFormat(nItem);
+	CClipFormatQListCtrl* format = GetItem_CF_DIB_ClipFormat(nItem);
 	if (format != NULL)
 	{
 		HGLOBAL smallImage = format->GetDibFittingToHeight(hDC, crRect.Height());
@@ -651,7 +1221,7 @@ LRESULT CQListCtrl::OnToolTipText(LPNMHDR pNMHDR)
 	return 0;
 }
 
-INT_PTR CQListCtrl::OnToolHitTest(CPoint point, TOOLINFO * pTI) const
+INT_PTR CQListCtrl::OnToolHitTest(CPoint point, TOOLINFO* pTI) const
 {
 	CRect rect;
 	GetClientRect(&rect);
@@ -758,7 +1328,15 @@ BOOL CQListCtrl::PreTranslateMessage(MSG* pMsg)
 			return TRUE;
 		break; // end case WM_KEYDOWN
 	case WM_MOUSEWHEEL:
-		break;
+		// Will be handled by default, but ensure scrollbar updates after
+		{
+			HWND hParent = GetParent();
+			if (hParent != NULL)
+			{
+				::PostMessage(hParent, NM_UPDATE_SCROLLBAR, TRUE, 0);
+			}
+			return FALSE;
+		}
 
 	case WM_VSCROLL:
 		ASSERT(FALSE);
@@ -797,24 +1375,34 @@ BOOL CQListCtrl::HandleKeyDown(WPARAM wParam, LPARAM lParam)
 		break;
 
 	case VK_HOME:
-
 		if (GetKeyState(VK_SHIFT) & 0x8000)
 		{
-			int pos = GetNextItem(-1, LVNI_SELECTED) + 1;
-			if (pos >= 0 && pos < GetItemCount())
+			int nAnchor = GetSelectionMark();
+			if (nAnchor < 0)
 			{
-				for (int i = 0; i < pos; i++)
-				{
-					SetSelection(i, (i == 0));
-				}
+				nAnchor = GetCaret();
 			}
 
+			if (nAnchor >= 0)
+			{
+				RemoveAllSelection();
+
+				for (int i = 0; i <= nAnchor; i++)
+				{
+					SetSelection(i, TRUE);
+				}
+
+				ListView_SetSelectionMark(m_hWnd, nAnchor);
+				
+				SetCaret(0);
+				EnsureVisible(0, FALSE);
+			}
 		}
 		else
 		{
 			SetListPos(0);
 		}
-		break;
+		return TRUE;
 	} // end switch(vk)
 
 	return FALSE;
@@ -945,10 +1533,10 @@ bool CQListCtrl::ShowFullDescription(bool bFromAuto, bool fromNextPrev)
 			if (q.eof() == false)
 			{
 				CString clipData;
-				COleDateTime time((time_t)q.getIntField(_T("lDate")));
+				COleDateTime time((time_t)q.getInt64Field(_T("lDate")));
 				clipData += "Added: " + time.Format();
 
-				COleDateTime modified((time_t)q.getIntField(_T("lastPasteDate")));
+				COleDateTime modified((time_t)q.getInt64Field(_T("lastPasteDate")));
 				clipData += _T(" | Last Used: ") + modified.Format();
 
 				if (q.getIntField(_T("lDontAutoDelete")) > 0)
@@ -1012,7 +1600,7 @@ bool CQListCtrl::ShowFullDescription(bool bFromAuto, bool fromNextPrev)
 		if (GetClipData(nItem, Clip) && Clip.m_hgData)
 		{
 			m_pToolTip->SetToolTipText(Clip.GetAsCString());
-			bSetPlainText = true;		
+			bSetPlainText = true;
 
 			Clip.Free();
 			Clip.Clear();
@@ -1022,7 +1610,7 @@ bool CQListCtrl::ShowFullDescription(bool bFromAuto, bool fromNextPrev)
 		{
 			Clip.m_cfType = CF_TEXT;
 			if (GetClipData(nItem, Clip) && Clip.m_hgData)
-			{	
+			{
 				CString cs(Clip.GetAsCStringA());
 
 				m_pToolTip->SetToolTipText(cs);
@@ -1043,7 +1631,7 @@ bool CQListCtrl::ShowFullDescription(bool bFromAuto, bool fromNextPrev)
 		if (GetClipData(nItem, Clip) && Clip.m_hgData)
 		{
 			m_pToolTip->SetRTFText(Clip.GetAsCStringA());
-		
+
 			Clip.Free();
 			Clip.Clear();
 		}
@@ -1053,7 +1641,7 @@ bool CQListCtrl::ShowFullDescription(bool bFromAuto, bool fromNextPrev)
 		if (GetClipData(nItem, Clip) && Clip.m_hgData)
 		{
 			CString html = CTextConvert::Utf8ToUnicode(Clip.GetAsCStringA());
-			m_pToolTip->SetHtmlText(html);		
+			m_pToolTip->SetHtmlText(html);
 
 			Clip.Free();
 			Clip.Clear();
@@ -1079,7 +1667,7 @@ bool CQListCtrl::ShowFullDescription(bool bFromAuto, bool fromNextPrev)
 	return true;
 }
 
-void CQListCtrl::GetToolTipText(int nItem, CString &csText)
+void CQListCtrl::GetToolTipText(int nItem, CString& csText)
 {
 	CWindow pParent = GetParent();
 	if (pParent.m_hWnd != NULL)
@@ -1101,7 +1689,7 @@ void CQListCtrl::GetToolTipText(int nItem, CString &csText)
 	}
 }
 
-BOOL CQListCtrl::GetClipData(int nItem, CClipFormat &Clip)
+BOOL CQListCtrl::GetClipData(int nItem, CClipFormat& Clip)
 {
 	return theApp.GetClipData(GetItemData(nItem), Clip);
 }
@@ -1134,7 +1722,7 @@ DWORD CQListCtrl::GetItemData(int nItem)
 
 CClipFormatQListCtrl* CQListCtrl::GetItem_CF_DIB_ClipFormat(int nItem)
 {
-	CClipFormatQListCtrl *format = NULL;
+	CClipFormatQListCtrl* format = NULL;
 
 	CWindow pParent = GetParent();
 	if (pParent.m_hWnd != NULL)
@@ -1153,7 +1741,7 @@ CClipFormatQListCtrl* CQListCtrl::GetItem_CF_DIB_ClipFormat(int nItem)
 
 		if (info.item.lParam != NULL)
 		{
-			format = (CClipFormatQListCtrl *)info.item.lParam;
+			format = (CClipFormatQListCtrl*)info.item.lParam;
 		}
 	}
 
@@ -1162,7 +1750,7 @@ CClipFormatQListCtrl* CQListCtrl::GetItem_CF_DIB_ClipFormat(int nItem)
 
 CClipFormatQListCtrl* CQListCtrl::GetItem_CF_RTF_ClipFormat(int nItem)
 {
-	CClipFormatQListCtrl *format = NULL;
+	CClipFormatQListCtrl* format = NULL;
 
 	CWindow pParent = GetParent();
 	if (pParent.m_hWnd != NULL)
@@ -1181,7 +1769,7 @@ CClipFormatQListCtrl* CQListCtrl::GetItem_CF_RTF_ClipFormat(int nItem)
 
 		if (info.item.lParam != NULL)
 		{
-			format = (CClipFormatQListCtrl *)info.item.lParam;
+			format = (CClipFormatQListCtrl*)info.item.lParam;
 		}
 	}
 
@@ -1252,11 +1840,18 @@ BOOL CQListCtrl::SetItemCountEx(int iCount, DWORD dwFlags /* = 0 */)
 
 LRESULT CQListCtrl::OnSelectionChange(LPNMHDR pNMHDR)
 {
-	NMLISTVIEW *pnmv = (NMLISTVIEW *)pNMHDR;
+	NMLISTVIEW* pnmv = (NMLISTVIEW*)pNMHDR;
 
 	if ((pnmv->uNewState == 3) ||
 		(pnmv->uNewState == 1))
 	{
+		// Notify parent to update modern scrollbar when selection changes (keyboard navigation)
+		HWND hParent = GetParent();
+		if (hParent != NULL)
+		{
+			::PostMessage(hParent, NM_UPDATE_SCROLLBAR, FALSE, 0);
+		}
+
 		if (VALID_TOOLTIP &&
 			::IsWindowVisible(m_pToolTip->m_hWnd))
 		{
@@ -1365,7 +1960,7 @@ LRESULT CQListCtrl::OnTimer(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHand
 	return 0;
 }
 
-void CQListCtrl::SetLogFont(LOGFONT &font)
+void CQListCtrl::SetLogFont(LOGFONT& font)
 {
 	if (!m_Font.IsNull())
 		m_Font.DeleteObject();
@@ -1399,27 +1994,37 @@ LRESULT CQListCtrl::OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& b
 	CPoint point(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 	if (CGetSetOptions::m_showScrollBar == FALSE)
 	{
-		CPoint cursorPos;
-		GetCursorPos(&cursorPos);
-
 		CRect crWindow;
 		this->GetWindowRect(&crWindow);
 		ScreenToClient(&crWindow);
 
-		crWindow.right -= m_windowDpi->Scale(::GetSystemMetrics(SM_CXVSCROLL));
-		crWindow.bottom -= m_windowDpi->Scale(::GetSystemMetrics(SM_CXHSCROLL));
+		// Don't subtract scrollbar size - detect in the full window area
+		// This prevents flickering when scrollbar appears/disappears
 
 		if (MouseInScrollBarArea(crWindow, point))
 		{
-			if ((GetTickCount() - m_mouseOverScrollAreaStart) > 500)
+			// Show scrollbar immediately when mouse enters scrollbar area
+			if (m_mouseOverScrollAreaStart == 0)
 			{
-				SetTimer(TIMER_SHOW_SCROLL, 500, NULL);
-
 				m_mouseOverScrollAreaStart = GetTickCount();
+				
+				// For modern scrollbar, notify parent
+				if (CGetSetOptions::m_useModernScrollBar)
+				{
+					GetParent().PostMessage(NM_UPDATE_SCROLLBAR, TRUE, 0);
+				}
+				else
+				{
+					// For native scrollbar, show immediately and start hide timer
+					m_timerToHideScrollAreaSet = true;
+					GetParent().SendMessage(NM_SHOW_HIDE_SCROLLBARS, 1, 0);
+					SetTimer(TIMER_HIDE_SCROL, 1000, NULL);
+				}
 			}
 		}
 		else
 		{
+			m_mouseOverScrollAreaStart = 0;
 			if (m_timerToHideScrollAreaSet)
 			{
 				StopHideScrollBarTimer();
@@ -1435,11 +2040,16 @@ LRESULT CQListCtrl::OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& b
 
 bool CQListCtrl::MouseInScrollBarArea(CRect crWindow, CPoint point)
 {
+	int scrollBarWidth = m_windowDpi->Scale(::GetSystemMetrics(SM_CXVSCROLL));
+	int scrollBarHeight = m_windowDpi->Scale(::GetSystemMetrics(SM_CYHSCROLL));
+	int extraMargin = m_windowDpi->Scale(6); // Small extra margin for easier detection
+
 	CRect crRight(crWindow);
 	CRect crBottom(crWindow);
 
-	crRight.left = crRight.right - m_windowDpi->Scale(::GetSystemMetrics(SM_CXVSCROLL));
-	crBottom.top = crBottom.bottom - m_windowDpi->Scale(::GetSystemMetrics(SM_CYHSCROLL));
+	// Detect from the right edge of the window (includes scrollbar area when visible)
+	crRight.left = crRight.right - scrollBarWidth - extraMargin;
+	crBottom.top = crBottom.bottom - scrollBarHeight - extraMargin;
 
 	/*CString cs;
 	cs.Format(_T("point.x: %d, Width: %d, Height: %d\n"), point.x, crWindow.Width(), crWindow.Height());
@@ -1550,7 +2160,7 @@ void CQListCtrl::OnDpiChanged()
 	SetDpiInfo(m_windowDpi);
 }
 
-void CQListCtrl::SetDpiInfo(CDPI *dpi)
+void CQListCtrl::SetDpiInfo(CDPI* dpi)
 {
 	m_windowDpi = dpi;
 
@@ -1606,6 +2216,27 @@ LRESULT CQListCtrl::OnMouseHWheel(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL&
 	else
 	{
 		this->SendMessage(WM_HSCROLL, SB_LINELEFT, NULL);
+	}
+
+	// Notify parent to update modern scrollbar
+	HWND hParent = GetParent();
+	if (hParent != NULL)
+	{
+		::PostMessage(hParent, NM_UPDATE_SCROLLBAR, TRUE, 0);
+	}
+
+	return 0;
+}
+
+LRESULT CQListCtrl::OnVScrollNotify(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+{
+	::DefWindowProc(m_hWnd, uMsg, wParam, lParam);
+
+	// Notify parent to update the modern scrollbar after native scrolling
+	HWND hParent = GetParent();
+	if (hParent != NULL)
+	{
+		::PostMessage(hParent, NM_UPDATE_SCROLLBAR, TRUE, 0);
 	}
 
 	return 0;

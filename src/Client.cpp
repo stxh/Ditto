@@ -46,8 +46,12 @@ BOOL SendToFriend(CSendToFriendInfo &Info)
 	INT_PTR count = Info.m_pClipList->GetCount();
 	int i = -1;
 
-	for (CClip* pClip : Info.m_pClipList->m_ClipList)
+	CClip* pClip;
+	POSITION pos;
+	pos = Info.m_pClipList->GetHeadPosition();
+	while(pos)
 	{
+		pClip = Info.m_pClipList->GetNext(pos);
 		if(pClip == NULL)
 		{
 			ASSERT(FALSE);
@@ -310,7 +314,7 @@ HGLOBAL CClient::RequestCopiedFiles(CClipFormat &HDropFormat, CString csIP, CStr
 
 	LogSendRecieveInfo(StrF(_T("************** START of requesting files from cpu %s, ip: %s **************"), csComputerName, csIP));
 
-	pProgress->Create(NULL);
+	pProgress->Create(IDD_DIALOG_REMOTE_FILE);
 	pProgress->ShowWindow(SW_SHOW);
 	pProgress->SetMessage(StrF(_T("Opening Connection to %s (%s)"), csComputerName, csIP));
 	pProgress->PumpMessages();

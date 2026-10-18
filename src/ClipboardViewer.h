@@ -46,6 +46,8 @@ public:
 	void SetEnsureConnectedTimer();
 	bool ValidActiveWnd();
 
+	bool GetIgnoreClipboardChange();
+
 	DWORD m_dwLastCopy;
 
 	BEGIN_MSG_MAP(CClipboardViewer)

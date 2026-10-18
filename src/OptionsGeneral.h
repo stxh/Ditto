@@ -31,6 +31,8 @@ public:
 		COMMAND_ID_HANDLER(IDC_BUTTON_ABOUT, OnButtonAbout)
 		COMMAND_ID_HANDLER(IDC_BUTTON_ADVANCED, OnBnClickedButtonAdvanced)
 		COMMAND_ID_HANDLER(IDC_BUTTON_THEME, OnBnClickedButtonTheme)
+		COMMAND_ID_HANDLER(IDC_BUTTON_PREVIEW_THEME, OnBtnPreviewThemeCmd)
+		COMMAND_HANDLER(IDC_COMBO_THEME, CBN_SELCHANGE, OnComboThemeSelCmd)
 		COMMAND_ID_HANDLER(IDC_BUTTON_DEFAULT_FAULT, OnBnClickedButtonDefaultFault)
 		COMMAND_ID_HANDLER(IDC_BUTTON_FONT, OnBnClickedButtonFont)
 		COMMAND_HANDLER(IDC_PATH, EN_CHANGE, OnEnChangePath)
@@ -50,6 +52,12 @@ public:
 	LRESULT OnEnChangePath(WORD, WORD, HWND, BOOL&);
 	LRESULT OnClickedMaximumEntries(WORD, WORD, HWND, BOOL&);
 	LRESULT OnClickedExpireEntries(WORD, WORD, HWND, BOOL&);
+
+	void OnBnClickedButtonPreviewTheme();
+	void OnCbnSelchangeComboTheme();
+	void ApplySelectedThemeToPreview();
+	LRESULT OnBtnPreviewThemeCmd(WORD, WORD, HWND, BOOL&) { OnBnClickedButtonPreviewTheme(); return 0; }
+	LRESULT OnComboThemeSelCmd(WORD, WORD, HWND, BOOL&) { OnCbnSelchangeComboTheme(); return 0; }
 
 	int OnApply();
 	BOOL OnSetActive();

@@ -6,6 +6,7 @@
 #include "AdvGeneral.h"
 #include "ScriptEditor.h"
 #include "DimWnd.h"
+#include "MoveToGroupDlg.h"
 
 #define SETTING_DESC_SIZE 1
 #define SETTING_SHOW_TASKBAR_ICON 2
@@ -108,6 +109,16 @@
 #define SETTING_RTF_EDITOR_PATH 99
 #define SETTING_UPDATE_DESC_ON_CLIP_EDIT 100
 #define SETTING_QR_CODE_URL 101
+#define SETTING_APPEND_NAME_IP 102
+#define SETTING_USE_UTF8_FOR_DIFF 103
+#define SETTING_IMAGE_EDITOR_PATH 104
+#define SETTING_CLIP_EDIT_SAVE_DELAY_AFTER_LOAD 105
+#define SETTING_ClIP_EDIT_SAVE_DELAY_AFTER_SAVE 106
+#define SETTING_WEB_SEARCH_URL 107
+#define SETTING_DO_NOT_HIDE_ON_DEACTIVATE 108
+#define SETTING_HIDE_TASKBAR_ICON_ON_CLOSE 109
+#define SETTING_USE_MODERN_SCROLLBAR 110
+#define SETTING_ENFORCE_CLIPBOARD_IGNORE_FORMATS 111
 
 CAdvGeneral::CAdvGeneral()
 {
@@ -202,6 +213,18 @@ void CAdvGeneral::BuildGrid()
 	AddTrueFalse(_T("Write debug to file"), CGetSetOptions::GetEnableDebugLogging(), SETTING_DEBUG_TO_FILE);
 	AddTrueFalse(_T("Write debug to OutputDebugString"), CGetSetOptions::GetEnableOutputDebugStringLogging(), SETTING_DEBUG_TO_OUTPUT_STRING);
 
+	AddTrueFalse(_T("Append Computer Name and IP when receiving clips"), CGetSetOptions::GetAppendRemoveComputerNameAndIPToDescription(), SETTING_APPEND_NAME_IP);
+	AddTrueFalse(_T("Diff save compare files as utf8"), CGetSetOptions::GetPreferUtf8ForCompare(), SETTING_USE_UTF8_FOR_DIFF);
+	AddTrueFalse(_T("Do not hide Ditto window on deactivate"), CGetSetOptions::GetDoNotHideOnDeactivate(), SETTING_DO_NOT_HIDE_ON_DEACTIVATE);
+	AddTrueFalse(_T("Enforce clipboard ignore formats"), CGetSetOptions::GetEnforceClipboardIgnoreFormats(), SETTING_ENFORCE_CLIPBOARD_IGNORE_FORMATS);
+	AddTrueFalse(_T("Hide taskbar icon when Ditto window closes"), CGetSetOptions::GetHideTaskbarIconOnClose(), SETTING_HIDE_TASKBAR_ICON_ON_CLOSE);
+	AddTrueFalse(_T("Use modern scroll bar"), CGetSetOptions::GetUseModernScrollBar(), SETTING_USE_MODERN_SCROLLBAR);
+	m_grid.AddInt(0, _T("Clip edit save delay after load (seconds)"), (long)CGetSetOptions::GetClipEditSaveDelayAfterLoadSeconds(), _T(""), SETTING_CLIP_EDIT_SAVE_DELAY_AFTER_LOAD);
+	m_grid.AddInt(0, _T("Clip edit save delay after save (seconds)"), (long)CGetSetOptions::GetClipEditSaveDelayAfterSaveSeconds(), _T(""), SETTING_ClIP_EDIT_SAVE_DELAY_AFTER_SAVE);
+	static TCHAR szImageEditorFilter[] = _T("Image Editors (*.exe)|*.exe||");
+	m_grid.AddFile(0, _T("Image editor path (empty for system mapping)"), CGetSetOptions::GetImageEditorPath(), szImageEditorFilter, _T(""), SETTING_IMAGE_EDITOR_PATH);
+	m_grid.AddText(0, _T("Web Search Url"), CGetSetOptions::GetWebSearchUrl(), _T(""), SETTING_WEB_SEARCH_URL);
+
 	m_grid.AddCategory(_T("Exclude clips by Regular Expressions"), FALSE);
 
 	CString processFilterDesc = _T("Process making the copy first must match this before the Regex will be applied (empty or * for all processes) (separate multiples by ;)");
@@ -242,6 +265,11 @@ LRESULT CAdvGeneral::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 	m_Resize.AddControl(IDC_BT_COMPACT_AND_REPAIR, DR_MoveTop);
 	m_Resize.AddControl(IDC_BUTTON_COPY_SCRIPTS, DR_MoveTop);
 	m_Resize.AddControl(IDC_BUTTON_PASTE_SCRIPTS, DR_MoveTop);
+	m_Resize.AddControl(IDC_EDIT_ADV_FILTER, DR_SizeWidth | DR_MoveTop);
+	m_Resize.AddControl(IDC_BUTTON_NEXT_MATCH, DR_MoveTop | DR_MoveRight);
+	m_Resize.AddControl(IDC_BUTTON_COPY_SCRIPTS2, DR_MoveTop);
+
+	m_editFilter.SubclassWindow(GetDlgItem(IDC_EDIT_ADV_FILTER));
 
 	return TRUE;
 }
@@ -523,6 +551,36 @@ void CAdvGeneral::ApplySettings()
 		case SETTING_QR_CODE_URL:
 			CGetSetOptions::SetQRCodeUrl(szNew);
 			break;
+		case SETTING_APPEND_NAME_IP:
+			CGetSetOptions::SetAppendRemoveComputerNameAndIPToDescription(bVal);
+			break;
+		case SETTING_USE_UTF8_FOR_DIFF:
+			CGetSetOptions::SetPreferUtf8ForCompare(bVal);
+			break;
+		case SETTING_DO_NOT_HIDE_ON_DEACTIVATE:
+			CGetSetOptions::SetDoNotHideOnDeactivate(bVal);
+			break;
+		case SETTING_ENFORCE_CLIPBOARD_IGNORE_FORMATS:
+			CGetSetOptions::SetEnforceClipboardIgnoreFormats(bVal);
+			break;
+		case SETTING_HIDE_TASKBAR_ICON_ON_CLOSE:
+			CGetSetOptions::SetHideTaskbarIconOnClose(bVal);
+			break;
+		case SETTING_USE_MODERN_SCROLLBAR:
+			CGetSetOptions::SetUseModernScrollBar(bVal);
+			break;
+		case SETTING_CLIP_EDIT_SAVE_DELAY_AFTER_LOAD:
+			CGetSetOptions::SetClipEditSaveDelayAfterLoadSeconds((int)nNew);
+			break;
+		case SETTING_ClIP_EDIT_SAVE_DELAY_AFTER_SAVE:
+			CGetSetOptions::SetClipEditSaveDelayAfterSaveSeconds((int)nNew);
+			break;
+		case SETTING_IMAGE_EDITOR_PATH:
+			CGetSetOptions::SetImageEditorPath(szNew);
+			break;
+		case SETTING_WEB_SEARCH_URL:
+			CGetSetOptions::SetWebSearchUrl(szNew);
+			break;
 		}
 	}
 }
@@ -655,5 +713,107 @@ LRESULT CAdvGeneral::OnNcLButtonDown(UINT, WPARAM wParam, LPARAM, BOOL& bHandled
 
 	// DefWindowProc has to run: it starts the caption-move and border-size loops.
 	bHandled = FALSE;
+	return 0;
+}
+void CAdvGeneral::Search(bool fromSelection)
+{
+	CString filterText;
+	m_editFilter.GetWindowText(filterText);
+	filterText.MakeLower();
+
+	if (filterText.IsEmpty())
+	{
+		m_grid.SelectFirst();
+		return;
+	}
+
+	int nStartAfter = fromSelection ? m_grid.SelectedRow() : -1;
+	m_grid.SelectNextMatch(filterText, nStartAfter);
+}
+
+LRESULT CAdvGeneral::OnEnChangeAdvFilter(WORD, WORD, HWND, BOOL&)
+{
+	Search(false);
+	return 0;
+}
+
+LRESULT CAdvGeneral::OnBnClickedButtonNextMatch(WORD, WORD, HWND, BOOL&)
+{
+	Search(true);
+	return 0;
+}
+
+LRESULT CAdvGeneral::OnBnClickedButtonCopyScripts2(WORD, WORD, HWND, BOOL&)
+{
+	CDimWnd dimmer(m_hWnd);
+
+	CMoveToGroupDlg dlg(_T("Select group to reset clip order"));
+	if (dlg.DoModal(m_hWnd) != IDOK)
+		return 0;
+
+	CWaitCursor wait;
+
+	const int groupID = dlg.GetSelectedGroup();
+
+	CString reOrderSql = R"(
+
+			WITH OrderedRows AS(
+
+				SELECT
+
+					rowid AS original_rowid,
+
+					ROW_NUMBER() OVER(ORDER BY {orderField} ASC) AS rn
+
+				FROM
+
+					Main
+
+				WHERE lParentID = {parentID}
+
+			)
+
+			--Update the main table using the CTE results
+
+			UPDATE 
+
+				Main
+
+			SET {orderField} = (
+
+					SELECT rn
+
+					FROM OrderedRows
+
+					WHERE OrderedRows.original_rowid = Main.rowid
+
+				)
+
+			WHERE lParentID = {parentID}
+
+		)";
+
+	if (groupID == -1)
+	{
+		reOrderSql.Replace(_T("{orderField}"), _T("clipOrder"));
+
+		//reorder all clips
+		reOrderSql.Replace(_T("WHERE lParentID = {parentID}"), _T(""));
+	}
+	else
+	{
+		reOrderSql.Replace(_T("{parentID}"), std::to_wstring(groupID).c_str());
+		reOrderSql.Replace(_T("{orderField}"), _T("clipGroupOrder"));
+	}
+
+	try
+	{
+		theApp.m_db.execDML(reOrderSql);
+	}
+	catch (CppSQLite3Exception& e)
+	{
+		MessageBox(e.errorMessage());
+	}
+
 	return 0;
 }

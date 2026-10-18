@@ -1,13 +1,38 @@
-What is DittoWTL?
-- DittoWTL 4.0.0.1 is the WTL port of Ditto, an extension to the Windows Clipboard. You copy something to the Clipboard and Ditto takes what you copied and stores it in a database to retrieve at a later time.
-- Ditto 本身的行为、数据库格式和数据目录 (`%APPDATA%\Ditto`) 都没有变化，可执行文件仍为 `Ditto.exe`。界面与窗口标题显示为 DittoWTL，用于区分这个不再依赖 MFC 的分支。
+# [Ditto - Clipboard Manager](https://github.com/sabrogden/Ditto/releases/download/3.25.113.0/DittoSetup_3_25_113_0.exe)
 
-Basic Usage
-- Run Ditto
-- Copy things to the clipboard, e.g. using Ctrl-C with text selected in a text editor.
-- Open Ditto by clicking its icon in the system tray or by pressing its Hot Key which defaults to Ctrl + ` – i.e. hold down Ctrl and press the back-quote (tilde ~) key.
-- Double click or press enter on the item to paste it to the previous window.
+![GitHub Downloads (all assets, latest release)](https://img.shields.io/github/downloads/sabrogden/Ditto/latest/total) ![GitHub commits since latest release](https://img.shields.io/github/commits-since/sabrogden/Ditto/latest) ![GitHub contributors](https://img.shields.io/github/contributors/sabrogden/Ditto)
 
-Building
-- Open `CP_Main_10.sln` with Visual Studio 18 (MSVC 14.51, platform toolset v145) and build `Release|x64`; the WTL 10 headers are vendored in `wtl\include`, so no external WTL install is needed.
-- Migration status, what is done and what is left: [WTL_Migration_Status.md](WTL_Migration_Status.md).
+
+
+[Help/Wiki](https://github.com/sabrogden/Ditto/wiki)&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;[Forums](https://github.com/sabrogden/Ditto/issues)&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;[Donate](https://www.paypal.com/donate/?item_name=Donation+to+Ditto&cmd=_donations&business=sabrogden%40gmail.com&Z3JncnB0=)&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;[Beta](https://ditto-cp.sourceforge.io/beta/)&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;[Source](https://github.com/sabrogden/Ditto)&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;[History](https://github.com/sabrogden/Ditto/releases)
+
+Ditto is an extension to the standard windows clipboard. It saves each item placed on the clipboard allowing you access to any of those items at a later time. Ditto allows you to save any type of information that can be put on the clipboard, text, images, html, custom formats.
+
+
+1. [Installer](https://github.com/sabrogden/Ditto/releases/download/3.25.113.0/DittoSetup_3_25_113_0.exe)
+2. [Portable](https://github.com/sabrogden/Ditto/releases/download/3.25.113.0/DittoPortable_3_25_113_0.zip)
+3. [Chocolatey](https://chocolatey.org/packages/ditto/3.23.124.0) choco install ditto
+4. [Chocolatey Portable](https://chocolatey.org/packages/ditto.portable/3.23.124.0) choco install ditto.portable
+5. [Winget](https://winget.run/pkg/Ditto/Ditto) winget install -e --id Ditto.Ditto
+6. [Windows Store App](https://www.microsoft.com/en-us/store/p/ditto-cp/9nblggh3zbjq)  
+
+
+## Basic Usage
+
+1. Run Ditto
+2. Copy things to the clipboard, e.g. using Ctrl-C with text selected in a text editor.
+3. Open Ditto by clicking its icon in the system tray or by pressing its Hot Key which defaults to Ctrl + ` – i.e. hold down Ctrl and press the back-quote (tilde ~) key.
+4. Double click or press enter on the item to paste it to the previous window.
+
+## Local First
+- No login
+- No cloud
+- No telemetry
+
+## Windows Code-Signing Policy
+Free code signing on Windows binaries provided by SignPath.io, certificate by SignPath Foundation.
+<br>
+<br>
+
+<img src="ditto.gif">
+

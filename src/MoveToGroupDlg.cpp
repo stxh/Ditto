@@ -21,7 +21,10 @@ LRESULT CMoveToGroupDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
     m_Tree.SetNotificationWndEx(m_hWnd);
     m_Tree.FillTree();
 
-    theApp.m_Language.UpdateMoveToGroups(m_hWnd);
+    if (!m_windowTitle.IsEmpty())
+        SetWindowText(m_windowTitle);
+    else
+        theApp.m_Language.UpdateMoveToGroups(m_hWnd);
 
     return TRUE;
 }

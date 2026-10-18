@@ -11,20 +11,22 @@
 
 #define IS_WIN30_DIB(lpbi)  ((*(LPDWORD)(lpbi)) == sizeof(BITMAPINFOHEADER))
 
-class CBitmapHelper  
+#include "clip.h"
+
+class CBitmapHelper
 {
 public:
 	CBitmapHelper();
 	virtual ~CBitmapHelper();
 
-	static int		GetCBitmapWidth(const CBitmap & cbm);
-	static int		GetCBitmapHeight(const CBitmap & cbm);
-	static BOOL		GetCBitmap(void	*pClip2, HDC hdc, CBitmap *pBitMap, int nMaxHeight);
-	static BOOL		GetCBitmap(CClipFormats&clips, HDC hdc, CBitmap* pBitMap, BOOL horizontal);
+	static int		GetCBitmapWidth(const CBitmap& cbm);
+	static int		GetCBitmapHeight(const CBitmap& cbm);
+	static BOOL		GetCBitmap(void* pClip2, CDC* pDC, CBitmap* pBitMap, int nMaxHeight);
+	static BOOL		GetCBitmap(CClipFormats& clips, CDC* pDC, CBitmap* pBitMap, BOOL horizontal);
 	static HANDLE	hBitmapToDIB(HBITMAP hBitmap, DWORD dwCompression, HPALETTE hPal);
 	static WORD		PaletteSize(LPSTR lpDIB);
 	static WORD		DIBNumColors(LPSTR lpDIB);
-	static bool		DrawDIB(HDC hdc, HANDLE hData, int nLeft, int nRight, int &nWidth);
+	static bool		DrawDIB(CDC* pDC, HANDLE hData, int nLeft, int nRight, int& nWidth);
 
 };
 

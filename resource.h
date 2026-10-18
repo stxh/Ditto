@@ -8,12 +8,24 @@
 #define IDR_CP_MAITYPE                  129
 #define IDR_EDIT_WND                    129
 #define IDR_MENU                        130
+#define IDR_EDIT_WND1                   130
+#define IDR_EDIT_WND_200                130
 #define IDD_SELECT_DB                   131
+#define IDR_EDIT_WND_125                131
 #define IDD_OPTIONS_STATS               132
+#define IDR_EDIT_WND_150                132
+#define IDR_EDIT_WND_175                133
 #define IDD_ADD_TYPE                    134
+#define IDR_EDIT_WND_225                134
 #define IDD_COPY_PROPERTIES             135
+#define IDR_EDIT_WND_FORMAT_200         135
 #define IDD_ABOUT                       136
+#define IDR_EDIT_WND_FORMAT_125         136
+#define IDR_EDIT_WND_FORMAT_150         137
 #define IDD_GROUP_NAME                  138
+#define IDR_EDIT_WND_FORMAT_175         138
+#define IDR_EDIT_WND_FORMAT_201         139
+#define IDR_EDIT_WND_FORMAT_225         139
 #define IDB_CLOSED_FOLDER               141
 #define IDB_CLOSED_FOLDER_PRESSED       142
 #define IDB_CLOSED_FOLDER_FOCUSED       143
@@ -240,6 +252,9 @@
 #define IDR_MENU_NO_DB                  387
 #define IDI_ICON3                       388
 #define IDI_MAINFRAME_NO_DB             388
+#define IDR_MENU2                       390
+#define IDR_MENU_DELETE_CLIP_DATA       390
+#define IDR_MENU3                       391
 #define IDC_PATH                        1000
 #define IDC_GET_PATH                    1001
 #define IDC_SELECT_SOUND                1002
@@ -322,6 +337,7 @@
 #define IDC_CHECK_CLIP_TITLE            1042
 #define IDC_CHECK_SHIFT_1               1042
 #define IDC_CHECK_ACTIVE                1042
+#define IDC_BUTTON_COPY_SCRIPTS2        1042
 #define IDC_PLAY_SOUND_2                1043
 #define IDC_CHECK_MOVE_CLIPS_ON_PASTE   1043
 #define IDC_CHECK_CREATE_DATE           1043
@@ -558,7 +574,7 @@
 #define IDC_WIN_PASTE_5                 2122
 #define IDC_EDIT_DIFF_PATH              2123
 #define IDC_CUT_5                       2123
-#define IDC_BUTTON2                     2124
+#define IDC_BUTTON_NEXT_MATCH           2124
 #define IDC_BUTTON_DIFF_BROWSE          2124
 #define IDC_BUTTON_REMOVE               2124
 #define IDC_BUTTON_ADVANCED             2124
@@ -633,6 +649,10 @@
 #define IDC_RICHEDIT21                  2172
 #define IDC_MFCLINK2                    2172
 #define IDC_EDIT_ACTIVE_APP             2173
+#define IDC_CHECK_DO_NOT_HIDE_ON_DEACTIVATE 2174
+#define IDC_BUTTON_PREVIEW_THEME        2175
+#define IDC_EDIT_ADV_FILTER             5001
+#define IDC_NEXT_MATCH_BUTTON           5002
 #define ID_FIRST_OPTION                 32771
 #define ID_FIRST_EXIT                   32772
 #define ID_FIRST_SHOWQUICKPASTE         32773
@@ -833,15 +853,38 @@
 #define ID_SPECIALPASTE_MULTIPLEIMAGES  32977
 #define ID_SPECIALPASTE_MULTIPLEIMAGESVERTICALLY 32978
 #define ID_SPECIALPASTE_ASCIITEXTONLY   32979
+#define ID__VIEWFULLDESCRIPTION         32980
+#define ID__SAVETOFILE                  32981
+#define ID__PROPERTIES                  32982
+#define ID_BUTTON32983                  32983
+#define IDR_EDIT_WND_FORMAT             32984
+#define BUTTON_FONT                     32985
+#define BUTTON_COLOR                    32986
+#define BUTTON_BOLD                     32987
+#define BUTTON_ITALIC                   32988
+#define BUTTON_UNDERLINE                32989
+#define BUTTON_LEFTALIGN                32990
+#define BUTTON_CENTERALIGN              32991
+#define BUTTON_RIGHTALIGN               32992
+#define BUTTON_INDENT                   32993
+#define BUTTON_OUTDENT                  32994
+#define BUTTON_BULLET                   32995
+#define ID_BUTTONWRAP                   32996
+#define ID_IMPORT_EXPORTTOWEBSEARCH     32997
+#define ID_SPECIALPASTE_PASTENEWGUID    32998
+#define ID_SPECIALPASTE_POSIXIFY_PATHS  32999
+#define ID_MENU_SHOWSTARREDCLIPS        33000
+#define ID_SPECIALPASTE_PASTEASIMAGE    33001
+#define ID_MENU_GOTOENTRY               33002
 
 // Next default values for new objects
-// 
+//
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        390
-#define _APS_NEXT_COMMAND_VALUE         32980
-#define _APS_NEXT_CONTROL_VALUE         2173
+#define _APS_NEXT_RESOURCE_VALUE        394
+#define _APS_NEXT_COMMAND_VALUE         33002
+#define _APS_NEXT_CONTROL_VALUE         2174
 #define _APS_NEXT_SYMED_VALUE           104
 #endif
 #endif

@@ -1,7 +1,6 @@
 ﻿#include "stdafx.h"
 #include "CP_Main.h"
 #include "OptionsGeneral.h"
-#include "InternetUpdate.h"
 #include <io.h>
 #include <Mmsystem.h>
 #include "Path.h"
@@ -212,7 +211,7 @@ int COptionsGeneral::OnApply()
 			CString cs;
 			cs.Format(_T("The database %s does not exist.\n\nCreate a new database?"), resolvedPath);
 
-			if (MessageBox(cs, _T("DittoWTL"), MB_YESNO) == IDYES)
+			if (MessageBox(cs, _T("DittoWTL"), MB_OKCANCEL) == IDOK)
 			{
 				if (CreateDB(resolvedPath))
 				{
@@ -581,4 +580,59 @@ void COptionsGeneral::FillThemes()
 			}
 		}
 	}
+}
+
+void COptionsGeneral::OnBnClickedButtonPreviewTheme()
+{
+	if (theApp.m_pMainFrame != NULL)
+	{
+		CQPasteWnd* pPasteWnd = theApp.m_pMainFrame->m_quickPaste.m_pwndPaste;
+
+		// If the window doesn't exist yet, create/show it first (will load persisted theme)
+		if (pPasteWnd == NULL || IsWindow(pPasteWnd->m_hWnd) == FALSE)
+		{
+			theApp.m_pMainFrame->m_quickPaste.ShowQPasteWnd(theApp.m_pMainFrame, true, false, TRUE);
+			pPasteWnd = theApp.m_pMainFrame->m_quickPaste.m_pwndPaste;
+		}
+
+		// Ensure it is visible before applying preview theme
+		if (pPasteWnd != NULL && IsWindow(pPasteWnd->m_hWnd))
+		{
+			pPasteWnd->ShowWindow(SW_SHOW);
+			pPasteWnd->SetForegroundWindow();
+		}
+
+		// Reuse the dropdown-change logic to load/apply the selected theme
+		OnCbnSelchangeComboTheme();
+	}
+}
+
+void COptionsGeneral::OnCbnSelchangeComboTheme()
+{
+	// If the Ditto window is currently visible, update the theme live
+	if (theApp.m_pMainFrame != NULL && theApp.m_pMainFrame->m_quickPaste.IsWindowVisibleEx())
+	{
+		ApplySelectedThemeToPreview();
+		
+		// Refresh the window to apply the new theme
+		if (theApp.m_pMainFrame->m_quickPaste.m_pwndPaste != NULL)
+		{
+			theApp.m_pMainFrame->m_quickPaste.m_pwndPaste->RefreshThemeColors();
+		}
+	}
+}
+
+void COptionsGeneral::ApplySelectedThemeToPreview()
+{
+	CString csTheme = _T("");
+	if (m_cbTheme.GetCurSel() >= 0)
+	{
+		if (m_cbTheme.GetItemData(m_cbTheme.GetCurSel()) == 1)
+		{
+			m_cbTheme.GetLBText(m_cbTheme.GetCurSel(), csTheme);
+		}
+	}
+	
+	// Load the selected theme
+	CGetSetOptions::m_Theme.Load(csTheme, false, true);
 }

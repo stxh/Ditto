@@ -40,7 +40,7 @@ HGLOBAL CImageFormatAggregator::GetHGlobal()
 		return NULL;
 	}
 
-	int count = m_images.GetCount();
+	int count = (int)m_images.GetCount();
 	for (int i = 0; i < count; i++)
 	{
 		CClipFormat clip = m_images[i];
