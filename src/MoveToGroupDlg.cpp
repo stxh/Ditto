@@ -4,13 +4,19 @@
 #include "GroupName.h"
 #include "ProcessPaste.h"
 
-CMoveToGroupDlg::CMoveToGroupDlg()
+CMoveToGroupDlg::CMoveToGroupDlg(CString windowTitle /*= _T("")*/)
     : m_nSelectedGroup(-1)
+    , m_windowTitle(windowTitle)
 {
 }
 
 LRESULT CMoveToGroupDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
 {
+    if (!m_windowTitle.IsEmpty())
+    {
+        SetWindowText(m_windowTitle);
+    }
+
     HWND hTree = GetDlgItem(IDC_TREE);
     if (hTree != nullptr)
     {
@@ -21,10 +27,7 @@ LRESULT CMoveToGroupDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&)
     m_Tree.SetNotificationWndEx(m_hWnd);
     m_Tree.FillTree();
 
-    if (!m_windowTitle.IsEmpty())
-        SetWindowText(m_windowTitle);
-    else
-        theApp.m_Language.UpdateMoveToGroups(m_hWnd);
+    theApp.m_Language.UpdateMoveToGroups(m_hWnd);
 
     return TRUE;
 }

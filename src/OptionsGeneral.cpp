@@ -211,7 +211,7 @@ int COptionsGeneral::OnApply()
 			CString cs;
 			cs.Format(_T("The database %s does not exist.\n\nCreate a new database?"), resolvedPath);
 
-			if (MessageBox(cs, _T("DittoWTL"), MB_OKCANCEL) == IDOK)
+			if (MessageBox(cs, _T("DittoWTL"), MB_YESNO) == IDYES)
 			{
 				if (CreateDB(resolvedPath))
 				{
@@ -589,17 +589,17 @@ void COptionsGeneral::OnBnClickedButtonPreviewTheme()
 		CQPasteWnd* pPasteWnd = theApp.m_pMainFrame->m_quickPaste.m_pwndPaste;
 
 		// If the window doesn't exist yet, create/show it first (will load persisted theme)
-		if (pPasteWnd == NULL || IsWindow(pPasteWnd->m_hWnd) == FALSE)
+		if (pPasteWnd == NULL || ::IsWindow(pPasteWnd->m_hWnd) == FALSE)
 		{
 			theApp.m_pMainFrame->m_quickPaste.ShowQPasteWnd(theApp.m_pMainFrame, true, false, TRUE);
 			pPasteWnd = theApp.m_pMainFrame->m_quickPaste.m_pwndPaste;
 		}
 
 		// Ensure it is visible before applying preview theme
-		if (pPasteWnd != NULL && IsWindow(pPasteWnd->m_hWnd))
+		if (pPasteWnd != NULL && ::IsWindow(pPasteWnd->m_hWnd))
 		{
 			pPasteWnd->ShowWindow(SW_SHOW);
-			pPasteWnd->SetForegroundWindow();
+			::SetForegroundWindow(pPasteWnd->m_hWnd);
 		}
 
 		// Reuse the dropdown-change logic to load/apply the selected theme

@@ -368,63 +368,69 @@ bool CClipEditThread::ReadFile(CString filePath, bool &unicode, CString &unicode
 	return true;
 }
 
-std::vector<BYTE> CImageToPNGBytes(const CImage& image, REFGUID guidFileType)
+static const CLSID CLSID_ImageFormatPNG = { 0x557cf406, 0x1a04, 0x11d3, { 0x9a, 0x73, 0x00, 0x00, 0xf8, 0x1e, 0x32, 0x58 } };
+
+static bool GdipBitmapToFormatBytes(Gdiplus::Bitmap* bitmap, const CLSID& clsid, std::vector<BYTE>& outBytes)
 {
+	if (bitmap == nullptr)
+	{
+		return false;
+	}
+
 	IStream* pStream = nullptr;
 	HRESULT hr = CreateStreamOnHGlobal(nullptr, TRUE, &pStream);
 	if (FAILED(hr)) {
-		return {};
+		return false;
 	}
 
-	ULARGE_INTEGER ulSize;
+	bool ok = false;
 
-	hr = image.Save(pStream, guidFileType);
-	if (FAILED(hr)) {
-		pStream->Release();
-		return {};
+	if (bitmap->Save(pStream, &clsid, nullptr) == Gdiplus::Ok)
+	{
+		LARGE_INTEGER liZero = { 0 };
+		ULARGE_INTEGER ulSize = { 0 };
+
+		hr = pStream->Seek(liZero, STREAM_SEEK_END, &ulSize);
+		if (SUCCEEDED(hr) && ulSize.QuadPart > 0)
+		{
+			hr = pStream->Seek(liZero, STREAM_SEEK_SET, nullptr);
+			if (SUCCEEDED(hr))
+			{
+				ULONG written = 0;
+				outBytes.resize((size_t)ulSize.QuadPart);
+				hr = pStream->Read(outBytes.data(), (ULONG)ulSize.QuadPart, &written);
+				ok = SUCCEEDED(hr) && written == (ULONG)ulSize.QuadPart;
+			}
+		}
 	}
 
-	LARGE_INTEGER liZero = { 0 };
-	hr = pStream->Seek(liZero, STREAM_SEEK_SET, nullptr);
-	if (FAILED(hr)) {
-		pStream->Release();
-		return {};
-	}
-
-	hr = pStream->Seek({ 0 }, STREAM_SEEK_END, &ulSize);
-	if (FAILED(hr)) {
-		pStream->Release();
-		return {};
-	}
-
-	std::vector<BYTE> pngBytes((UINT)ulSize.QuadPart);
-
-	hr = pStream->Seek(liZero, STREAM_SEEK_SET, nullptr);
-	if (FAILED(hr)) {
-		pStream->Release();
-		return {};
-	}
-
-	hr = pStream->Read(pngBytes.data(), (UINT)ulSize.QuadPart, nullptr);
 	pStream->Release();
 
-	if (FAILED(hr)) {
-		return {};
+	if (!ok)
+	{
+		outBytes.clear();
 	}
-	return pngBytes;
+	return ok;
 }
 
 bool CClipEditThread::ReadImageFile(CString path, std::vector<BYTE> &cf_dibBytes, std::vector<BYTE> & pngBytes)
 {
-	CImage image;
-	HRESULT hr = image.Load(path);
-	if (FAILED(hr)) 
+	Gdiplus::Bitmap* bitmap = Gdiplus::Bitmap::FromFile(path);
+	if (bitmap == nullptr || bitmap->GetLastStatus() != Gdiplus::Ok)
 	{
+		delete bitmap;
 		Log(StrF(_T("Failed to load image, %s"), path));
 		return false;
 	}
 
-	pngBytes = CImageToPNGBytes(image, Gdiplus::ImageFormatPNG);	
+	bool ok = GdipBitmapToFormatBytes(bitmap, CLSID_ImageFormatPNG, pngBytes);
+	delete bitmap;
+
+	if (!ok)
+	{
+		Log(StrF(_T("Failed to encode image to png, %s"), path));
+		return false;
+	}
 
 	return true;
 }
@@ -450,4 +456,4 @@ BOOL CClipEditThread::GetTextFromRTF(CStringA rtf, CString &unicodeText)
 	}	
 
 	return false;
-}
+}

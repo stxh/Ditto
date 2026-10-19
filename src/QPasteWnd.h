@@ -20,6 +20,7 @@
 #include "SymbolEdit.h"
 #include "Popup.h"
 #include "CustomFriendsHelper.h"
+#include "ChaiScriptXml.h"
 #include "CmdUI.h"
 #include "ModernScrollBar.h"
 #include <shlobj.h>
@@ -402,6 +403,8 @@ public:
 	DWORD m_lastNonActiveMouseMove;
 
     void RefreshNc();
+    void RefreshScrollBarColors();
+    void RefreshThemeColors();
     void UpdateStatus(bool bRepaintImmediately = false); // regenerates the status (caption) text
     BOOL FillList(CString csSQLSearch = "");
     BOOL HideQPasteWindow(bool releaseFocus, BOOL clearSearchData = -1);
@@ -412,7 +415,7 @@ public:
 
 	BOOL OpenID(int id, CSpecialPasteOptions pasteOptions);
 	BOOL OpenSelection(CSpecialPasteOptions pasteOptions);
-    BOOL OpenIndex(int item);
+    BOOL OpenIndex(int item, bool plainTextOnly = false);
 	BOOL NewGroup(bool bGroupSelection = true, int parentId = -1);
 
     CString LoadDescription(int nItem);
@@ -455,6 +458,7 @@ public:
 	bool DoActionPrevDescription();
 	bool DoActionPastePosixifyPaths();
 	bool DoPasteAsImage();
+	bool DoActionGenerateGuid();
 	bool DoActionShowMenu();
 	bool DoActionShowSystemMenu();
 	bool DoActionNewGroup();
@@ -551,7 +555,7 @@ public:
 
 	bool ShowProperties(int id, int row);
 	bool DeleteClips(CClipIDs &IDs, ARRAY &Indexs);
-	void RemoveFromImageRtfCache(int id);
+	void RemoveFromImageRtfCache(int row, int id = -1);
 	bool SyncClipDataToArrayData(CClip &clip);
 	bool SelectIds(ARRAY &ids);
 

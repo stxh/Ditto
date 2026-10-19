@@ -859,7 +859,6 @@ xcopy /Y /R "$(ProjectDir)Themes\*" "$(OutDir)Themes\"</Command>
     <ClCompile Include="src\ScrollHelper.cpp" />
     <ClCompile Include="src\SendMail.cpp" />
     <ClCompile Include="Shared\TextConvert.cpp" />
-    <ClCompile Include="Shared\Tokenizer.cpp" />
     <ClCompile Include="src\ShowTaskBarIcon.cpp" />
     <ClCompile Include="src\SimpleBrowser.cpp" />
     <ClCompile Include="src\SnapWindow.cpp" />

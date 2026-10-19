@@ -134,7 +134,7 @@ int CQPasteWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	//m_search.SetButtonArea(rcCloseArea);
 
 	// Create the header control
-	if (!m_lstHeader.Create(m_hWnd, rcZero, NULL, WS_TABSTOP | WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | LVS_NOCOLUMNHEADER) | LVS_REPORT | LVS_SHOWSELALWAYS | LVS_OWNERDATA | LVS_OWNERDRAWFIXED, 0, ID_LIST_HEADER))
+	if (!m_lstHeader.Create(m_hWnd, rcZero, NULL, WS_TABSTOP | WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | LVS_NOCOLUMNHEADER | LVS_REPORT | LVS_SHOWSELALWAYS | LVS_OWNERDATA | LVS_OWNERDRAWFIXED, 0, ID_LIST_HEADER))
 	{
 		ASSERT(FALSE);
 		return -1;
@@ -1395,7 +1395,7 @@ BOOL CQPasteWnd::FillList(CString csSQLSearch)
 void CQPasteWnd::ShowRightClickMenu()
 {
 	POINT pp;
-	CMenu cmPopUp;
+	CMenuHandle cmPopUp;
 	CMenuHandle cmSubMenu = NULL;
 
 	GetCursorPos(&pp);
@@ -3369,7 +3369,7 @@ bool CQPasteWnd::DoAction(CAccel a)
 		ret = DoPasteAsImage();
 		break;
 	case ActionEnums::SHOW_STARRED_CLIPS:
-		OnMenuShowStarredClips();
+		{ BOOL bHandled = TRUE; OnMenuShowStarredClips(0, ID_MENU_SHOWSTARREDCLIPS, NULL, bHandled); }
 		ret = true;
 		break;
 	}
@@ -4430,7 +4430,7 @@ bool CQPasteWnd::DoExportToWebSearch()
 
 bool CQPasteWnd::DoActionGenerateGuid()
 {
-	if (::GetFocus() == m_lstHeader.GetSafeHwnd())
+	if (::GetFocus() == m_lstHeader.m_hWnd)
 	{
 		CSpecialPasteOptions pasteOptions;
 		pasteOptions.m_pasteGuid = true;
@@ -4443,7 +4443,7 @@ bool CQPasteWnd::DoActionGenerateGuid()
 
 bool CQPasteWnd::DoPasteAsImage()
 {
-	if (::GetFocus() == m_lstHeader.GetSafeHwnd())
+	if (::GetFocus() == m_lstHeader.m_hWnd)
 	{
 		CSpecialPasteOptions pasteOptions;
 		pasteOptions.m_pasteAsImage = true;
@@ -7055,7 +7055,7 @@ LRESULT CQPasteWnd::OnSystemButton(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOO
 	m_lstHeader.HidePopup(true);
 
 	POINT pp;
-	CMenu cmPopUp;
+	CMenuHandle cmPopUp;
 	CMenuHandle cmSubMenu = NULL;
 
 	GetCursorPos(&pp);

@@ -9,14 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-class VersionInfo
-{
-public:
-	int Major;
-	int Minor;
-	int Revision;
-	int Build;
-};
+#include "Misc.h"
 
 class CInternetUpdate  
 {

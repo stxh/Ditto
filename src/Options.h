@@ -3,6 +3,7 @@
 #include "Theme.h"
 #include "RegExFilterHelper.h"
 #include "ChaiScriptXml.h"
+#include "..\Shared\ArrayEx.h"
 #include <set>
 
 #define MAX_SEND_CLIENTS	15
@@ -72,7 +73,7 @@ public:
 	static bool m_bFromIni;
 	static CString m_csIniFileName;
 	static bool m_bInConversion;
-	static CTheme m_Theme;
+	static CDittoTheme m_Theme;
 	static bool m_portable;
 	static bool m_windowsApp;
 	static bool m_chocolateyApp;
@@ -349,7 +350,7 @@ public:
 	static BOOL		GetEnableOutputDebugStringLogging();
 	static void		SetEnableOutputDebugStringLogging(BOOL bSet);
 
-	static CStringArray m_csNetworkPasswordArray;
+	static CArrayEx<CString> m_csNetworkPasswordArray;
 
 	static CString  GetPath(long lPathID);
 

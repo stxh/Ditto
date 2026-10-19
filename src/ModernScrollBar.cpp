@@ -86,7 +86,7 @@ void CModernScrollBar::UpdateScrollBar()
 	// Get the list control position relative to parent
 	CRect listRectInParent;
 	m_pListCtrl->GetWindowRect(&listRectInParent);
-	::ScreenToClient(m_hWndParent, &listRectInParent);
+	::ScreenToClient(m_hWndParent, (LPPOINT)&listRectInParent);
 
 	// Get parent client rect to ensure we stay within visible area
 	CRect parentClientRect;
@@ -138,7 +138,7 @@ void CModernScrollBar::UpdateScrollBar()
 	// Only move if position changed
 	CRect currentRect;
 	GetWindowRect(&currentRect);
-	::ScreenToClient(m_hWndParent, &currentRect);
+	::ScreenToClient(m_hWndParent, (LPPOINT)&currentRect);
 
 	if (currentRect != scrollRect)
 	{
@@ -274,7 +274,7 @@ void CModernScrollBar::OnPaint(CDCHandle dc)
 	CDCHandle memDC = ::CreateCompatibleDC(dc);
 
 	HBITMAP hBitmap = ::CreateCompatibleBitmap(dc, clientRect.Width(), clientRect.Height());
-	HGDIOBJ hOldBitmap = memDC.SelectObject(hBitmap);
+	HBITMAP hOldBitmap = memDC.SelectBitmap(hBitmap);
 
 	// Fill with track color (solid background)
 	memDC.FillSolidRect(&clientRect, m_trackColor);
@@ -298,7 +298,7 @@ void CModernScrollBar::OnPaint(CDCHandle dc)
 	// Copy to screen
 	dc.BitBlt(0, 0, clientRect.Width(), clientRect.Height(), memDC, 0, 0, SRCCOPY);
 
-	memDC.SelectObject(hOldBitmap);
+	memDC.SelectBitmap(hOldBitmap);
 	::DeleteObject(hBitmap);
 	memDC.DeleteDC();
 }

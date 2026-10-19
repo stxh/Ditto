@@ -13,8 +13,9 @@
 #include <atlframe.h>
 #include <vector>
 
-// CDeleteClipData dialog
 class CToolTipEx;
+
+// CDeleteClipData dialog
 
 class CDeleteData
 {
@@ -34,8 +35,9 @@ public:
 	DWORD m_dataSize;
 	CString m_quickPasteText;
 };
-	
-	
+		
+		
+		
 	
 
 // Edit control that asks the dialog to run the search when Enter is pressed.
@@ -61,7 +63,7 @@ public:
 	}
 };
 
-class CDeleteClipData : public CDialogImpl<CDeleteClipData>
+class CDeleteClipData : public CDialogImpl<CDeleteClipData>, public WTL::CMessageFilter
 {
 public:
 	CDeleteClipData(HWND hParent = NULL);   // standard constructor
@@ -83,15 +85,16 @@ protected:
 		MESSAGE_HANDLER(WM_NCDESTROY, OnNcDestroy)
 		MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
 		MESSAGE_HANDLER(WM_TIMER, OnTimer)
+		MESSAGE_HANDLER(WM_CONTEXTMENU, OnContextMenu)
 		COMMAND_ID_HANDLER(IDC_BUTTON_SEARCH, OnBnClickedButtonSearch)
 		COMMAND_ID_HANDLER(IDC_CHECK_CLIP_TITLE, OnBnClickedCheckClipTitle)
 		COMMAND_ID_HANDLER(IDC_BUTTON_APPLY, OnBnClickedButtonApply)
-		COMMAND_ID_HANDLER(IDCANCEL, OnBnClickedCancel)
+		COMMAND_ID_HANDLER(IDCLOSE, OnBnClickedClose)
+		COMMAND_ID_HANDLER(IDCANCEL, OnCancel)
+		COMMAND_ID_HANDLER(IDC_BT_COMPACT_AND_REPAIR, OnBnClickedBtCompactAndRepair)
 		COMMAND_ID_HANDLER(IDC_CHECK_CREATE_DATE, OnBnClickedCheckCreateDate)
 		COMMAND_ID_HANDLER(IDC_CHECK_LAST_USE_DATE, OnBnClickedCheckLastUseDate)
 		COMMAND_ID_HANDLER(IDC_CHECK_DATA_FORMAT, OnBnClickedCheckDataFormat)
-		MESSAGE_HANDLER(WM_CONTEXTMENU, OnContextMenu)
-		COMMAND_ID_HANDLER(IDC_BT_COMPACT_AND_REPAIR, OnBnClickedCompactRepairCmd)
 		NOTIFY_HANDLER(IDC_LIST2, LVN_KEYDOWN, OnLvnKeydownList2)
 		NOTIFY_HANDLER(IDC_LIST2, LVN_ITEMCHANGED, OnLvnItemchangedList2)
 		NOTIFY_HANDLER(0, HDN_GETDISPINFO, OnHdnGetdispinfoList2)
@@ -110,12 +113,14 @@ protected:
 	bool m_applyingDelete;
 	bool m_cancelDelete;
 
+	CToolTipEx* m_pDescriptionWindow;
 
 
 	void InitListCtrlCols();
 	BOOL OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 
 	LRESULT OnClose(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	void CloseDescriptionWindow();
 	LRESULT OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT OnNcDestroy(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	void LoadItems();
@@ -156,23 +161,15 @@ public:
 	CString m_toDeleteSize;
 	LRESULT OnBnClickedCheckClipTitle(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnBnClickedButtonApply(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
-	LRESULT OnBnClickedCancel(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnBnClickedClose(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnCancel(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnTimer(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnContextMenu(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT OnBnClickedCheckCreateDate(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnBnClickedCheckLastUseDate(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnBnClickedCheckDataFormat(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnLvnColumnclickList2(int idCtrl, LPNMHDR pNMHDR, BOOL& bHandled);
-	LRESULT OnContextMenu(UINT, WPARAM, LPARAM, BOOL&);
-	LRESULT OnBnClickedCompactRepairCmd(WORD, WORD, HWND, BOOL&) { OnBnClickedBtCompactAndRepair(); return 0; }
-	void OnBnClickedBtCompactAndRepair();
-	CToolTipEx* m_pDescriptionWindow;
-	void CloseDescriptionWindow();
-	void RemoveAllSelection();
-	BOOL SetCaret(int nRow, BOOL bFocus = 1);
-	BOOL SetSelection(int nRow, BOOL bSelect = 1);
-	void SelectRow(int selectedRow);
-	void CreateAndShowDescriptionWindow();
-	void SetDescriptionWindowText(INT_PTR row);
-	void SaveClipDataItemToFile(CDeleteData item);
+	BOOL PreTranslateMessage(MSG* pMsg);
 	void ShowClipPropertiesWindow();
+	LRESULT OnBnClickedBtCompactAndRepair(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 };

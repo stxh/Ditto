@@ -163,7 +163,14 @@ void CProcessPaste::MarkAsPasted(bool updateClipOrder)
 	pData->updateClipOrder = updateClipOrder;
 
 	//Moved to a thread because when running from from U3 devices the write is time consuming
-	AfxBeginThread(CProcessPaste::MarkAsPastedThread, (LPVOID)pData, THREAD_PRIORITY_LOWEST);
+	//Lowest priority so the paste target application is not slowed by our database write.
+	HANDLE hThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)CProcessPaste::MarkAsPastedThread, (LPVOID)pData, CREATE_SUSPENDED, NULL);
+	if (hThread)
+	{
+		::SetThreadPriority(hThread, THREAD_PRIORITY_LOWEST);
+		::ResumeThread(hThread);
+		CloseHandle(hThread);
+	}
 
 	Log(_T("End of MarkAsPasted"));
 }
@@ -172,8 +179,8 @@ UINT CProcessPaste::MarkAsPastedThread(LPVOID pParam)
 {
 	DWORD startTick = GetTickCount();
 
-	static CEvent UpdateTimeEvent(TRUE, TRUE, _T("Ditto_Update_Clip_Time"), NULL);
-	UpdateTimeEvent.ResetEvent();
+	static CEvent UpdateTimeEvent(NULL, TRUE, TRUE, _T("Ditto_Update_Clip_Time"));
+	UpdateTimeEvent.Reset();
 
 	Log(_T("Start of MarkAsPastedThread"));
 
@@ -263,6 +270,6 @@ UINT CProcessPaste::MarkAsPastedThread(LPVOID pParam)
 	if((endTick-startTick) > 350)
 		Log(StrF(_T("Paste Timing MarkAsPastedThread: %d, ClipId: %d"), endTick-startTick, clipId));
 
-	UpdateTimeEvent.SetEvent();
+	UpdateTimeEvent.Set();
 	return bRet;
-}
+}

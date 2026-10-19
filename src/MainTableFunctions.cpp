@@ -1,4 +1,4 @@
-﻿// MainTableFunctions.cpp: implementation of the CMainTableFunctions class.
+// MainTableFunctions.cpp: implementation of the CMainTableFunctions class.
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -78,21 +78,21 @@ CString CMainTableFunctions::GetDisplayText(int nMaxLines, const CString &OrigTe
 
 	// get the lines
 	CString token;
-	CStringArray tokens;
+	std::vector<CString> tokens;
 	CTokenizer tokenizer(text, "\r\n");
 	for(int nLines=0; nLines < 100 && tokenizer.Next(token); nLines++)
 	{
-		tokens.Add(token);
+		tokens.push_back(token);
 	}
 
 	// remove each line's indent
 	TCHAR chFirst;
 	CString line;
-	INT_PTR count = tokens.GetSize();
+	size_t count = tokens.size();
 	text = _T("");
-	for(int i=0; i < count; i++)
+	for(size_t i=0; i < count; i++)
 	{
-		line = tokens.ElementAt(i);
+		line = tokens[i];
 		chFirst = line.GetAt(0);
 		if(chFirst == ' ' || chFirst == '\t')
 		{
@@ -112,4 +112,4 @@ CString CMainTableFunctions::GetDisplayText(int nMaxLines, const CString &OrigTe
 	}
 
 	return text;
-}
+}

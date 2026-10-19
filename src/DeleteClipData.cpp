@@ -1,4 +1,4 @@
-0﻿// DeleteClipData.cpp : implementation file
+// DeleteClipData.cpp : implementation file
 //
 
 #include "stdafx.h"
@@ -6,6 +6,8 @@
 #include "DeleteClipData.h"
 #include "Misc.h"
 #include "ProgressWnd.h"
+#include "ToolTipEx.h"
+#include "Path.h"
 #include <atlctrlx.h>
 #include <algorithm>
 #include "../Shared/TextConvert.h"
@@ -14,7 +16,7 @@
 #include "DimWnd.h"
 
 // CDeleteClipData dialog
-17CDeleteClipData::CDeleteClipData(HWND hParent)
+CDeleteClipData::CDeleteClipData(HWND hParent)
 	: m_pDescriptionWindow(nullptr)
 	, m_clipTitle(_T(""))
 	, m_filterByClipTitle(FALSE)
@@ -55,6 +57,12 @@ BOOL CDeleteClipData::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL
 	m_searchEdit.SubclassWindow(GetDlgItem(IDC_EDIT_CLIP_TITLE));
 
 	theApp.m_Language.UpdateDeleteClipData(m_hWnd);
+
+	// Register with the message loop so PreTranslateMessage is pumped
+	// (WTL modeless windows are not reached through an MFC-style chain).
+	WTL::CMessageLoop* pLoop = theApp.GetMessageLoop();
+	if (pLoop != NULL)
+		pLoop->AddMessageFilter(this);
 
 	m_Resize.SetParent(m_hWnd);
 	m_Resize.AddControl(IDC_LIST2, DR_SizeHeight | DR_SizeWidth);
@@ -142,7 +150,7 @@ void CDeleteClipData::InitListCtrlCols()
 
 void CDeleteClipData::LoadItems()
 {
-	CCursorWait wait;
+	CWaitCursor wait;
 	m_data.clear();	
 	m_filteredOut.clear();
 
@@ -207,14 +215,15 @@ void CDeleteClipData::CloseDescriptionWindow()
 {
 	if (m_pDescriptionWindow != nullptr)
 	{
-		m_pDescriptionWindow->CloseWindow();
+		// CWindow has no CloseWindow() (MFC's minimized the window);
+		// minimize then destroy. CToolTipEx frees itself in OnFinalMessage,
+		// so do not delete it here.
+		m_pDescriptionWindow->ShowWindow(SW_MINIMIZE);
 		m_pDescriptionWindow->DestroyWindow();
-		delete m_pDescriptionWindow;
 		m_pDescriptionWindow = nullptr;
 	}
 }
 
-void CDeleteClipData::OnSize(UINT nType, int cx, int cy)
 LRESULT CDeleteClipData::OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	m_Resize.MoveControls(CSize(LOWORD(lParam), HIWORD(lParam)));
@@ -225,6 +234,12 @@ LRESULT CDeleteClipData::OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& b
 
 LRESULT CDeleteClipData::OnNcDestroy(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
+	WTL::CMessageLoop* pLoop = theApp.GetMessageLoop();
+	if (pLoop != NULL)
+		pLoop->RemoveMessageFilter(this);
+
+	CloseDescriptionWindow();
+
 	::PostMessage(m_hWndParent, WM_DELETE_CLIPS_CLOSED, 0, 0);
 
 	bHandled = FALSE;
@@ -391,15 +406,39 @@ LRESULT CDeleteClipData::OnLvnKeydownList2(int idCtrl, LPNMHDR pNMHDR, BOOL& bHa
 
 	switch(pLVKeyDow->wVKey)
 	{
-		case VK_DELETE:
-			this->ApplyDelete();
-			break;
-		case VK_RETURN:
+	case VK_DELETE:
+		this->ApplyDelete();
+		break;
+	case VK_RETURN:
 		{
 			if (GetKeyState(VK_MENU) & 0x8000) // Check if Alt is also pressed
 			{
 				ShowClipPropertiesWindow();
-				*pResult = 1;
+			}
+		}
+		break;
+	case VK_F3:
+		{
+			CreateAndShowDescriptionWindow();
+		}
+		break;
+	case 'N':
+		{
+			int nSelItem = m_clipList.GetNextItem(-1, LVNI_SELECTED);
+			if (nSelItem != -1 && nSelItem < m_clipList.GetItemCount() - 1)
+			{
+				SelectRow(nSelItem + 1);
+				CreateAndShowDescriptionWindow();
+			}
+		}
+		break;
+	case 'P':
+		{
+			int nSelItem = m_clipList.GetNextItem(-1, LVNI_SELECTED);
+			if (nSelItem != -1 && nSelItem > 0)
+			{
+				SelectRow(nSelItem - 1);
+				CreateAndShowDescriptionWindow();
 			}
 		}
 		break;
@@ -417,26 +456,26 @@ LRESULT CDeleteClipData::OnLvnItemchangedList2(int idCtrl, LPNMHDR pNMHDR, BOOL&
 
 	for (int row = m_clipList.GetNextItem(-1, LVNI_SELECTED); row != -1; row = m_clipList.GetNextItem(row, LVNI_SELECTED))
 	{
-		if(row >= 0 && row < (int)m_data.size())
+		if (row >= 0 && row < (int)m_data.size())
 		{
 			selectedDataSize += m_data[row].m_dataSize;
 			selectedCount++;
-				if (row == nCaretItem &&
-					setDescriptionWindowText == false &&
-					m_pDescriptionWindow != nullptr && 
-					m_pDescriptionWindow->IsWindowVisible())
-				{
-					SetDescriptionWindowText(row);
 
-					CRect r;
-					m_pDescriptionWindow->GetWindowRectEx(r);
-					CPoint pt;
-					pt = r.TopLeft();
+			if (row == nCaretItem &&
+				setDescriptionWindowText == false &&
+				m_pDescriptionWindow != nullptr &&
+				m_pDescriptionWindow->IsWindowVisible())
+			{
+				SetDescriptionWindowText(row);
 
-					m_pDescriptionWindow->Show(pt);
+				CRect r;
+				m_pDescriptionWindow->GetWindowRectEx(&r);
+				CPoint pt;
+				pt = r.TopLeft();
 
-					setDescriptionWindowText = true;
-				}
+				m_pDescriptionWindow->Show(pt);
+
+				setDescriptionWindowText = true;
 			}
 		}
 	}
@@ -566,12 +605,10 @@ void CDeleteClipData::ApplyDelete()
 		m_applyingDelete = true;
 		m_cancelDelete = false;
 
-		CCursorWait wait;
+		CWaitCursor wait;
 
 		try
 		{
-			theApp.m_db.execDML(_T("PRAGMA auto_vacuum = 2"));
-
 			std::vector<int> rowsToDelete;
 
 			for (int row = m_clipList.GetNextItem(-1, LVNI_SELECTED); row != -1; row = m_clipList.GetNextItem(row, LVNI_SELECTED))
@@ -618,19 +655,19 @@ void CDeleteClipData::ApplyDelete()
 				}
 				CATCH_SQLITE_EXCEPTION
 			}
-			
+
 			progress.StepIt();
 			progress.SetText(_T("Refreshing database size"));
-			SetDbSize();			
-			
+			SetDbSize();
+
 			progress.StepIt();
-			progress.SetText(_T("Applying filter"));			
+			progress.SetText(_T("Applying filter"));
 			FilterItems();
 
 			m_clipList.SetItemCountEx((int)m_data.size(), 0);
 
 			int selectedRow = m_clipList.GetNextItem(-1, LVNI_SELECTED);
-			if (selectedRow >= 0)
+			if (selectedRow != -1)
 			{
 				SelectRow(selectedRow);
 			}
@@ -643,13 +680,8 @@ void CDeleteClipData::ApplyDelete()
 	}
 }
 
-LRESULT CDeleteClipData::OnBnClickedCancel(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
+LRESULT CDeleteClipData::OnBnClickedClose(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
-	// Upstream ignores the Escape key here (OnCancel is a no-op in the MFC build);
-	// a WM_COMMAND with no control window means Escape.
-	if (hWndCtl == NULL)
-		return 0;
-
 	if (m_applyingDelete)
 	{
 		m_cancelDelete = true;
@@ -657,6 +689,12 @@ LRESULT CDeleteClipData::OnBnClickedCancel(WORD wNotifyCode, WORD wID, HWND hWnd
 	}
 	CloseDescriptionWindow();
 	DestroyWindow();
+	return 0;
+}
+
+LRESULT CDeleteClipData::OnCancel(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
+{
+	//don't close on escape key
 	return 0;
 }
 
@@ -833,12 +871,42 @@ LRESULT CDeleteClipData::OnLvnColumnclickList2(int idCtrl, LPNMHDR pNMHDR, BOOL&
 	return 0;
 }
 
+
+BOOL CDeleteClipData::PreTranslateMessage(MSG* pMsg)
+{
+	if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_ESCAPE)
+	{
+		// Only act on messages routed to this dialog or its child windows
+		// (the description window is parented to this dialog).
+		bool bForThisWindow = false;
+		HWND h = pMsg->hwnd;
+		while (h != NULL)
+		{
+			if (h == m_hWnd)
+			{
+				bForThisWindow = true;
+				break;
+			}
+			h = ::GetParent(h);
+		}
+
+		if (bForThisWindow && m_pDescriptionWindow != nullptr)
+		{
+			m_pDescriptionWindow->Hide();
+			return TRUE;
+		}
+	}
+
+	// Enter on the search edit is handled by the CSearchEnterEdit subclass.
+	return FALSE;
+}
+
 void CDeleteClipData::SelectRow(int selectedRow)
 {
 	RemoveAllSelection();
 	SetCaret(selectedRow);
 	SetSelection(selectedRow);
-	ListView_SetSelectionMark(m_clipList.GetSafeHwnd(), selectedRow);
+	ListView_SetSelectionMark(m_clipList.m_hWnd, selectedRow);
 	m_clipList.EnsureVisible(selectedRow, FALSE);
 }
 
@@ -872,21 +940,21 @@ void CDeleteClipData::CreateAndShowDescriptionWindow()
 	{
 		m_pDescriptionWindow = new CToolTipEx;
 		m_pDescriptionWindow->Create(this);
-		m_pDescriptionWindow->SetNotifyWnd(GetParent());
+		m_pDescriptionWindow->SetNotifyWnd(m_hWndParent);
 	}
 
 	int row = m_clipList.GetNextItem(-1, LVNI_SELECTED);
 	if (row >= 0 && row < (int)m_data.size())
 	{
-			SetDescriptionWindowText(row);			
+		SetDescriptionWindowText(row);			
 
-			CRect rc;
-			this->GetWindowRect(rc);
+		CRect rc;
+		::GetWindowRect(m_hWnd, &rc);
 
-			CPoint pt;
-			pt = CPoint(rc.right, rc.top);
+		CPoint pt;
+		pt = CPoint(rc.right, rc.top);
 
-			m_pDescriptionWindow->Show(pt);
+		m_pDescriptionWindow->Show(pt);
 	}
 }
 
@@ -894,7 +962,7 @@ void CDeleteClipData::SetDescriptionWindowText(INT_PTR row)
 {
 	m_pDescriptionWindow->SetGdiplusBitmap(NULL);
 	m_pDescriptionWindow->SetRTFText("");
-	m_pDescriptionWindow->SetHtmlText("");
+	m_pDescriptionWindow->SetHtmlText(_T(""));
 	m_pDescriptionWindow->SetToolTipText(_T(""));
 	m_pDescriptionWindow->SetFolderPath(_T(""));
 
@@ -905,10 +973,10 @@ void CDeleteClipData::SetDescriptionWindowText(INT_PTR row)
 	selectedClip.LoadFormats(m_data[row].m_lID, false, false, m_data[row].m_DatalID);
 
 	CString clipData;
-	COleDateTime time(selectedClip.m_Time.GetTime());
-	clipData += "Added: " + time.Format();
+	COleDateTime time(selectedClip.m_Time);
+	clipData += _T("Added: ") + time.Format();
 
-	COleDateTime modified(selectedClip.m_lastPasteDate.GetTime());
+	COleDateTime modified(selectedClip.m_lastPasteDate);
 	clipData += _T(" | Last Used: ") + modified.Format();
 
 	if(selectedClip.m_dontAutoDelete > 0)
@@ -1019,18 +1087,21 @@ void CDeleteClipData::SetDescriptionWindowText(INT_PTR row)
 	}
 }
 
-LRESULT CDeleteClipData::OnContextMenu(UINT, WPARAM wParam, LPARAM lParam, BOOL&)
+LRESULT CDeleteClipData::OnContextMenu(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	CPoint point = CPoint(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-	HWND hWnd = (HWND)wParam;
-	CMenu menu;
-	menu.LoadMenu(IDR_MENU_DELETE_CLIP_DATA); // Load your context menu from resource
+	CMenuHandle menu;
+	if (menu.LoadMenu(IDR_MENU_DELETE_CLIP_DATA) == 0)
+		return 0;
 
-	CMenu* pContextMenu = menu.GetSubMenu(0); // Get the first submenu
+	CMenuHandle pContextMenu = menu.GetSubMenu(0); // Get the first submenu
 
-	if (pContextMenu != nullptr)
+	if (pContextMenu.m_hMenu != NULL)
 	{
-		int nID = pContextMenu->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_RETURNCMD, point.x, point.y, this);
+		::SetForegroundWindow(m_hWnd);
+
+		int nID = ::TrackPopupMenuEx(pContextMenu.m_hMenu,
+			TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_RETURNCMD,
+			GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), m_hWnd, NULL);
 
 		switch (nID)
 		{
@@ -1042,7 +1113,7 @@ LRESULT CDeleteClipData::OnContextMenu(UINT, WPARAM wParam, LPARAM lParam, BOOL&
 			case ID__SAVETOFILE:
 			{
 				int row = m_clipList.GetNextItem(-1, LVNI_SELECTED);
-				if (row >= 0 && row < (INT_PTR)m_data.size())
+				if (row >= 0 && row < (int)m_data.size())
 				{
 					SaveClipDataItemToFile(m_data[row]);
 				}
@@ -1055,16 +1126,18 @@ LRESULT CDeleteClipData::OnContextMenu(UINT, WPARAM wParam, LPARAM lParam, BOOL&
 			break;
 		}
 	}
+
+	return 0;
 }
 
 void CDeleteClipData::ShowClipPropertiesWindow()
 {
 	int row = m_clipList.GetNextItem(-1, LVNI_SELECTED);
-	if (row >= 0 && row < (INT_PTR)m_data.size())
+	if (row >= 0 && row < (int)m_data.size())
 	{
-		CDimWnd dimmer(this);
+		CDimWnd dimmer(m_hWnd);
 
-		CCopyProperties props(m_data[row].m_lID, this);
+		CCopyProperties props(m_data[row].m_lID, m_hWnd);
 		props.DoModal();
 	}
 }
@@ -1160,19 +1233,15 @@ void CDeleteClipData::SaveClipDataItemToFile(CDeleteData item)
 		}
 	}
 }
-void CDeleteClipData::OnCancel()
-{
-	//don't close on escape key
-}
 
-void CDeleteClipData::OnBnClickedBtCompactAndRepair()
+LRESULT CDeleteClipData::OnBnClickedBtCompactAndRepair(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
 	auto msg = theApp.m_Language.GetString("CompactRepairWarning", "Warning this can take quite a long time and require up to double the hard drive space as your current database size, Continue?");
-	int ret = MessageBox(msg, _T("Ditto"), MB_OKCANCEL);
+	int ret = ::MessageBox(m_hWnd, msg, _T("Ditto"), MB_OKCANCEL);
 
 	if (ret == IDOK)
 	{
-		CCursorWait wait;
+		CWaitCursor wait;
 
 		try
 		{
@@ -1195,4 +1264,6 @@ void CDeleteClipData::OnBnClickedBtCompactAndRepair()
 		}
 		CATCH_SQLITE_EXCEPTION
 	}
+
+	return 0;
 }

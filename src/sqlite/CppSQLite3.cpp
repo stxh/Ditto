@@ -883,7 +883,7 @@ int CppSQLite3DB::execDMLEx(LPCTSTR szSQL,...)
 	CString csText;
 	va_list vlist;
 
-	ASSERT(AfxIsValidString(szSQL));
+	ASSERT(szSQL != NULL);
 	va_start(vlist,szSQL);
 	csText.FormatV(szSQL,vlist);
 	va_end(vlist);
@@ -919,7 +919,7 @@ CppSQLite3Query CppSQLite3DB::execQueryEx(LPCTSTR szSQL,...)
 	CString csText;
 	va_list vlist;
 
-	ASSERT(AfxIsValidString(szSQL));
+	ASSERT(szSQL != NULL);
 	va_start(vlist,szSQL);
 	csText.FormatV(szSQL,vlist);
 	va_end(vlist);
@@ -960,7 +960,7 @@ int CppSQLite3DB::execScalarEx(LPCTSTR szSQL,...)
 	CString csText;
 	va_list vlist;
 
-	ASSERT(AfxIsValidString(szSQL));
+	ASSERT(szSQL != NULL);
 	va_start(vlist, szSQL);
 	csText.FormatV(szSQL,vlist);
 	va_end(vlist);

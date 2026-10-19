@@ -191,7 +191,7 @@ __int64 FileSize(const TCHAR *fileName);
 
 int FindNoCaseAndInsert(CString& mainStr, CString& findStr, CString preInsert, CString postInsert, int linesPerRow);
 
-void OnInitMenuPopupEx(CMenu *pPopupMenu, UINT nIndex, BOOL bSysMenu, CWnd *pWnd);
+void OnInitMenuPopupEx(HMENU hPopupMenu);
 
 CString InternetEncode(CString text);
 

@@ -1,10 +1,9 @@
 #pragma once
 
-#ifndef __AFXWIN_H__
+#ifndef __ATLAPP_H__
 #error include 'stdafx.h' before including this file for PCH
 #endif
-
-#include "../resource.h"       // main symbols
+#include "..\resource.h"       // main symbols
 #include "Clip.h"
 #include "DatabaseUtilities.h"
 #include "Misc.h"
@@ -25,14 +24,16 @@
 #include "ClipEditThread.h"
 
 
+class CNoDbFrameWnd;
+
+
 extern class CCP_MainApp theApp;
 
-class CCP_MainApp : public CWinApp
+class CCP_MainApp : public CAppModule
 {
 public:
 	CCP_MainApp();
 	~CCP_MainApp();
-
 	CppSQLite3DB m_db;
 	bool m_databaseOnNetworkShare;
 
@@ -48,7 +49,10 @@ public:
 	// MainFrame
 	HWND m_MainhWnd;
 	CMainFrame* m_pMainFrame;
-	CFrameWnd* m_pNoDbMainFrame;
+	CNoDbFrameWnd* m_pNoDbMainFrame;
+	// The loop is created in InitInstance, once the module itself is initialised,
+	// and run by wWinMain. CMainFrame::OnCreate registers on it while it is created.
+	WTL::CMessageLoop* m_pLoop;
 	void AfterMainCreate();  // called after main window creation
 	void BeforeMainClose();  // called before main window close
 
@@ -105,7 +109,7 @@ public:
 	bool GetConnectCV() { return m_CopyThread.GetConnectCV(); }
 	void SetConnectCV(bool bConnect);
 	bool ToggleConnectCV();
-	void UpdateMenuConnectCV(CMenu* pMenu, UINT nMenuID);
+	void UpdateMenuConnectCV(CMenuHandle* pMenu, UINT nMenuID);
 	bool ImportClips(HWND hWnd);
 	void LoadGlobalClips();
 
@@ -175,7 +179,7 @@ public:
 	CLIPFORMAT m_PNG_Format;
 
 
-	COleDateTime m_oldtStartUp;
+	SYSTEMTIME m_oldtStartUp;
 
 	CMultiLanguage m_Language;
 
@@ -205,13 +209,13 @@ public:
 	CICU_String m_icuString;
 
 public:
-	virtual BOOL InitInstance();
-	virtual int ExitInstance();
+	BOOL InitInstance(HINSTANCE hInstance, int nCmdShow);
+	int ExitInstance();
 
-	afx_msg void OnAppAbout();
-	DECLARE_MESSAGE_MAP()
-	virtual BOOL OnIdle(LONG lCount);
-
+	void OnAppAbout();
+	
+	// WTL message handling
+	BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID = 0);
 protected:
 	void ShowCommandLineError(CString csTitle, CString csMessage);
 	CUAC_Thread* m_pUacPasteThread;

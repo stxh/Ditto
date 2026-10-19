@@ -42,8 +42,8 @@ BOOL COleClipSource::DoDelayRender()
 	m_ClipIDs.GetTypes(types);
 
 	bool foundHDrop = false;
-
-	INT_PTR count = types.GetSize();
+	
+	INT_PTR count = (INT_PTR)types.size();
 	for(int i=0; i < count; i++)
 	{
 		if (m_pasteOptions.m_dragDropFilesOnly)
@@ -1597,19 +1597,30 @@ void COleClipSource::PasteAsImage(CClip& clip)
 		return;
 	}
 
-	CImage image;
-	HRESULT hr = image.Load(path);
-	if (FAILED(hr))
+	static const CLSID clsidPng = { 0x557cf406, 0x1a04, 0x11d3, { 0x9a, 0x73, 0x00, 0x00, 0xf8, 0x1e, 0x32, 0x58 } };
+
+	Gdiplus::Bitmap* image = Gdiplus::Bitmap::FromFile(path);
+	if (image == nullptr || image->GetLastStatus() != Gdiplus::Ok)
 	{
+		delete image;
 		Log(StrF(_T("PasteAsImage - failed to load image: %s"), path));
 		return;
 	}
 
-	HBITMAP hBitmap = (HBITMAP)image;
+	HBITMAP hBitmap = NULL;
+	if (image->GetHBITMAP(Gdiplus::Color::Transparent, &hBitmap) != Gdiplus::Ok || hBitmap == NULL)
+	{
+		delete image;
+		Log(_T("PasteAsImage - failed to get hbitmap"));
+		return;
+	}
+
 	HPALETTE hPal = NULL;
 	HANDLE hDib = CBitmapHelper::hBitmapToDIB(hBitmap, BI_RGB, hPal);
+	DeleteObject(hBitmap);
 	if (hDib == NULL)
 	{
+		delete image;
 		Log(_T("PasteAsImage - failed to convert to DIB"));
 		return;
 	}
@@ -1623,11 +1634,11 @@ void COleClipSource::PasteAsImage(CClip& clip)
 	IStream* pStream = nullptr;
 	if (SUCCEEDED(CreateStreamOnHGlobal(nullptr, TRUE, &pStream)))
 	{
-		if (SUCCEEDED(image.Save(pStream, Gdiplus::ImageFormatPNG)))
+		if (image->Save(pStream, &clsidPng, nullptr) == Gdiplus::Ok)
 		{
 			LARGE_INTEGER liZero = { 0 };
-			ULARGE_INTEGER ulSize;
-			pStream->Seek({ 0 }, STREAM_SEEK_END, &ulSize);
+			ULARGE_INTEGER ulSize = { 0 };
+			pStream->Seek(liZero, STREAM_SEEK_END, &ulSize);
 			pStream->Seek(liZero, STREAM_SEEK_SET, nullptr);
 
 			HGLOBAL hPng = GlobalAlloc(GMEM_MOVEABLE, (SIZE_T)ulSize.QuadPart);
@@ -1644,6 +1655,8 @@ void COleClipSource::PasteAsImage(CClip& clip)
 		}
 		pStream->Release();
 	}
+
+	delete image;
 
 	Log(_T("End of PasteAsImage"));
 }

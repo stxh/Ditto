@@ -300,6 +300,54 @@ void CPropGrid::SetSelection(int nRow, BOOL bEditValue)
 		BeginEdit();
 }
 
+// Search support for the Advanced page filter box (upstream's CMFCPropertyGridCtrl search).
+int CPropGrid::SelectNextMatch(LPCTSTR szTextLower, int nStartAfter)
+{
+	if (m_rows.empty() || szTextLower == NULL || *szTextLower == _T('\0'))
+		return -1;
+
+	const int nCount = (int)m_rows.size();
+	for (int n = 0; n < nCount; n++)
+	{
+		// Wrap around so repeated Next-Match clicks cycle the whole list.
+		int i = nStartAfter < 0 ? n : (nStartAfter + 1 + n) % nCount;
+
+		if (m_rows[i].bCategory)
+			continue;
+
+		CString name = m_rows[i].name;
+		name.MakeLower();
+		if (name.Find(szTextLower) < 0)
+			continue;
+
+		// Expand the containing category, the way MFC's pSubItem->Show() did.
+		for (int c = i - 1; c >= 0; c--)
+		{
+			if (m_rows[c].bCategory)
+			{
+				m_rows[c].bExpanded = TRUE;
+				break;
+			}
+		}
+
+		EndEdit(TRUE);
+		BuildVisible();
+		SetSelection(i, FALSE);
+		return i;
+	}
+
+	return -1;
+}
+
+void CPropGrid::SelectFirst()
+{
+	if (m_rows.empty())
+		return;
+
+	EndEdit(TRUE);
+	SetSelection(0, FALSE);
+}
+
 LRESULT CPropGrid::OnPaint(UINT, WPARAM, LPARAM, BOOL&)
 {
 	CPaintDC dc(m_hWnd);

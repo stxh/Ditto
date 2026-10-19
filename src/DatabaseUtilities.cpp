@@ -8,7 +8,8 @@
 #include "ProcessPaste.h"
 #include <io.h>
 #include "Path.h"
-#include "zlib.h"
+#include "InternetUpdate.h"
+#include "zlib/zlib.h"
 #include "..\Shared\TextConvert.h"
 using namespace nsPath;
 
@@ -163,9 +164,9 @@ BOOL CheckDBExists(CString csDBPath)
 				csMarkAsBad,
 				theApp.m_Language.GetString("New_Database", "and a new database will be created"),
 				csPath);
-
-			AfxMessageBox(cs);
-
+			
+			MessageBox(NULL, cs, _T("Error"), MB_OK | MB_ICONERROR);
+			
 			CFile::Rename(csDBPath, csMarkAsBad);
 
 			csDBPath = csPath;

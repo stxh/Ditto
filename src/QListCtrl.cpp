@@ -15,8 +15,8 @@
 #include <vector>
 #include <string>
 #include <cwchar>   // For swscanf
+#include <cwctype>  // For iswxdigit
 #include <algorithm> // For std::round
-#include <mutex>
 #include <gdiplus.h>
 
 #ifdef _DEBUG
@@ -42,12 +42,12 @@ static char THIS_FILE[] = __FILE__;
 
 // Static map to hold W3C color names and their RGB values
 static std::map<CString, COLORREF> g_colorNameMap;
-static std::mutex g_colorNameMapMutex;
+static CCriticalSection g_colorNameMapMutex;
 
 // Initializes the color map on first use
 void InitializeColorNameMap()
 {
-	std::lock_guard<std::mutex> lock(g_colorNameMapMutex);
+	ATL::CCritSecLock lock(g_colorNameMapMutex);
 	if (g_colorNameMap.empty())
 	{
         // Populate the map with W3C named colors
@@ -606,7 +606,6 @@ LRESULT CQListCtrl::OnCustomdrawList(LPNMHDR pNMHDR)
 
 	return 0;
 }
-
 
 // Helper function implementation to check for valid hex characters
 bool CQListCtrl::IsHexString(const CString& str)
@@ -1328,15 +1327,16 @@ BOOL CQListCtrl::PreTranslateMessage(MSG* pMsg)
 			return TRUE;
 		break; // end case WM_KEYDOWN
 	case WM_MOUSEWHEEL:
-		// Will be handled by default, but ensure scrollbar updates after
+		// Will be handled by default (the list view window proc scrolls on dispatch),
+		// but ensure the modern scrollbar updates afterwards.
 		{
-			HWND hParent = GetParent();
-			if (hParent != NULL)
+			CWindow pParent = GetParent();
+			if (pParent.m_hWnd != NULL)
 			{
-				::PostMessage(hParent, NM_UPDATE_SCROLLBAR, TRUE, 0);
+				pParent.PostMessage(NM_UPDATE_SCROLLBAR, TRUE, 0);
 			}
-			return FALSE;
 		}
+		break;
 
 	case WM_VSCROLL:
 		ASSERT(FALSE);
@@ -1846,10 +1846,10 @@ LRESULT CQListCtrl::OnSelectionChange(LPNMHDR pNMHDR)
 		(pnmv->uNewState == 1))
 	{
 		// Notify parent to update modern scrollbar when selection changes (keyboard navigation)
-		HWND hParent = GetParent();
-		if (hParent != NULL)
+		CWindow pParent = GetParent();
+		if (pParent.m_hWnd != NULL)
 		{
-			::PostMessage(hParent, NM_UPDATE_SCROLLBAR, FALSE, 0);
+			pParent.PostMessage(NM_UPDATE_SCROLLBAR, FALSE, 0);
 		}
 
 		if (VALID_TOOLTIP &&
@@ -1972,6 +1972,20 @@ void CQListCtrl::SetLogFont(LOGFONT& font)
 	m_boldFont.CreateFontIndirect(&font);
 
 	SetFont(m_Font);
+}
+
+LRESULT CQListCtrl::OnVScrollNotify(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+{
+	// Notify parent to update the modern scrollbar.  Let the list view window
+	// proc perform the actual scrolling (bHandled = FALSE).
+	CWindow pParent = GetParent();
+	if (pParent.m_hWnd != NULL)
+	{
+		pParent.PostMessage(NM_UPDATE_SCROLLBAR, TRUE, 0);
+	}
+
+	bHandled = FALSE;
+	return 0;
 }
 
 LRESULT CQListCtrl::OnOdCacheHint(LPNMHDR pNMHDR)
@@ -2219,24 +2233,10 @@ LRESULT CQListCtrl::OnMouseHWheel(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL&
 	}
 
 	// Notify parent to update modern scrollbar
-	HWND hParent = GetParent();
-	if (hParent != NULL)
+	CWindow pParent = GetParent();
+	if (pParent.m_hWnd != NULL)
 	{
-		::PostMessage(hParent, NM_UPDATE_SCROLLBAR, TRUE, 0);
-	}
-
-	return 0;
-}
-
-LRESULT CQListCtrl::OnVScrollNotify(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
-{
-	::DefWindowProc(m_hWnd, uMsg, wParam, lParam);
-
-	// Notify parent to update the modern scrollbar after native scrolling
-	HWND hParent = GetParent();
-	if (hParent != NULL)
-	{
-		::PostMessage(hParent, NM_UPDATE_SCROLLBAR, TRUE, 0);
+		pParent.PostMessage(NM_UPDATE_SCROLLBAR, TRUE, 0);
 	}
 
 	return 0;
