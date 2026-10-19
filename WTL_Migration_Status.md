@@ -46,6 +46,15 @@ Win32 之前链接失败（`LNK1181` 找不到 `Release\EncryptDecrypt.lib`，�
 
 ## 4. 已完成
 
+- **Phase 2 首次全量 sync（本轮，`834cc5d` + `194cb4e`）**：merge `upstream/master(a80fd35)` 进 `sync/upstream-202610`，155 个冲突路径全部解决；随后发现合并提交把大量已迁移文件静默还原为上游 MFC 内容，按逐文件三方重并（ours=`b39ce70`、base=`2ee24aa`、theirs=`upstream/master`）+ 再 WTL 化修复，并经两轮全树 MFC 符号回归扫描确认无残留；四配置（Debug/Release × x64/Win32）全量 Rebuild `0 error`。与上游的**有意分歧**（后续 sync 需按此处理）：
+  - 保留 fork 特性 `src\InternetUpdate.*`（上游已删除；其 `VersionInfo` 类改用上游 `Misc.h` 新增的同名类）；
+  - 上游内部剪贴板编辑器未引入（fork 走外部编辑器方案）；QR 查看器已剥离；
+  - `CTheme` 更名 `CDittoTheme`（避让 uxtheme.h 的 SDK `CTheme`，经 `atltheme.h`/`atltime.h` 链可见）；
+  - `CStringArray` → `CArrayEx<CString>`（`Shared\ArrayEx.h`）；
+  - `Shared\Tokenizer.cpp` 上游已改为纯头文件实现（`Shared\Tokenizer.h`），两边工程均删除该编译项；
+  - MFC `CImage`（上游新功能 ClipEditThread/OleClipSource 使用）移植为 `Gdiplus::Bitmap` + PNG encoder CLSID；
+  - `ModernScrollBar` 滚动驱动方式保留 fork 的 `SB_THUMBPOSITION` 方案；
+  - libpng nuget 包（x64/x86 1.6.33.8807）按 zlib 先例入库；`focus`/`EncryptDecrypt` 工程文件截断（缺 `</Project>`）已修复。
 - 全部编译进 `CP_Main.vcxproj` 的源文件已无 MFC 头依赖；`UseOfMfc=false`。
 - 路线 A 的仿真类型（`CWinThread`、`CWinApp` 消息泵、MFC 属性网格、`CStringArray` 等）已删除，改为真实 WTL/ATL/STL 实现。
 - 复制线程改为带真实消息泵的线程，线程退出时窗口析构顺序修正（`CopyThread.cpp`）。
@@ -94,6 +103,20 @@ Win32 之前链接失败（`LNK1181` 找不到 `Release\EncryptDecrypt.lib`，�
 | 6 | 托盘菜单 Exit | 进程 2 秒内退出，Debug 版无断言对话框 |
 | 7 | 关闭选项后再次粘贴 | 功能不降级（属性页销毁不影响主窗口句柄） |
 
+Phase 2 新增功能复测项（本轮合并自上游，需重点人工验证）：
+
+| # | 操作 | 预期 |
+|---|---|---|
+| 8 | 托盘/菜单打开 Delete Clip Data | 列表含 ID 首列；搜索框回车触发查询；点选行弹出描述浮窗（F3/N/P 切换内容）；ESC 关闭浮窗不关主对话框；Close 按钮关闭窗口 |
+| 9 | Delete Clip Data 右键列表项 | 菜单含 View Full Description / Save to File / Properties；Save to File 落盘、Properties 弹出属性页 |
+| 10 | Delete Clip Data → Compact and Repair Database | 弹出确认框，确认后执行 VACUUM/压缩，DB 尺寸文本更新 |
+| 11 | 复制 CSS 颜色串（如 `#ff0000`、`rgb(0,255,0)`、`oklch(70% .2 30)`、W3C 颜色名） | 列表项色块按新绘制逻辑显示（含 alpha 棋盘格背景） |
+| 12 | 开启 modern scroll bar 后操作 QuickPaste | 滚动条随滚动/选择/鼠标悬停实时同步，无闪烁 |
+| 13 | Options → General → 主题下拉切换 | 预览即时应用到 QuickPaste 窗口（Preview Theme 按钮路径），前景窗口行为正常 |
+| 14 | 外部编辑器编辑剪贴板（png/bmp 文件）后保存 | ClipEditThread 读回图像并以 GDI+ 编码 PNG 入库，列表显示缩略图 |
+| 15 | Special Paste → Paste As Image（对含图片路径的文本条目） | 以 CF_DIB + PNG 格式粘贴为图像 |
+| 16 | Home/Shift+Home 在列表中 | 从选择锚点起全选/取消，行为与上游一致 |
+
 ## 7. 上游同步策略（stxh/Ditto ↔ sabrogden/Ditto）
 
 远端：`upstream` = sabrogden/Ditto（push 已禁用），`origin` = stxh/Ditto（fork，保留上游完整历史）。策略为 **fork + 周期性 merge**，主线永不 rebase。
@@ -109,5 +132,5 @@ Win32 之前链接失败（`LNK1181` 找不到 `Release\EncryptDecrypt.lib`，�
 
 1. **Phase 0（已完成）**：cherry 框架无关的关键修复（`e6c745c` powrprof 死锁、`43ed9f6` IME 丢字符），见第 4 节。
 2. **Phase 1 结构对齐（已完成，`e5c4ba8`）**：258 个根目录源文件 + `chaiscript/TinyXml/sqlite/zlib` 四目录 `git mv` 进 `src\`；`Resource.h`→`resource.h`（仍留根目录，对齐上游大小写）；include 统一为上游写法（`shared/…`→`..\Shared\…`、`EncryptDecrypt\Encryption.h`→`..\EncryptDecrypt\…`、`resource.h`→`..\resource.h`）；`CP_Main.vcxproj/.filters` 条目加 `src\` 前缀，`zlibstat.lib` 改 `src\zlib\...`；DittoUtil `stdafx.h` 指向 `..\..\src\StdAfx.h`。四配置全量 Rebuild 0 error。纯 rename 文件字节级不变（已验证 `git mv` 未触发 clean filter 改写 blob）。原计划的 `.gitattributes` 行尾统一不需要（行尾规范化已被证伪）。
-3. **Phase 2 首次全量 sync**：`sync/upstream-YYYYMM` 分支 merge `upstream/master`。Phase 1 后干跑合并为 155 个冲突路径（`src\*` ~137、工程/rc/resource 8、Language/Themes XML 9 取上游、其余为双改文件），全部为真实的"双方都改过"内容冲突——路径已对齐，逐文件三方合并解决即可。新功能按 WTL 重写；四配置 Rebuild + 第 6 节冒烟清单通过后 PR 回 master。
+3. **Phase 2 首次全量 sync（已完成，`834cc5d` + `194cb4e`）**：`sync/upstream-202610` merge `upstream/master(a80fd35)`。Phase 1 后干跑合并为 155 个冲突路径，全部按逐文件三方合并解决；新功能按 WTL 重写。经验教训：merge 提交可能把已迁移文件静默还原成上游 MFC 内容（自动合并区无冲突标记），每次 sync 后必须跑「与迁移 tip 的 MFC 符号计数对比」回归扫描，而不是只看冲突表。四配置 Rebuild 0 error 后待第 6 节冒烟通过再 PR 回 master。与上游的有意分歧清单见第 4 节。
 4. **常态**：每逢上游 release tag 执行一次 sync 流程；与 WTL 无关的纯 bug 修复可从 `contrib/*` 分支回贡上游，被接受的提交会缩小后续冲突面。发布 tag 用 `wtl-x.y` 命名空间避免与上游 `3.24.x` 混淆。
