@@ -17,6 +17,9 @@ public:
 
 	~CDimWnd();
 
+	// All CDimWnd instances are stack objects (MFC ~CWnd semantics); prevent the WTL default delete this.
+	void OnFinalMessage(HWND /*hWnd*/) {}
+
 private:
 	HWND m_ParentWnd;
 };

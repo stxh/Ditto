@@ -267,40 +267,64 @@ void CModernScrollBar::DrawRoundedRect(HDC hDC, CRect rect, int radius, COLORREF
 
 void CModernScrollBar::OnPaint(CDCHandle dc)
 {
+	// MSG_WM_PAINT passes (HDC)wParam which is NULL for WM_PAINT; own the paint DC ourselves (same pattern as CToolTipEx::OnPaint).
+	PAINTSTRUCT ps;
+	HDC hPaintDC = dc;
+	BOOL bOwnDC = (hPaintDC == NULL);
+	if (bOwnDC)
+		hPaintDC = ::BeginPaint(m_hWnd, &ps);
+
 	CRect clientRect;
 	GetClientRect(&clientRect);
 
-	// Create memory DC for double buffering
-	CDCHandle memDC = ::CreateCompatibleDC(dc);
-
-	HBITMAP hBitmap = ::CreateCompatibleBitmap(dc, clientRect.Width(), clientRect.Height());
-	HBITMAP hOldBitmap = memDC.SelectBitmap(hBitmap);
-
-	// Fill with track color (solid background)
-	memDC.FillSolidRect(&clientRect, m_trackColor);
-
-	// Get thumb rect
-	CRect thumbRect = GetThumbRect();
-
-	if (!thumbRect.IsRectEmpty())
+	if (hPaintDC != NULL && !clientRect.IsRectEmpty())
 	{
-		int radius = m_cornerRadius;
-		if (m_pDPI)
-			radius = m_pDPI->Scale(m_cornerRadius);
+		// Create memory DC for double buffering
+		CDCHandle memDC = ::CreateCompatibleDC(hPaintDC);
 
-		// Determine thumb color based on state
-		COLORREF thumbColor = m_isMouseOver || m_isDragging ? m_thumbHoverColor : m_thumbColor;
+		HBITMAP hBitmap = ::CreateCompatibleBitmap(hPaintDC, clientRect.Width(), clientRect.Height());
 
-		// Draw the thumb
-		DrawRoundedRect(memDC, thumbRect, radius, thumbColor);
+		if (!memDC.IsNull() && hBitmap != NULL)
+		{
+			HBITMAP hOldBitmap = memDC.SelectBitmap(hBitmap);
+
+			// Fill with track color (solid background)
+			memDC.FillSolidRect(&clientRect, m_trackColor);
+
+			// Get thumb rect
+			CRect thumbRect = GetThumbRect();
+
+			if (!thumbRect.IsRectEmpty())
+			{
+				int radius = m_cornerRadius;
+				if (m_pDPI)
+					radius = m_pDPI->Scale(m_cornerRadius);
+
+				// Determine thumb color based on state
+				COLORREF thumbColor = m_isMouseOver || m_isDragging ? m_thumbHoverColor : m_thumbColor;
+
+				// Draw the thumb
+				DrawRoundedRect(memDC, thumbRect, radius, thumbColor);
+			}
+
+			// Copy to screen
+			::BitBlt(hPaintDC, 0, 0, clientRect.Width(), clientRect.Height(), memDC, 0, 0, SRCCOPY);
+
+			memDC.SelectBitmap(hOldBitmap);
+			::DeleteObject(hBitmap);
+		}
+		else
+		{
+			if (hBitmap != NULL)
+				::DeleteObject(hBitmap);
+		}
+
+		if (!memDC.IsNull())
+			memDC.DeleteDC();
 	}
 
-	// Copy to screen
-	dc.BitBlt(0, 0, clientRect.Width(), clientRect.Height(), memDC, 0, 0, SRCCOPY);
-
-	memDC.SelectBitmap(hOldBitmap);
-	::DeleteObject(hBitmap);
-	memDC.DeleteDC();
+	if (bOwnDC)
+		::EndPaint(m_hWnd, &ps);
 }
 
 BOOL CModernScrollBar::OnEraseBkgnd(CDCHandle dc)

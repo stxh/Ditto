@@ -23,6 +23,10 @@ CDimWnd::CDimWnd(HWND hWndParent)
 
 CDimWnd::~CDimWnd()
 {
+	// MFC ~CWnd destroyed the associated HWND; WTL does not. Restore that semantics
+	// so the dim overlay doesn't outlive the stack object (atlgdi/atlwin assert in dtor otherwise).
+	if (IsWindow())
+		DestroyWindow();
 }
 
 LRESULT CDimWnd::OnEraseBkgnd(UINT, WPARAM wParam, LPARAM, BOOL&)
